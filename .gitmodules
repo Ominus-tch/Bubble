@@ -1,0 +1,6 @@
+[submodule "Bubble/vendor/spdlog"]
+	path = Bubble/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "Bubble/vendor/GLFW"]
+	path = Bubble/vendor/GLFW
+	url = https://github.com/TheCherno/GLFW

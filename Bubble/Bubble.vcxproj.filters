@@ -1,36 +1,63 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Bubble">
+      <UniqueIdentifier>{911D50AA-7DBF-7A80-667A-8ED452BB01D1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Bubble\Events">
+      <UniqueIdentifier>{55BC2C02-C17C-A838-8AB7-F1B5F636ED14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Windows">
+      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Bubble\Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Bubble.h" />
     <ClInclude Include="src\Bubble\Application.h">
-      <Filter>Header Files</Filter>
+      <Filter>Bubble</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Bubble\Core.h">
+      <Filter>Bubble</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\EntryPoint.h">
-      <Filter>Header Files</Filter>
+      <Filter>Bubble</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Events\ApplicationEvent.h">
+      <Filter>Bubble\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Events\Event.h">
+      <Filter>Bubble\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Events\KeyEvent.h">
+      <Filter>Bubble\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Events\MouseEvent.h">
+      <Filter>Bubble\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Log.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Window.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bgpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Bubble</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Log.cpp">
+      <Filter>Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bgpch.cpp" />
   </ItemGroup>
 </Project>
