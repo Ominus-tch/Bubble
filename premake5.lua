@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Bubble/vendor/GLFW/include"
 IncludeDir["Glad"] = "Bubble/vendor/Glad/include"
 IncludeDir["ImGui"] = "Bubble/vendor/imgui"
+IncludeDir["glm"] = "Bubble/vendor/glm"
 
 include "Bubble/vendor/GLFW"
 include "Bubble/vendor/Glad"
@@ -36,7 +37,9 @@ project "Bubble"
     files
     {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/glm/glm/**.hpp",
+        "%{prj.name}/vendor/glm/glm/**.inl"
     }
 
     includedirs
@@ -45,7 +48,8 @@ project "Bubble"
         "%{prj.name}/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.glm}"
     }
 
     links 
@@ -105,7 +109,8 @@ project "Sandbox"
     includedirs
     {
         "Bubble/vendor/spdlog/include",
-        "Bubble/src"
+        "Bubble/src",
+        "%{IncludeDir.glm}"
     }
 
     links
