@@ -13,8 +13,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directiories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "Bubble/vendor/GLFW/include"
+IncludeDir["Glad"] = "Bubble/vendor/Glad/include"
+IncludeDir["ImGui"] = "Bubble/vendor/imgui"
 
 include "Bubble/vendor/GLFW"
+include "Bubble/vendor/Glad"
+include "Bubble/vendor/imgui"
 
 project "Bubble"
     location "Bubble"
@@ -37,12 +41,16 @@ project "Bubble"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}"
     }
 
     links 
     {
         "GLFW",
+        "Glad",
+        "ImGui",
         "opengl32.lib"
     }
 
@@ -54,7 +62,8 @@ project "Bubble"
         defines 
         {
             "BG_PLATFORM_WINDOWS",
-            "BG_BUILD_DLL"
+            "BG_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands
@@ -63,15 +72,21 @@ project "Bubble"
         }
 
     filter "configurations:Debug"
-        defines "BG_DEBUG"
+        defines "BG_DBG"
+        staticruntime "off"
+        runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines "BG_RELEASE"
+        staticruntime "off"
+        runtime "Release"
         optimize "On"
 
     filter "configurations:Dist"
         defines "BG_DIST"
+        staticruntime "off"
+        runtime "Release"
         optimize "On"
 
 project "Sandbox"
@@ -111,12 +126,18 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "BG_DEBUG"
+        staticruntime "off"
+        runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines "BG_RELEASE"
+        staticruntime "off"
+        runtime "Release"
         optimize "On"
 
     filter "configurations:Dist"
         defines "BG_DIST"
+        staticruntime "off"
+        runtime "Release"
         optimize "On"

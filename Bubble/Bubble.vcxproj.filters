@@ -7,8 +7,14 @@
     <Filter Include="Bubble\Events">
       <UniqueIdentifier>{55BC2C02-C17C-A838-8AB7-F1B5F636ED14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bubble\ImGui">
+      <UniqueIdentifier>{7BBBF68B-671E-8630-10A4-BEE6FCE551B3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\Windows">
       <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
@@ -37,11 +43,23 @@
     <ClInclude Include="src\Bubble\Events\MouseEvent.h">
       <Filter>Bubble\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h">
+      <Filter>Bubble\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Layer.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\LayerStack.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Log.h">
       <Filter>Bubble</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Window.h">
       <Filter>Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h">
+      <Filter>Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
       <Filter>Platform\Windows</Filter>
@@ -52,8 +70,20 @@
     <ClCompile Include="src\Bubble\Application.cpp">
       <Filter>Bubble</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp">
+      <Filter>Bubble\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Layer.cpp">
+      <Filter>Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\LayerStack.cpp">
+      <Filter>Bubble</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Log.cpp">
       <Filter>Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
+      <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>Platform\Windows</Filter>
