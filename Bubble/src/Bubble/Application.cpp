@@ -3,6 +3,8 @@
 
 #include <glad/glad.h>
 
+#include "Input.h"
+
 namespace Bubble {
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -52,19 +54,32 @@ namespace Bubble {
 	{
 		while (m_Running)
 		{
+			if (Input::IsKeyPressed(269))
+				m_Running = false;
+
 			glClearColor(1, 0, 1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 
+			//auto [x, y] = Input::GetMousePos();
+			//BG_CORE_TRACE("{0}, {1}", x, y);
+
 			m_Window->OnUpdate();
 		}
+		OnExit();
+	}
+
+	void Application::OnExit()
+	{
+		BG_CORE_INFO("Exiting...");
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_Running = false;
+		OnExit();
 		return true;
 	}
 }

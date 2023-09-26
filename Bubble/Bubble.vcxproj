@@ -76,7 +76,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BG_PLATFORM_WINDOWS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_DBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -84,6 +84,7 @@
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -97,7 +98,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BG_PLATFORM_WINDOWS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -108,6 +109,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +124,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BG_PLATFORM_WINDOWS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -133,6 +135,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,11 +158,15 @@
     <ClInclude Include="src\Bubble\Events\KeyEvent.h" />
     <ClInclude Include="src\Bubble\Events\MouseEvent.h" />
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Bubble\Input.h" />
+    <ClInclude Include="src\Bubble\KeyCodes.h" />
     <ClInclude Include="src\Bubble\Layer.h" />
     <ClInclude Include="src\Bubble\LayerStack.h" />
     <ClInclude Include="src\Bubble\Log.h" />
+    <ClInclude Include="src\Bubble\MouseButtonCodes.h" />
     <ClInclude Include="src\Bubble\Window.h" />
     <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\bgpch.h" />
   </ItemGroup>
@@ -170,6 +177,10 @@
     <ClCompile Include="src\Bubble\LayerStack.cpp" />
     <ClCompile Include="src\Bubble\Log.cpp" />
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bgpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\bgpch.cpp" />
   </ItemGroup>

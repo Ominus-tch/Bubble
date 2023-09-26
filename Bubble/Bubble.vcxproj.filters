@@ -65,6 +65,12 @@
       <Filter>Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\bgpch.h" />
+    <ClInclude Include="src\Bubble\Input.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
+    <ClInclude Include="src\Bubble\KeyCodes.h" />
+    <ClInclude Include="src\Bubble\MouseButtonCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Application.cpp">
@@ -89,5 +95,6 @@
       <Filter>Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\bgpch.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
   </ItemGroup>
 </Project>

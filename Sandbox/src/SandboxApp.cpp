@@ -10,12 +10,17 @@ public:
 
 	void OnUpdate() override
 	{
-		BG_INFO("ExampleLayer::OnUpdate");
+		if (Bubble::Input::IsKeyPressed(BG_KEY_TAB))
+			BG_INFO("Tab key is pressed");
 	}
 
 	void OnEvent(Bubble::Event& event) override
 	{
-		BG_TRACE("{0}", event);
+		if (event.GetEventType() == Bubble::EventType::KeyPressed)
+		{
+			Bubble::KeyPressedEvent& e = (Bubble::KeyPressedEvent&)event;
+			BG_TRACE("{0} ({1})", (char)e.GetKeyCode(), e.GetKeyCode());
+		}
 	}
 };
 
