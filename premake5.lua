@@ -24,15 +24,16 @@ include "Bubble/vendor/imgui"
 
 project "Bubble"
     location "Bubble"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-    --pchheader "bgpch.h"
-    --pchsource "Bubble/src/bgpch.cpp"
+    pchheader "bgpch.h"
+    pchsource "Bubble/src/bgpch.cpp"
 
     files
     {
@@ -60,8 +61,12 @@ project "Bubble"
         "opengl32.lib"
     }
 
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
+    }
+
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines 
@@ -71,31 +76,27 @@ project "Bubble"
             "GLFW_INCLUDE_NONE"
         }
 
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
-        }
-
     filter "configurations:Debug"
         defines "BG_DBG"
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "BG_RELEASE"
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines "BG_DIST"
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
     language "C++"
-    staticruntime "off"
+    cppdialect "C++20"
+    staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -110,6 +111,7 @@ project "Sandbox"
     {
         "Bubble/vendor/spdlog/include",
         "Bubble/src",
+        "Bubble/vendor",
         "%{IncludeDir.glm}"
     }
 
@@ -119,7 +121,6 @@ project "Sandbox"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines 
@@ -128,16 +129,16 @@ project "Sandbox"
         }
 
     filter "configurations:Debug"
-        defines "BG_DEBUG"
+        defines "BG_DBG"
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "BG_RELEASE"
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines "BG_DIST"
         runtime "Release"
-        optimize "On"
+        optimize "on"

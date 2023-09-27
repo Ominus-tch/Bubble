@@ -5,6 +5,8 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
+#include "imgui/imgui.h"
+
 glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
 {
 	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.f);
@@ -32,6 +34,13 @@ public:
 			BG_INFO("Tab key is pressed");
 	}
 
+	void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World!");
+		ImGui::End();
+	}
+
 	void OnEvent(Bubble::Event& event) override
 	{
 		if (event.GetEventType() == Bubble::EventType::KeyPressed)
@@ -48,7 +57,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Bubble::ImGuiLayer());
 	}
 
 	~Sandbox()
