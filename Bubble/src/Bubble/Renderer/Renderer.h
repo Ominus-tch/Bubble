@@ -4,7 +4,7 @@ namespace Bubble {
 
 	enum class RendererAPI
 	{
-		None = 0, OpenGL = 1
+		None = 0, OpenGL = 1, Direct3D = 2
 	};
 
 	class Renderer
