@@ -1375,6 +1375,10 @@
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
+    <ClInclude Include="src\Bubble\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Bubble\Renderer\RenderCommand.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
+    <ClInclude Include="src\Bubble\Renderer\OrthographicCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Application.cpp">
@@ -1421,5 +1425,9 @@
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\RenderCommand.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\OrthographicCamera.cpp" />
   </ItemGroup>
 </Project>

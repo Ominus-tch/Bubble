@@ -28,8 +28,14 @@ namespace Bubble {
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		BG_CORE_INFO("Creating OpenGLVertexArray...");
 		//glCreateVertexArrays(1, &m_RendererID);
 		glGenVertexArrays(1, &m_RendererID);
+	}
+
+	OpenGLVertexArray::~OpenGLVertexArray()
+	{
+		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
@@ -42,17 +48,19 @@ namespace Bubble {
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& buffer)
+	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
 	{
-		BG_CORE_ASSERT(buffer->GetLayout().GetElements().size(), "Vertex buffer has no layout!");
+		BG_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layout!");
 
 		glBindVertexArray(m_RendererID);
-		buffer->Bind();
+		vertexBuffer->Bind();
 
 		uint32_t index = 0;
-		const auto& layout = buffer->GetLayout();
+		const auto& layout = vertexBuffer->GetLayout();
+		BG_CORE_INFO("layout: {0}", layout.GetStride());
 		for (const auto& element : layout)
 		{
+			BG_CORE_INFO("Element: {0}, {1}", element.Name, (int)element.Type);
 			glEnableVertexAttribArray(index);
 			glVertexAttribPointer(
 				index,
@@ -60,19 +68,18 @@ namespace Bubble {
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				layout.GetStride(),
-				(const void*)element.Offset
-			);
+				(const void*)element.Offset);
 			index++;
 		}
 
-		m_VertexBuffers.push_back(buffer);
+		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& buffer)
+	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
-		buffer->Bind();
-		m_IndexBuffer = buffer;
+		indexBuffer->Bind();
+		m_IndexBuffer = indexBuffer;
 	}
 
 }

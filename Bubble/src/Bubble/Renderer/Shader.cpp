@@ -2,6 +2,7 @@
 #include "Shader.h"
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Bubble {
 
@@ -84,8 +85,6 @@ namespace Bubble {
 
 		glDetachShader(m_RendererID, vertexShader);
 		glDetachShader(m_RendererID, fragShader);
-
-		BG_CORE_INFO("Succesfully created Shader");
 	}
 
 	Shader::~Shader()
@@ -101,6 +100,12 @@ namespace Bubble {
 	void Shader::Unbind() const
 	{
 		glUseProgram(0);
+	}
+
+	void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 }

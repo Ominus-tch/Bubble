@@ -13,7 +13,7 @@ public:
 	void OnUpdate() override
 	{
 		if (Bubble::Input::IsKeyPressed(BG_KEY_TAB))
-			BG_INFO("Tab key is pressed");
+			BG_TRACE("Tab key is pressed");
 	}
 
 	void OnImGuiRender() override
@@ -25,10 +25,20 @@ public:
 
 	void OnEvent(Bubble::Event& event) override
 	{
-		if (event.GetEventType() == Bubble::EventType::KeyPressed)
+		auto eventType = event.GetEventType();
+		if (eventType == Bubble::EventType::KeyPressed)
 		{
 			Bubble::KeyPressedEvent& e = (Bubble::KeyPressedEvent&)event;
 			BG_TRACE("{0} ({1})", (char)e.GetKeyCode(), e.GetKeyCode());
+		}
+		else if (eventType == Bubble::EventType::MouseButtonPressed)
+		{
+			Bubble::MouseButtonEvent& e = (Bubble::MouseButtonEvent&)event;
+
+			POINT cursorPos = {};
+			GetCursorPos(&cursorPos);
+
+			BG_TRACE("Pressed: {0} at ({1}, {2})", e.GetMouseButton(), cursorPos.x, cursorPos.y);
 		}
 	}
 };

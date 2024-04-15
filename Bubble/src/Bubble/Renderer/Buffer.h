@@ -30,11 +30,11 @@ namespace Bubble {
 
 	struct BufferElement
 	{
-		std::string Name;
-		ShaderDataType Type;
-		uint32_t Size;
-		uint32_t Offset;
-		bool Normalized;
+		std::string Name = "";
+		ShaderDataType Type = ShaderDataType::None;
+		uint32_t Size = 0;
+		uint32_t Offset = 0;
+		bool Normalized = false;
 
 		BufferElement() {}
 
