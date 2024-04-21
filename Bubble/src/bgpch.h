@@ -12,7 +12,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Bubble/Log.h"
+#include "Bubble/Core/Log.h"
+
+#include "Bubble/Debug/Intrumentor.h"
 
 #ifdef BG_PLATFORM_WINDOWS
 	#include <Windows.h>

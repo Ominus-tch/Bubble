@@ -1,111 +1,70 @@
 #include "bgpch.h"
-#include "Shader.h"
 
-#include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
+#include "Bubble/Renderer/Renderer.h"
+#include "Bubble/Renderer/Shader.h"
+
+#include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Bubble {
 
-	Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc)
+	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		const GLchar* source = vertexSrc.c_str();
-		glShaderSource(vertexShader, 1, &source, 0);
-
-		glCompileShader(vertexShader);
-
-		GLint isCompiled = 0;
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
-		if (isCompiled == GL_FALSE)
+		switch (Renderer::GetAPI())
 		{
-			GLint maxLength = 0;
-			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-			std::vector<GLchar> infoLog(maxLength);
-			glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &infoLog[0]);
-
-			glDeleteShader(vertexShader);
-
-			BG_CORE_ERROR("{0}", infoLog.data());
-			BG_CORE_ASSERT(false, "Vertex shader compilation failure!");
-
-			return;
+		case RendererAPI::API::None:	BG_CORE_ASSERT(false, "RendererAPI::None is not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 		}
 
-		GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+		BG_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
 
-		source = fragSrc.c_str();
-		glShaderSource(fragShader, 1, &source, 0);
-		glCompileShader(fragShader);
-
-		isCompiled = 0;
-		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &isCompiled);
-		if (isCompiled == GL_FALSE)
+	Ref<Shader> Shader::Create(const std::string& filepath)
+	{
+		switch (Renderer::GetAPI())
 		{
-			GLint maxLength = 0;
-			glGetShaderiv(fragShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-			std::vector<GLchar> infoLog(maxLength);
-			glGetShaderInfoLog(fragShader, maxLength, &maxLength, &infoLog[0]);
-
-			glDeleteShader(fragShader);
-
-			BG_CORE_ERROR("{0}", infoLog.data());
-			BG_CORE_ASSERT(false, "Fragment shader compilation failure!");
-
-			return;
+		case RendererAPI::API::None:	BG_CORE_ASSERT(false, "RendererAPI::None is not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(filepath);
 		}
 
-		m_RendererID = glCreateProgram();
-
-		glAttachShader(m_RendererID, vertexShader);
-		glAttachShader(m_RendererID, fragShader);
-
-		glLinkProgram(m_RendererID);
-
-		GLint isLinked = 0;
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int*)&isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxLength);
-
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(m_RendererID, maxLength, &maxLength, &infoLog[0]);
-
-
-			glDeleteProgram(m_RendererID);
-
-			glDeleteShader(vertexShader);
-			glDeleteShader(fragShader);
-
-			BG_CORE_ERROR("{0}", infoLog.data());
-			BG_CORE_ASSERT(false, "Program linking failure!");
-		}
-
-		glDetachShader(m_RendererID, vertexShader);
-		glDetachShader(m_RendererID, fragShader);
+		BG_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
 	}
 
-	Shader::~Shader()
+	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
-		glDeleteProgram(m_RendererID);
+		BG_CORE_ASSERT(!Exists(name), "Shader already exists!");
+		m_Shaders[name] = shader;
 	}
 
-	void Shader::Bind() const
+	void ShaderLibrary::Add(const Ref<Shader>& shader)
 	{
-		glUseProgram(m_RendererID);
+		auto& name = shader->GetName();
+		Add(name, shader);
 	}
 
-	void Shader::Unbind() const
+	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
 	{
-		glUseProgram(0);
+		auto shader = Shader::Create(filepath);
+		Add(shader);
+		return shader;
 	}
 
-	void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
+	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+		auto shader = Shader::Create(filepath);
+		Add(name, shader);
+		return shader;
 	}
 
+	Ref<Shader> ShaderLibrary::Get(const std::string& name)
+	{
+		BG_CORE_ASSERT(Exists(name), "Shader not found!");
+		return m_Shaders[name];
+	}
+
+	bool ShaderLibrary::Exists(const std::string& name) const
+	{
+		return m_Shaders.find(name) != m_Shaders.end();
+	}
 }

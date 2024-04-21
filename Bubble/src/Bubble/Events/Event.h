@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bubble/Core.h"
+#include "Bubble/Core/Base.h"
 #include "bgpch.h"
 
 namespace Bubble {
@@ -29,7 +29,7 @@ namespace Bubble {
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	class BUBBLE_API Event
+	class  Event
 	{
 		friend class EventDispatcher;
 	public:

@@ -1,7 +1,7 @@
 #include "bgpch.h"
 #include "WindowsInput.h"
 
-#include "Bubble/Application.h"
+#include "Bubble/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 

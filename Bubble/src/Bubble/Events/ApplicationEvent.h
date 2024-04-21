@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Event.h"
+#include "Bubble/Events/Event.h"
 
 typedef unsigned int uint;
 
 namespace Bubble
 {
-	class BUBBLE_API WindowResizeEvent : public Event
+	class  WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(uint width, uint height)
@@ -28,7 +28,7 @@ namespace Bubble
 		uint m_Width, m_Height;
 	};
 
-	class BUBBLE_API WindowCloseEvent : public Event
+	class  WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}
@@ -37,7 +37,7 @@ namespace Bubble
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class BUBBLE_API AppTickEvent : public Event
+	class  AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() {}
@@ -46,7 +46,7 @@ namespace Bubble
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class BUBBLE_API AppUpdateEvent : public Event
+	class  AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() {}
@@ -55,7 +55,7 @@ namespace Bubble
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class BUBBLE_API AppRenderEvent : public Event
+	class  AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() {}

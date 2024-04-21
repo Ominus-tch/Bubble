@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Bubble/Renderer/GraphicsContext.h"
 
 struct GLFWwindow;

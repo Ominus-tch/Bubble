@@ -11,30 +11,34 @@
 
 namespace Bubble
 {
-	static bool s_GLFWInitialized = false;
+	static uint8_t s_GLFWWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* desc)
 	{
 		BG_CORE_ERROR("GLFW Error ({0}): {1}", error, desc);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		BG_PROFILE_FUNCTION()
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		BG_PROFILE_FUNCTION()
+
 		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		BG_PROFILE_FUNCTION()
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -42,16 +46,19 @@ namespace Bubble
 		BG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 
-		if (!s_GLFWInitialized)
+		if (s_GLFWWindowCount == 0)
 		{
-			// TODO: glfwTerminate on system shutdown
+			BG_PROFILE_SCOPE("glfwInit");
 			int success = glfwInit();
-			BG_CORE_ASSERT(success, "Could not initilize GLFW!");
+			BG_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
 		}
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		{
+			BG_PROFILE_SCOPE("glfwCreateWindow");
+			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			++s_GLFWWindowCount;
+		}
 
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
@@ -151,17 +158,29 @@ namespace Bubble
 
 	void WindowsWindow::Shutdown()
 	{
+		BG_PROFILE_FUNCTION()
+
 		glfwDestroyWindow(m_Window);
+		--s_GLFWWindowCount;
+
+		if (s_GLFWWindowCount == 0)
+		{
+			glfwTerminate();
+		}
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
+		BG_PROFILE_FUNCTION()
+
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
+		BG_PROFILE_FUNCTION()
+
 		if (enabled)
 			glfwSwapInterval(1);
 		else

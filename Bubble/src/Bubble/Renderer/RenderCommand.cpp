@@ -1,10 +1,11 @@
 #include "bgpch.h"
-#include "RenderCommand.h"
+
+#include "Bubble/Renderer/RenderCommand.h"
 
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Bubble {
 
-	RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI;
+	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
 
 }

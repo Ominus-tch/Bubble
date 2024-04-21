@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bubble/Window.h"
+#include "Bubble/Core/Window.h"
 #include "Bubble/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>

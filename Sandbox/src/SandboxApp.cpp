@@ -1,54 +1,20 @@
 #include <Bubble.h>
-#include "imgui/imgui.h"
+#include <Bubble/Core/EntryPoint.h>
 
-class ExampleLayer : public Bubble::Layer
-{
-public:
-	ExampleLayer()
-		: Layer("Example")
-	{
-		BG_INFO("Hello");
-	}
-
-	void OnUpdate() override
-	{
-		if (Bubble::Input::IsKeyPressed(BG_KEY_TAB))
-			BG_TRACE("Tab key is pressed");
-	}
-
-	void OnImGuiRender() override
-	{
-		ImGui::Begin("Test");
-		ImGui::Text("Hello World!");
-		ImGui::End();
-	}
-
-	void OnEvent(Bubble::Event& event) override
-	{
-		auto eventType = event.GetEventType();
-		if (eventType == Bubble::EventType::KeyPressed)
-		{
-			Bubble::KeyPressedEvent& e = (Bubble::KeyPressedEvent&)event;
-			BG_TRACE("{0} ({1})", (char)e.GetKeyCode(), e.GetKeyCode());
-		}
-		else if (eventType == Bubble::EventType::MouseButtonPressed)
-		{
-			Bubble::MouseButtonEvent& e = (Bubble::MouseButtonEvent&)event;
-
-			POINT cursorPos = {};
-			GetCursorPos(&cursorPos);
-
-			BG_TRACE("Pressed: {0} at ({1}, {2})", e.GetMouseButton(), cursorPos.x, cursorPos.y);
-		}
-	}
-};
+#include "Sandbox2D.h"
+#include "ExampleLayer.h"
 
 class Sandbox : public Bubble::Application
 {
 public:
-	Sandbox()
+	Sandbox(const Bubble::ApplicationSpecification& specification)
+	: Bubble::Application(specification)
 	{
-		PushLayer(new ExampleLayer());
+		//Bubble::Window& window = GetWindow();
+		//window.SetVSync(false);
+
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()
@@ -57,7 +23,12 @@ public:
 	}
 };
 
-Bubble::Application* Bubble::CreateApplication()
+Bubble::Application* Bubble::CreateApplication(Bubble::ApplicationCommandLineArgs args)
 {
-	return new Sandbox();
+	ApplicationSpecification spec;
+	spec.Name = "Sandbox";
+	//spec.WorkingDirectory = "../Hazelnut";
+	spec.CommandLineArgs = args;
+
+	return new Sandbox(spec);
 }

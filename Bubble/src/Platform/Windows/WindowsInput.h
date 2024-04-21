@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bubble/Input.h"
+#include "Bubble/Core/Input.h"
 
 
 namespace Bubble {

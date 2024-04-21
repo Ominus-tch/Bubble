@@ -17,6 +17,7 @@ IncludeDir["GLFW"] = "Bubble/vendor/GLFW/include"
 IncludeDir["Glad"] = "Bubble/vendor/Glad/include"
 IncludeDir["ImGui"] = "Bubble/vendor/imgui"
 IncludeDir["glm"] = "Bubble/vendor/glm"
+IncludeDir["stb_image"] = "Bubble/vendor/stb_image"
 
 include "Bubble/vendor/GLFW"
 include "Bubble/vendor/Glad"
@@ -39,8 +40,18 @@ project "Bubble"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
+
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp",
+
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl"
+    }
+
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS",
+        "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
     }
 
     includedirs
@@ -50,7 +61,8 @@ project "Bubble"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.stb_image}"
     }
 
     links 
@@ -61,17 +73,12 @@ project "Bubble"
         "opengl32.lib"
     }
 
-    defines
-    {
-        "_CRT_SECURE_NO_WARNINGS"
-    }
 
     filter "system:windows"
         systemversion "latest"
 
         defines 
         {
-            "BG_PLATFORM_WINDOWS",
             "BG_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
@@ -125,7 +132,7 @@ project "Sandbox"
 
         defines 
         {
-            "BG_PLATFORM_WINDOWS"
+            "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
         }
 
     filter "configurations:Debug"

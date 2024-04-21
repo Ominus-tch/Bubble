@@ -1,5 +1,6 @@
 #include "bgpch.h"
-#include "OpenGlContext.h"
+
+#include "Platform/OpenGL/OpenGlContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -15,6 +16,8 @@ namespace Bubble {
 
 	void OpenGLContext::Init()
 	{
+		BG_PROFILE_FUNCTION()
+
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		BG_CORE_ASSERT(status, "Failed to initialize Glad");
@@ -27,6 +30,8 @@ namespace Bubble {
 
 	void OpenGLContext::SwapBuffers()
 	{
+		BG_PROFILE_FUNCTION()
+
 		glfwSwapBuffers(m_WindowHandle);
 	}
 

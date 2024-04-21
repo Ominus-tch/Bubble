@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Event.h"
+#include "Bubble/Events/Event.h"
 
 namespace Bubble
 {
-	class BUBBLE_API KeyEvent : public Event
+	class  KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -17,7 +17,7 @@ namespace Bubble
 		int m_KeyCode;
 	};
 
-	class BUBBLE_API KeyPressedEvent : public KeyEvent
+	class  KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount)
@@ -37,7 +37,7 @@ namespace Bubble
 		int m_RepeatCount;
 	};
 
-	class BUBBLE_API KeyReleasedEvent : public KeyEvent
+	class  KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
@@ -52,7 +52,7 @@ namespace Bubble
 
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
-	class BUBBLE_API KeyTypedEvent : public KeyEvent
+	class  KeyTypedEvent : public KeyEvent
 	{
 	public:
 		KeyTypedEvent(int keycode)

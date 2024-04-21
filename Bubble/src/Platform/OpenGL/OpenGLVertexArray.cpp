@@ -1,5 +1,6 @@
 #include "bgpch.h"
-#include "OpenGLVertexArray.h"
+
+#include "Platform/OpenGL/OpenGLVertexArray.h"
 
 #include <glad/glad.h>
 
@@ -28,18 +29,23 @@ namespace Bubble {
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		BG_CORE_INFO("Creating OpenGLVertexArray...");
+		BG_PROFILE_FUNCTION()
+
 		//glCreateVertexArrays(1, &m_RendererID);
 		glGenVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		BG_PROFILE_FUNCTION()
+
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
+		BG_PROFILE_FUNCTION()
+
 		glBindVertexArray(m_RendererID);
 	}
 
@@ -48,8 +54,10 @@ namespace Bubble {
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
+		BG_PROFILE_FUNCTION()
+
 		BG_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layout!");
 
 		glBindVertexArray(m_RendererID);
@@ -57,10 +65,8 @@ namespace Bubble {
 
 		uint32_t index = 0;
 		const auto& layout = vertexBuffer->GetLayout();
-		BG_CORE_INFO("layout: {0}", layout.GetStride());
 		for (const auto& element : layout)
 		{
-			BG_CORE_INFO("Element: {0}, {1}", element.Name, (int)element.Type);
 			glEnableVertexAttribArray(index);
 			glVertexAttribPointer(
 				index,
@@ -75,8 +81,10 @@ namespace Bubble {
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
+		BG_PROFILE_FUNCTION()
+
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;
