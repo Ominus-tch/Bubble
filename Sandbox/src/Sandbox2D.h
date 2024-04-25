@@ -7,12 +7,12 @@
 #include "ParticleSystem.h"
 
 enum TileTypes {
-	None,
-	Blank, 
+	Blank,
 	Up,
 	Right,
 	Down,
-	Left
+	Left,
+	None
 };
 
 static const char* TypeToString(TileTypes type)
@@ -25,7 +25,7 @@ static const char* TypeToString(TileTypes type)
 	case Right: return "Right";
 	case Down: return "Down";
 	case Left: return "Left";
-	default: return "Unknwown";
+	default: return "Unknown";
 	}
 }
 
@@ -39,11 +39,11 @@ enum TileRotation {
 // Up, Right, Down, Left
 using Rule = std::vector<std::vector<TileTypes>>;
 static const std::unordered_map<TileTypes, Rule> Rules = {
-    { Blank,   {{Blank, Up}, {Blank, Right}, {Blank, Down}, {Blank, Left}} },
-    { Up,      {{Right, Left, Down}, {Left, Up, Down}, {Blank, Down}, {Right, Up, Down}} },
-    { Right,   {{Right, Left, Down}, {Left, Up, Down}, {Right, Left, Up}, {Blank, Left}} },
-    { Down,    {{Blank, Up}, {Left, Up, Down}, {Right, Left, Up}, {Right, Up, Down}} },
-    { Left,    {{Right, Left, Down}, {Blank, Right}, {Right, Left, Up}, {Up, Down, Right}} }
+	{ Blank,   {{Blank, Up}, {Blank, Right}, {Blank, Down}, {Blank, Left}} },
+	{ Up,      {{Right, Left, Down}, {Left, Up, Down}, {Blank, Down}, {Right, Up, Down}} },
+	{ Right,   {{Right, Left, Down}, {Left, Up, Down}, {Right, Left, Up}, {Blank, Left}} },
+	{ Down,    {{Blank, Up}, {Left, Up, Down}, {Right, Left, Up}, {Right, Up, Down}} },
+	{ Left,    {{Right, Left, Down}, {Blank, Right}, {Right, Left, Up}, {Up, Down, Right}} }
 };
 
 static const Rule& GetRule(TileTypes& tileType) {
@@ -56,7 +56,7 @@ static const Rule& GetRule(TileTypes& tileType) {
 	return emptyRule;
 }
 
-static void CheckValid(std::vector<int>& options, std::vector<TileTypes>& valid)
+static void CheckValid(std::vector<int>& options, std::vector<int>& valid)
 {
 
 	for (int i = options.size() - 1; i >= 0; i--)
@@ -70,13 +70,19 @@ static void CheckValid(std::vector<int>& options, std::vector<TileTypes>& valid)
 	}
 }
 
-struct Tile {
+struct Cell {
 	bool Collapsed = false;
 	TileTypes TileType = None;
 	//std::vector<TileTypes> Options = { Blank, Up, Right, Left, Down };
-	std::vector<int> Options;
+	//std::vector<int> Options = {};
+	std::vector<int> Options = {};
 
-	Tile(int numTiles)
+	Cell(int numTiles)
+	{
+		GenerateOptions(numTiles);
+	}
+
+	void GenerateOptions(int numTiles)
 	{
 		for (int i = 0; i < numTiles; i++)
 		{
@@ -87,32 +93,60 @@ struct Tile {
 	void PickOption()
 	{
 		int pick = Bubble::Random::Int(0, Options.size() - 1);
-		TileType = Options[pick];
-		Options = { TileType };
+		int option = Options[pick];
+		TileType = (TileTypes)option;
+		Options = { option };
 		Collapsed = true;
 	}
 };
 
-struct TileSpecs {
+struct Tile {
 	Bubble::Ref<Bubble::Texture2D> Texture;
-	std::vector<int> EdgeIds;
+	std::vector<int> Edges;
 	int Rotation;
 
-	TileSpecs Rotate(int rotation = 1)
+	std::vector<int> Up, Right, Down, Left;
+
+	Tile Rotate(int rotation = 1)
 	{
-		int len = EdgeIds.size();
+		int len = Edges.size();
 		std::vector<int> NewEdges(len);
 
 		for (int i = 0; i < len; i++)
 		{
-			NewEdges[i] = EdgeIds[(i - rotation + len) % len];
+			NewEdges[i] = Edges[(i - rotation + len) % len];
 		}
 
-		TileSpecs newTile = { Texture, NewEdges, Rotation + rotation };
+		Tile newTile = { Texture, NewEdges, Rotation + rotation };
 		return newTile;
 	}
-};
 
+	void Analyze(std::unordered_map<int, Tile>& tiles)
+	{
+		for (auto& kv : tiles)
+		{
+			int key = kv.first;
+			Tile& tile = kv.second;
+
+			// Up
+			if (tile.Edges[2] == Edges[0])
+				Up.push_back(key);
+
+			// Right
+			if (tile.Edges[3] == Edges[1])
+				Right.push_back(key);
+
+			// Down
+			if (tile.Edges[0] == Edges[2])
+				Down.push_back(key);
+
+			// Left
+			if (tile.Edges[1] == Edges[3])
+				Left.push_back(key);
+		}
+
+	}
+};
 
 class Sandbox2D : public Bubble::Layer
 {
@@ -127,8 +161,8 @@ public:
 	virtual void OnImGuiRender() override;
 	void OnEvent(Bubble::Event& e) override;
 
-public:
-	Tile* GetLowestEntropyTile();
+private:
+	Cell* GetLowestEntropyCell();
 	void ResetGrid();
 private:
 	Bubble::OrthographicCameraController m_CameraController;
@@ -156,8 +190,8 @@ private:
 	bool m_Done = false;
 
 	uint32_t m_MapWidth, m_MapHeight;
-	std::vector<Tile*> m_MapTiles;
-	std::unordered_map<TileTypes, TileSpecs> m_TileSpecs;
+	std::vector<Cell*> m_Grid;
+	std::unordered_map<int, Tile> m_Tiles;
 
 	bool m_WaveFunctionCollapse = false;
 

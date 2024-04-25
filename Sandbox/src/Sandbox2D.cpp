@@ -24,30 +24,25 @@ void Sandbox2D::OnAttach()
 	//s_TextureMap['W'] = Bubble::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 });
 
 	//m_SpriteBarrel = Bubble::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 2 }, { 128, 128 });
-
-	Bubble::Ref<Bubble::Texture2D> BlankTexture = Bubble::Texture2D::Create("assets/game/textures/blank.png");
-	//s_TextureMap[TileTypes::Blank] = BlankTexture;
-
-	Bubble::Ref<Bubble::Texture2D> UpTexture = Bubble::Texture2D::Create("assets/game/textures/up.png");
-	//s_TextureMap[TileTypes::Up] = UpTexture;
-	//s_TextureMap[TileTypes::Right] = UpTexture;
-	//s_TextureMap[TileTypes::Down] = UpTexture;
-	//s_TextureMap[TileTypes::Left] = UpTexture;
-
-	//s_TextureMap[TileTypes::Right] = Bubble::Texture2D::Create("assets/game/textures/right.png");
-	//s_TextureMap[TileTypes::Down] = Bubble::Texture2D::Create("assets/game/textures/down.png");
-	//s_TextureMap[TileTypes::Left] = Bubble::Texture2D::Create("assets/game/textures/left.png");
 	 
-	TileSpecs upTileSpecs =	{ UpTexture, {1, 1, 0, 1}, 0 };
-	TileSpecs leftTileSpecs = upTileSpecs.Rotate(1);
-	TileSpecs downTileSpecs = upTileSpecs.Rotate(2);
-	TileSpecs rightTileSpecs = upTileSpecs.Rotate(3);
+	Bubble::Ref<Bubble::Texture2D> BlankTexture = Bubble::Texture2D::Create("assets/game/textures/blank.png");
+	Bubble::Ref<Bubble::Texture2D> UpTexture = Bubble::Texture2D::Create("assets/game/textures/up.png");
+	Tile upTileSpecs = { UpTexture, {1, 1, 0, 1} };
+	Tile leftTileSpecs = upTileSpecs.Rotate(1);
+	Tile downTileSpecs = upTileSpecs.Rotate(2);
+	Tile rightTileSpecs = upTileSpecs.Rotate(3);
 
-	m_TileSpecs[TileTypes::Blank]	= { BlankTexture, {0, 0, 0, 0}, 0 };
-	m_TileSpecs[TileTypes::Up]		= upTileSpecs;
-	m_TileSpecs[TileTypes::Right]	= rightTileSpecs;
-	m_TileSpecs[TileTypes::Down]	= downTileSpecs;
-	m_TileSpecs[TileTypes::Left]	= leftTileSpecs;
+	m_Tiles[TileTypes::Blank] = { BlankTexture, {0, 0, 0, 0} };
+	m_Tiles[TileTypes::Up] = upTileSpecs;
+	m_Tiles[TileTypes::Right] = rightTileSpecs;
+	m_Tiles[TileTypes::Down] = downTileSpecs;
+	m_Tiles[TileTypes::Left] = leftTileSpecs;
+
+	for (auto& kv : m_Tiles)
+	{
+		Tile& tileSpecs = kv.second;
+		tileSpecs.Analyze(m_Tiles);
+	}
 
 	m_MapWidth = 50;
 	m_MapHeight = 50;
@@ -143,97 +138,87 @@ void Sandbox2D::OnUpdate(Bubble::Timestep ts)
 				BG_PROFILE_SCOPE("Update WaveFunctionCollapse");
 				//m_LoopTime = 0.f;
 
-				Tile* lowestEntropyTile = GetLowestEntropyTile();
+				Cell* lowestEntropyTile = GetLowestEntropyCell();
 				if (lowestEntropyTile)
 				{
 					lowestEntropyTile->PickOption();
 				}
 
-				std::vector<Tile*> nextTiles;
-				nextTiles.reserve(m_MapTiles.size());
+				int size = m_Tiles.size();
 
 				for (uint32_t y = 0; y < m_MapHeight; y++)
 				{
 					for (uint32_t x = 0; x < m_MapWidth; x++)
 					{
 						int i = x + y * m_MapWidth;
-						Tile* currentTile = m_MapTiles[i];
+						Cell* currentTile = m_Grid[i];
 
-						if (m_MapTiles[i]->Collapsed)
+						if (currentTile->Collapsed)
 						{
-							nextTiles.push_back(currentTile);
 							continue;
 						}
 
-						Tile* newTile = new Tile;
-						std::vector<TileTypes> validOptions;
+						currentTile->GenerateOptions(size);
+
+						std::vector<int> validOptions;
 
 						// Look up
 						if (y < m_MapHeight - 1)
 						{
-							Tile* up = m_MapTiles[x + (y + 1) * m_MapWidth];
-							for (TileTypes option : up->Options)
+							Cell* up = m_Grid[x + (y + 1) * m_MapWidth];
+							for (int option : up->Options)
 							{
-								const Rule& rule = GetRule(option);
-								const std::vector<TileTypes>& valid = rule[2];
+								auto& valid = m_Tiles[option].Right;
 								validOptions.insert(validOptions.end(), valid.begin(), valid.end());
 							}
-							CheckValid(newTile->Options, validOptions);
+							CheckValid(currentTile->Options, validOptions);
 						}
 
 						// Look right
 						if (x < m_MapWidth - 1)
 						{
-							Tile* right = m_MapTiles[x + 1 + y * m_MapWidth];
+							Cell* right = m_Grid[x + 1 + y * m_MapWidth];
 							validOptions.clear();
-							for (TileTypes option : right->Options)
+							for (int option : right->Options)
 							{
-								const Rule& rule = GetRule(option);
-								const std::vector<TileTypes>& valid = rule[3];
+								auto& valid = m_Tiles[option].Down;
 								validOptions.insert(validOptions.end(), valid.begin(), valid.end());
+ 
 							}
-							CheckValid(newTile->Options, validOptions);
+							CheckValid(currentTile->Options, validOptions);
 						}
 
 
 						// Look down
 						if (y > 0)
 						{
-							Tile* down = m_MapTiles[x + (y - 1) * m_MapWidth];
+							Cell* down = m_Grid[x + (y - 1) * m_MapWidth];
 							validOptions.clear();
-							for (TileTypes option : down->Options)
+							for (int option : down->Options)
 							{
-								const Rule& rule = GetRule(option);
-								const std::vector<TileTypes>& valid = rule[0];
+								auto& valid = m_Tiles[option].Left;
 								validOptions.insert(validOptions.end(), valid.begin(), valid.end());
 							}
-							CheckValid(newTile->Options, validOptions);
+							CheckValid(currentTile->Options, validOptions);
 						}
 
 						// Look left
 						if (x > 0)
 						{
-							Tile* left = m_MapTiles[x - 1 + y * m_MapWidth];
+							Cell* left = m_Grid[x - 1 + y * m_MapWidth];
 							validOptions.clear();
-							for (TileTypes option : left->Options)
+							for (int option : left->Options)
 							{
-								const Rule& rule = GetRule(option);
-								const std::vector<TileTypes>& valid = rule[1];
+								auto& valid = m_Tiles[option].Up;
 								validOptions.insert(validOptions.end(), valid.begin(), valid.end());
 							}
-							CheckValid(newTile->Options, validOptions);
+							CheckValid(currentTile->Options, validOptions);
 						}
 
-						//CheckValid(newTile->Options, validOptions);
-
-						if (newTile->Options.size() == 0)
-							newTile->Options = { Blank, Up, Right, Left, Down };
-
-						nextTiles.push_back(newTile);
+						if (currentTile->Options.size() == 0)
+							currentTile->GenerateOptions(size);
 					}
 				}
-
-				m_MapTiles = std::move(nextTiles);
 			}
 		}
 
@@ -259,16 +244,19 @@ void Sandbox2D::OnUpdate(Bubble::Timestep ts)
 			for (uint32_t x = 0; x < m_MapWidth; x++)
 			{
 				int idx = x + y * m_MapWidth;
-				Tile* tile = m_MapTiles[idx];
+				Cell* cell = m_Grid[idx];
 
-				if (tile->TileType == TileTypes::None)
+				if (cell->TileType == None)
 					continue;
 
-				TileSpecs tileSpecs = m_TileSpecs[tile->TileType];
+				Tile tileSpecs = m_Tiles[cell->TileType];
+				if (tileSpecs.Rotation == 0.f)
+				{
+					Bubble::Renderer2D::DrawQuad({ x - m_MapWidth / 2.f, y - m_MapHeight / 2.f }, { 1.0f, 1.0f }, tileSpecs.Texture);
+					continue;
+				}
+
 				float rotation = tileSpecs.Rotation * 90.f;
-
-				//BG_INFO("Rotation: {0} -> {1}", tileSpecs.Rotation, rotation);
-
 				Bubble::Renderer2D::DrawRotatedQuad({ x - m_MapWidth / 2.f, y - m_MapHeight / 2.f }, { 1.0f, 1.0f }, glm::radians(rotation), tileSpecs.Texture);
 			}
 		}
@@ -315,55 +303,59 @@ void Sandbox2D::OnEvent(Bubble::Event& e)
 	m_CameraController.OnEvent(e);
 }
 
-bool sortByOptionsSize(const Tile* tile1, const Tile* tile2) {
-	return tile1->Options.size() < tile2->Options.size();
+bool sortByOptionsSize(const Cell* cell1, const Cell* cell2) {
+	return cell1->Options.size() < cell2->Options.size();
 }
 
 void Sandbox2D::ResetGrid()
 {
-	m_MapTiles.clear();
+	m_Grid.clear();
+	size_t gridSize = m_MapHeight * m_MapWidth;
+	m_Grid.reserve(gridSize);
+
+	int size = m_Tiles.size();
 
 	for (uint32_t y = 0; y < m_MapHeight; y++)
 	{
 		for (uint32_t x = 0; x < m_MapWidth; x++)
 		{
-			m_MapTiles.push_back(new Tile);
+			m_Grid.emplace_back(new Cell(size));
 		}
 	}
 
 	m_Done = false;
 }
 
-Tile* Sandbox2D::GetLowestEntropyTile()
+Cell* Sandbox2D::GetLowestEntropyCell()
 {
 	BG_PROFILE_FUNCTION()
 
-	std::vector<Tile*> sortedTiles(m_MapTiles);
+		std::vector<Cell*> sortedCells(m_Grid);
 
-	for (auto it = sortedTiles.begin(); it != sortedTiles.end();) {
+	for (auto it = sortedCells.begin(); it != sortedCells.end();) {
 		if ((*it)->Collapsed) {
-			it = sortedTiles.erase(it);
+			it = sortedCells.erase(it);
 		}
 		else {
 			++it;
 		}
 	}
 
-	if (sortedTiles.size() == 0)
+	if (sortedCells.size() == 0)
 	{
 		m_Done = true;
 		return nullptr;
 	}
 
-	std::sort(sortedTiles.begin(), sortedTiles.end(), sortByOptionsSize);
+	std::sort(sortedCells.begin(), sortedCells.end(), sortByOptionsSize);
 
-	int len = sortedTiles[0]->Options.size();
-	bool collpased = sortedTiles[0]->Collapsed;
+	int len = sortedCells[0]->Options.size();
+	bool collpased = sortedCells[0]->Collapsed;
 
 	int stopIdx = 0;
-	for (int i = 1; i < sortedTiles.size(); i++)
+	for (int i = 1; i < sortedCells.size(); i++)
 	{
-		if (sortedTiles[i]->Options.size() > len)
+		if (sortedCells[i]->Options.size() > len)
 		{
 			stopIdx = i;
 			break;
@@ -371,12 +363,12 @@ Tile* Sandbox2D::GetLowestEntropyTile()
 	}
 	if (stopIdx == 0)
 	{
-		int pick = Bubble::Random::Int(0, sortedTiles.size() - 1);
-		return sortedTiles[pick];
+		int pick = Bubble::Random::Int(0, sortedCells.size() - 1);
+		return sortedCells[pick];
 	}
 
-	std::vector<Tile*> lowestEntropyTiles(sortedTiles.begin(), sortedTiles.begin() + stopIdx);
-	int pick = Bubble::Random::Int(0, lowestEntropyTiles.size() - 1);
+	std::vector<Cell*> lowestEntropyCells(sortedCells.begin(), sortedCells.begin() + stopIdx);
+	int pick = Bubble::Random::Int(0, lowestEntropyCells.size() - 1);
 
-	return lowestEntropyTiles[pick];
+	return lowestEntropyCells[pick];
 }
