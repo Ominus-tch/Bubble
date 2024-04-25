@@ -7,12 +7,12 @@
 #include "ParticleSystem.h"
 
 enum TileTypes {
+	None,
 	Blank, 
 	Up,
 	Right,
 	Down,
-	Left,
-	None
+	Left
 };
 
 static const char* TypeToString(TileTypes type)
@@ -56,7 +56,7 @@ static const Rule& GetRule(TileTypes& tileType) {
 	return emptyRule;
 }
 
-static void CheckValid(std::vector<int>& options, std::vector<int>& valid)
+static void CheckValid(std::vector<int>& options, std::vector<TileTypes>& valid)
 {
 
 	for (int i = options.size() - 1; i >= 0; i--)
@@ -70,19 +70,13 @@ static void CheckValid(std::vector<int>& options, std::vector<int>& valid)
 	}
 }
 
-struct Cell {
+struct Tile {
 	bool Collapsed = false;
 	TileTypes TileType = None;
 	//std::vector<TileTypes> Options = { Blank, Up, Right, Left, Down };
-	//std::vector<int> Options = {};
-	std::vector<int> Options = {};
+	std::vector<int> Options;
 
-	Cell(int numTiles)
-	{
-		GenerateOptions(numTiles);
-	}
-
-	void GenerateOptions(int numTiles)
+	Tile(int numTiles)
 	{
 		for (int i = 0; i < numTiles; i++)
 		{
@@ -93,58 +87,29 @@ struct Cell {
 	void PickOption()
 	{
 		int pick = Bubble::Random::Int(0, Options.size() - 1);
-		int option = Options[pick];
-		TileType = (TileTypes)option;
-		Options = { option };
+		TileType = Options[pick];
+		Options = { TileType };
 		Collapsed = true;
 	}
 };
 
-struct Tile {
+struct TileSpecs {
 	Bubble::Ref<Bubble::Texture2D> Texture;
-	std::vector<int> Edges;
+	std::vector<int> EdgeIds;
 	int Rotation;
 
-	std::vector<int> Up, Right, Down, Left;
-
-	Tile Rotate(int rotation = 1)
+	TileSpecs Rotate(int rotation = 1)
 	{
-		int len = Edges.size();
+		int len = EdgeIds.size();
 		std::vector<int> NewEdges(len);
 
 		for (int i = 0; i < len; i++)
 		{
-			NewEdges[i] = Edges[(i - rotation + len) % len];
+			NewEdges[i] = EdgeIds[(i - rotation + len) % len];
 		}
 
-		Tile newTile = { Texture, NewEdges, Rotation + rotation };
+		TileSpecs newTile = { Texture, NewEdges, Rotation + rotation };
 		return newTile;
-	}
-
-	void Analyze(std::unordered_map<int, Tile>& tiles)
-	{
-		for (auto& kv : tiles)
-		{
-			int key = kv.first;
-			Tile& tile = kv.second;
-
-			// Up
-			if (tile.Edges[2] == Edges[0])
-				Up.push_back(key);
-
-			// Right
-			if (tile.Edges[3] == Edges[1])
-				Right.push_back(key);
-
-			// Down
-			if (tile.Edges[0] == Edges[2])
-				Down.push_back(key);
-
-			// Left
-			if (tile.Edges[1] == Edges[3])
-				Left.push_back(key);
-		}
-
 	}
 };
 
@@ -163,7 +128,7 @@ public:
 	void OnEvent(Bubble::Event& e) override;
 
 public:
-	Cell* GetLowestEntropyCell();
+	Tile* GetLowestEntropyTile();
 	void ResetGrid();
 private:
 	Bubble::OrthographicCameraController m_CameraController;
@@ -191,8 +156,8 @@ private:
 	bool m_Done = false;
 
 	uint32_t m_MapWidth, m_MapHeight;
-	std::vector<Cell*> m_Grid;
-	std::unordered_map<int, Tile> m_Tiles;
+	std::vector<Tile*> m_MapTiles;
+	std::unordered_map<TileTypes, TileSpecs> m_TileSpecs;
 
 	bool m_WaveFunctionCollapse = false;
 
