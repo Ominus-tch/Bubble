@@ -66,11 +66,11 @@ namespace Bubble {
 		dispatcher.Dispatch<WindowCloseEvent>(BG_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BG_BIND_EVENT_FN(Application::OnWindowResize));
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*--it)->OnEvent(e);
 			if (e.Handled)
 				break;
+			(*it)->OnEvent(e);
 		}
 	}
 
@@ -91,6 +91,13 @@ namespace Bubble {
 
 					for (Layer* layer : m_LayerStack)
 						layer->OnUpdate(timestep);
+				}
+
+				{
+					BG_PROFILE_SCOPE("LayerStack OnRender")
+
+						for (Layer* layer : m_LayerStack)
+							layer->OnRender(timestep);
 				}
 
 				m_ImGuiLayer->Begin();

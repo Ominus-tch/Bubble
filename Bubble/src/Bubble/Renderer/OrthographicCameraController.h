@@ -29,7 +29,8 @@ namespace Bubble {
 
 		OrthographicCamera& GetCamera() { return m_Camera; }
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
-
+		
+		glm::vec2 GetCameraPos() const { return glm::vec2(m_CameraPosition.x, m_CameraPosition.y); }
 		float GetAspectRatio() const { return m_AspectRatio; }
 		float GetZoomLevel() const { return m_ZoomLevel; }
 		void SetZoomLevel(float level) { m_ZoomLevel = level; CalculateView(); }

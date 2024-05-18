@@ -13,8 +13,8 @@ namespace Bubble {
 
 	Ref<SubTexture2D> SubTexture2D::CreateFromCoords(const Ref<Texture2D>& texture, const glm::vec2& coords, const glm::vec2& cellSize, const glm::vec2& spriteSize)
 	{
-		const float textureWidth = texture->GetWidth();
-		const float textureHeight = texture->GetHeight();
+		const uint32_t textureWidth = texture->GetWidth();
+		const uint32_t textureHeight = texture->GetHeight();
 
 		glm::vec2 min = { (coords.x * cellSize.x) / textureWidth, (coords.y * cellSize.y) / textureHeight };
 		glm::vec2 max = { ((coords.x + spriteSize.x) * cellSize.x) / textureWidth, ((coords.y + spriteSize.y) * cellSize.y) / textureHeight };

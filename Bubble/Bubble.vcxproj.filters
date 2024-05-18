@@ -10,6 +10,9 @@
     <Filter Include="src\Bubble\Core">
       <UniqueIdentifier>{209879AF-8C23-E773-9534-6A68013F4374}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Bubble\Debug">
+      <UniqueIdentifier>{3EF7B89E-2AF0-D7F0-5322-BD753F7AB7FC}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Bubble\Events">
       <UniqueIdentifier>{AC316279-1848-600F-61BF-EB30CD143197}</UniqueIdentifier>
     </Filter>
@@ -18,6 +21,9 @@
     </Filter>
     <Filter Include="src\Bubble\Renderer">
       <UniqueIdentifier>{6E5BB051-DABC-8D5F-632A-D411CF8AC41E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Bubble\Scene">
+      <UniqueIdentifier>{E559C79F-D152-E6F1-FA84-CB76E6DCC5FD}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
@@ -58,16 +64,43 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Application.h">
-      <Filter>src\Bubble</Filter>
+      <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Base.h">
-      <Filter>src\Bubble</Filter>
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\EntryPoint.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Input.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\KeyCodes.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Layer.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\LayerStack.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Log.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\MouseCodes.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Random.h">
+      <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Timestep.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Core\EntryPoint.h">
-      <Filter>src\Bubble</Filter>
+    <ClInclude Include="src\Bubble\Core\Window.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Debug\Intrumentor.h">
+      <Filter>src\Bubble\Debug</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Events\ApplicationEvent.h">
       <Filter>src\Bubble\Events</Filter>
@@ -84,25 +117,10 @@
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h">
       <Filter>src\Bubble\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Input.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bubble\Core\KeyCodes.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Layer.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bubble\Core\LayerStack.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Log.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bubble\Core\MouseButtonCodes.h">
-      <Filter>src\Bubble</Filter>
-    </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Buffer.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\Framebuffer.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\GraphicsContext.h">
@@ -111,10 +129,16 @@
     <ClInclude Include="src\Bubble\Renderer\OrthographicCamera.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\OrthographicCameraController.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\RenderCommand.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Renderer.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\Renderer2D.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\RendererAPI.h">
@@ -123,19 +147,28 @@
     <ClInclude Include="src\Bubble\Renderer\Shader.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\SubTexture2D.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Texture.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\UniformBuffer.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\VertexArray.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Window.h">
-      <Filter>src\Bubble</Filter>
+    <ClInclude Include="src\Bubble\Scene\Components.h">
+      <Filter>src\Bubble\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
@@ -147,11 +180,11 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
+    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\Windows\WindowsInput.h">
-      <Filter>src\Platform\Windows</Filter>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
       <Filter>src\Platform\Windows</Filter>
@@ -1410,18 +1443,22 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Renderer\OrthographicCameraController.h" />
-    <ClInclude Include="src\Bubble\Renderer\Renderer2D.h" />
-    <ClInclude Include="src\Bubble\Renderer\UniformBuffer.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
-    <ClInclude Include="src\Bubble\Debug\Intrumentor.h" />
-    <ClInclude Include="src\Bubble\Scene\Components.h" />
-    <ClInclude Include="src\Bubble\Renderer\SubTexture2D.h" />
-    <ClInclude Include="src\Bubble\Core\Random.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
-      <Filter>src\Bubble</Filter>
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\Layer.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\LayerStack.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\Log.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\Random.cpp">
+      <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp">
       <Filter>src\Bubble\ImGui</Filter>
@@ -1429,19 +1466,16 @@
     <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp">
       <Filter>src\Bubble\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bubble\Core\Layer.cpp">
-      <Filter>src\Bubble</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bubble\Core\LayerStack.cpp">
-      <Filter>src\Bubble</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bubble\Core\Log.cpp">
-      <Filter>src\Bubble</Filter>
-    </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Buffer.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\Framebuffer.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\OrthographicCamera.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\OrthographicCameraController.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\RenderCommand.cpp">
@@ -1450,13 +1484,22 @@
     <ClCompile Include="src\Bubble\Renderer\Renderer.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\Renderer2D.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\RendererAPI.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Shader.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\SubTexture2D.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Texture.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\UniformBuffer.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\VertexArray.cpp">
@@ -1468,6 +1511,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1475,6 +1521,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
@@ -1492,11 +1541,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bubble\Renderer\OrthographicCameraController.cpp" />
-    <ClCompile Include="src\Bubble\Renderer\Renderer2D.cpp" />
-    <ClCompile Include="src\Bubble\Renderer\UniformBuffer.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
-    <ClCompile Include="src\Bubble\Renderer\SubTexture2D.cpp" />
-    <ClCompile Include="src\Bubble\Core\Random.cpp" />
   </ItemGroup>
 </Project>

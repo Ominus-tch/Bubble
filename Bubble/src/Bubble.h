@@ -22,6 +22,7 @@
 
 #include "Bubble/Renderer/Buffer.h"
 #include "Bubble/Renderer/Shader.h"
+#include "Bubble/Renderer/Framebuffer.h"
 #include "Bubble/Renderer/Texture.h"
 #include "Bubble/Renderer/SubTexture2D.h"
 #include "Bubble/Renderer/VertexArray.h"

@@ -4,20 +4,20 @@
 #include "Sandbox2D.h"
 #include "ExampleLayer.h"
 
-class Sandbox : public Bubble::Application
+class Bubblegum : public Bubble::Application
 {
 public:
-	Sandbox(const Bubble::ApplicationSpecification& specification)
+	Bubblegum(const Bubble::ApplicationSpecification& specification)
 	: Bubble::Application(specification)
 	{
 		//Bubble::Window& window = GetWindow();
 		//window.SetVSync(false);
 
 		//PushLayer(new ExampleLayer());
-		PushLayer(new Sandbox2D());
+		PushLayer(new EditorLayer());
 	}
 
-	~Sandbox()
+	~Bubblegum()
 	{
  
 	}
@@ -30,5 +30,5 @@ Bubble::Application* Bubble::CreateApplication(Bubble::ApplicationCommandLineArg
 	//spec.WorkingDirectory = "../Hazelnut";
 	spec.CommandLineArgs = args;
 
-	return new Sandbox(spec);
+	return new Bubblegum(spec);
 }

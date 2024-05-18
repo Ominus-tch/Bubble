@@ -80,7 +80,9 @@
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -104,6 +106,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -128,6 +131,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -143,22 +147,24 @@
     <ClInclude Include="src\Bubble.h" />
     <ClInclude Include="src\Bubble\Core\Application.h" />
     <ClInclude Include="src\Bubble\Core\Base.h" />
+    <ClInclude Include="src\Bubble\Core\EntryPoint.h" />
+    <ClInclude Include="src\Bubble\Core\Input.h" />
+    <ClInclude Include="src\Bubble\Core\KeyCodes.h" />
+    <ClInclude Include="src\Bubble\Core\Layer.h" />
+    <ClInclude Include="src\Bubble\Core\LayerStack.h" />
+    <ClInclude Include="src\Bubble\Core\Log.h" />
+    <ClInclude Include="src\Bubble\Core\MouseCodes.h" />
     <ClInclude Include="src\Bubble\Core\Random.h" />
     <ClInclude Include="src\Bubble\Core\Timestep.h" />
-    <ClInclude Include="src\Bubble\Core\EntryPoint.h" />
+    <ClInclude Include="src\Bubble\Core\Window.h" />
     <ClInclude Include="src\Bubble\Debug\Intrumentor.h" />
     <ClInclude Include="src\Bubble\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Bubble\Events\Event.h" />
     <ClInclude Include="src\Bubble\Events\KeyEvent.h" />
     <ClInclude Include="src\Bubble\Events\MouseEvent.h" />
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Bubble\Core\Input.h" />
-    <ClInclude Include="src\Bubble\Core\KeyCodes.h" />
-    <ClInclude Include="src\Bubble\Core\Layer.h" />
-    <ClInclude Include="src\Bubble\Core\LayerStack.h" />
-    <ClInclude Include="src\Bubble\Core\Log.h" />
-    <ClInclude Include="src\Bubble\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Bubble\Renderer\Buffer.h" />
+    <ClInclude Include="src\Bubble\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Bubble\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Bubble\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Bubble\Renderer\OrthographicCameraController.h" />
@@ -171,16 +177,15 @@
     <ClInclude Include="src\Bubble\Renderer\Texture.h" />
     <ClInclude Include="src\Bubble\Renderer\UniformBuffer.h" />
     <ClInclude Include="src\Bubble\Renderer\VertexArray.h" />
-    <ClInclude Include="src\Bubble\Core\Window.h" />
     <ClInclude Include="src\Bubble\Scene\Components.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
-    <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\bgpch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -603,13 +608,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp" />
-    <ClCompile Include="src\Bubble\Core\Random.cpp" />
-    <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp" />
-    <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Bubble\Core\Layer.cpp" />
     <ClCompile Include="src\Bubble\Core\LayerStack.cpp" />
     <ClCompile Include="src\Bubble\Core\Log.cpp" />
+    <ClCompile Include="src\Bubble\Core\Random.cpp" />
+    <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp" />
+    <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Bubble\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Bubble\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Bubble\Renderer\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Bubble\Renderer\RenderCommand.cpp" />
@@ -623,6 +629,7 @@
     <ClCompile Include="src\Bubble\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
