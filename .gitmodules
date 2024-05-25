@@ -6,7 +6,8 @@
 	url = https://github.com/TheCherno/GLFW
 [submodule "Bubble/vendor/imgui"]
 	path = Bubble/vendor/imgui
-	url = https://github.com/TheCherno/imgui
+	url = https://github.com/ocornut/imgui
+	branch = docking
 [submodule "Bubble/vendor/glm"]
 	path = Bubble/vendor/glm
 	url = https://github.com/g-truc/glm
