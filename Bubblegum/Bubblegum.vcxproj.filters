@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Black Hole Simulation">
+      <UniqueIdentifier>{6FF6EB56-DB62-A751-A456-3FAF1082C9B9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Default Editor Layer">
+      <UniqueIdentifier>{2EF3E525-1A82-6FEF-C3A0-83EAAF0E8095}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\EditorLayer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BubblegumApp.cpp" />
+    <ClCompile Include="src\EditorLayer.cpp" />
+  </ItemGroup>
+</Project>
