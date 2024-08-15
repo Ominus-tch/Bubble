@@ -2,6 +2,8 @@
 
 #include <Bubble.h>
 
+#include "Particle.h"
+
 namespace Bubble {
 
 	class EditorLayer : public Layer
@@ -35,6 +37,8 @@ namespace Bubble {
 		// App
 		Ref<Texture2D> m_CheckerboardTexture;
 		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
+
+		std::vector<Particle> m_Particles;
 	};
 
 }

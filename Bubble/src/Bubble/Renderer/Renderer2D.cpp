@@ -220,9 +220,27 @@ namespace Bubble {
 	{
 		BG_PROFILE_FUNCTION();
 
-		//BG_PROFILE_FUNCTION();
-
 		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjectionMatrix();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+
+		StartBatch();
+	}
+
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		BG_PROFILE_FUNCTION();
+
+		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+
+		StartBatch();
+	}
+
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		BG_PROFILE_FUNCTION();
+
+		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
 		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
@@ -557,7 +575,29 @@ namespace Bubble {
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness /*= 1.0f*/, float fade /*= 0.005f*/, int entityID /*= -1*/)
+	void Renderer2D::DrawCircle(const glm::vec3 pos, const float r, const glm::vec4 color)
+	{
+		int segments = 100;
+		float angleStep = 2 * PI / segments;
+		glm::vec3 previousPoint = pos + glm::vec3(r, 0, 0);
+
+		for (int i = 1; i <= segments; ++i) {
+			float angle = i * angleStep;
+			glm::vec3 newPoint = pos + glm::vec3(r * cos(angle), r * sin(angle), 0);
+			DrawLine(previousPoint, newPoint, color);
+			previousPoint = newPoint;
+		}
+	}
+
+	void Renderer2D::DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color)
+	{
+		auto transform = glm::translate(glm::mat4(1.0f), pos) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(r, r, 1.0f));
+		
+		DrawCircleFilled(glm::mat4(transform), color);
+	}
+
+	void Renderer2D::DrawCircleFilled(const glm::mat4& transform, const glm::vec4& color, float thickness /*= 1.0f*/, float fade /*= 0.005f*/, int entityID /*= -1*/)
 	{
 		BG_PROFILE_FUNCTION();
 
@@ -579,6 +619,19 @@ namespace Bubble {
 		s_Data.CircleIndexCount += 6;
 
 		s_Data.Stats.QuadCount++;
+	}
+
+	void Renderer2D::DrawArc(const glm::vec3& pos, float r, float startAngle, float endAngle, const glm::vec4& color) {
+		int segments = 100;
+		float angleStep = (endAngle - startAngle) / segments;
+		glm::vec3 previousPoint = pos + glm::vec3(r * cos(startAngle), r * sin(startAngle), 0);
+
+		for (int i = 1; i <= segments; ++i) {
+			float angle = startAngle + i * angleStep;
+			glm::vec3 newPoint = pos + glm::vec3(r * cos(angle), r * sin(angle), 0);
+			DrawLine(previousPoint, newPoint, color);
+			previousPoint = newPoint;
+		}
 	}
 
 
@@ -625,6 +678,14 @@ namespace Bubble {
 		DrawLine(lineVertices[1], lineVertices[2], color, entityID);
 		DrawLine(lineVertices[2], lineVertices[3], color, entityID);
 		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
+	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		if (src.Texture)
+			DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
+		else
+			DrawQuad(transform, src.Color, entityID);
 	}
 
 	float Renderer2D::GetLineWidth()

@@ -26,14 +26,6 @@ void EditorLayer::OnUpdate(Bubble::Timestep ts)
 {
 	BG_PROFILE_FUNCTION()
 
-	/*if (m_FrameCount < 10)
-	{
-		m_FrameCount++;
-		Bubble::Random::Next(ts);
-	}*/
-
-	//m_LoopTime += ts;
-
 	m_FPS = 1.f / ts;
 
     Bubble::Renderer2D::ResetStats();

@@ -28,9 +28,5 @@ private:
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
-	float m_LastFrameTime = 0.f;
 	float m_FPS = 0.f;
-	uint32_t m_FrameCount = 0;
-	
-	float m_LoopTime = 0.f;
 };

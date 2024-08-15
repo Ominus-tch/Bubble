@@ -5,10 +5,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "CameraController.h"
+
 namespace Bubble {
 
     EditorLayer::EditorLayer()
-        : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f }), m_Blackhole()
+        : Layer("EditorLayer"), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
     {
     }
 
@@ -24,6 +26,22 @@ namespace Bubble {
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         //m_CameraController.SetZoomLevel(5.f);
+
+        m_ActiveScene = CreateRef<Scene>();
+
+        m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity.AddComponent<CameraComponent>();
+
+        m_SecondCamera = m_ActiveScene->CreateEntity("Clip-Space Entity");
+        auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
+        cc.Primary = false;
+
+        //m_SecondCamera.AddComponent<NativeScriptComponent>();
+
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
     }
 
     void EditorLayer::OnDetach()
@@ -35,55 +53,31 @@ namespace Bubble {
     {
         BG_PROFILE_FUNCTION();
 
-        /*if (m_FrameCount < 10)
+        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification(); 
+            m_ViewportSize.x > 0.f && m_ViewportSize.y > 0.f &&
+            (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
         {
-            m_FrameCount++;
-            Random::Next(ts);
-        }*/
-
-        //m_LoopTime += ts;
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        }
 
         m_FPS = 1.f / ts;
 
-        // Update
-        m_CameraController.OnUpdate(ts);
-    }
+        m_SquareEntity.GetComponent<SpriteRendererComponent>().Color = m_SquareColor;
 
-    void EditorLayer::OnRender(Timestep ts)
-    {
         Renderer2D::ResetStats();
         {
             BG_PROFILE_SCOPE("Renderer Prep");
             m_Framebuffer->Bind();
-            RenderCommand::SetClearColor({ 1.f, 1.f, 1.f, 1 });
-            //RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+            //RenderCommand::SetClearColor({ 1.f, 1.f, 1.f, 1.f });
+            RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
             RenderCommand::Clear();
         }
 
         {
             BG_PROFILE_SCOPE("Renderer Draw");
 
-            static float rotation = 0.0f;
-            rotation += ts * 50.0f;
-
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-            Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-            Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
-            Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
-            Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(rotation), m_CheckerboardTexture, 20.0f);
-            Renderer2D::EndScene();
-
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            for (float y = -5.0f; y < 5.0f; y += 0.5f)
-            {
-                for (float x = -5.0f; x < 5.0f; x += 0.5f)
-                {
-                    glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-                    Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-                }
-            }
-            Renderer2D::EndScene();
+            m_ActiveScene->OnUpdateRuntime(ts);
 
             m_Framebuffer->Unbind();
         }
@@ -154,6 +148,23 @@ namespace Bubble {
         ImGui::Text("FPS: %f", m_FPS);
 
         ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+        ImGui::Separator();
+
+        ImGui::DragFloat3("Camera Transform",
+            glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Translation));
+
+        if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
+        {
+            m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
+            m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+        }
+
+        auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
+        float orthoSize = camera.GetOrthographicSize();
+        if (ImGui::DragFloat("Orthographic", &orthoSize))
+        {
+            camera.SetOrthographicSize(orthoSize);
+        }
 
         //ImGui::Image((void*)m_CheckerboardTexture->GetRendererID(), ImVec2(256.f, 256.f));
 
@@ -162,16 +173,7 @@ namespace Bubble {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
         ImGui::Begin("Viewport");
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-
-        if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize))
-        {
-            m_Framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-            m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
-
-            BG_WARN("Viewport Size: {0}, {1}", viewportPanelSize.x, viewportPanelSize.y); 
-            m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-        }
+        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
         ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), 
                     { m_ViewportSize.x, m_ViewportSize.y },
@@ -185,7 +187,7 @@ namespace Bubble {
 
     void EditorLayer::OnEvent(Event& e)
     {
-        m_CameraController.OnEvent(e);
+
     }
 
 }

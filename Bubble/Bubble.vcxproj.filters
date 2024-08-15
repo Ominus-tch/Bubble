@@ -1443,6 +1443,14 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\Scene.h" />
+    <ClInclude Include="src\Bubble\Core\UUID.h" />
+    <ClInclude Include="src\Bubble\Renderer\Camera.h" />
+    <ClInclude Include="src\Bubble\Renderer\EditorCamera.h" />
+    <ClInclude Include="src\Bubble\Scene\Entity.h" />
+    <ClInclude Include="src\Bubble\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Bubble\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Bubble\Scene\SceneSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
@@ -1541,5 +1549,11 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Core\UUID.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\EditorCamera.cpp" />
+    <ClCompile Include="src\Bubble\Scene\Entity.cpp" />
+    <ClCompile Include="src\Bubble\Scene\Scene.cpp" />
+    <ClCompile Include="src\Bubble\Scene\SceneCamera.cpp" />
+    <ClCompile Include="src\Bubble\Scene\SceneSerializer.cpp" />
   </ItemGroup>
 </Project>

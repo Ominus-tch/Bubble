@@ -9,6 +9,10 @@
 
 #include <glad/glad.h>
 
+// Example
+//#define GLFW_EXPOSE_NATIVE_WIN32
+//#include <GLFW/glfw3native.h>
+
 namespace Bubble
 {
 	static uint8_t s_GLFWWindowCount = 0;
@@ -55,9 +59,16 @@ namespace Bubble
 		}
 
 		{
+			// Example:
+			//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
 			BG_PROFILE_SCOPE("glfwCreateWindow");
 			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			++s_GLFWWindowCount;
+
+			//HWND hwnd = glfwGetWin32Window(m_Window);
+			//SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+			//SetLayeredWindowAttributes(hwnd, 0, (BYTE)(255 * 0.0f), LWA_ALPHA);
 		}
 
 		m_Context = new OpenGLContext(m_Window);

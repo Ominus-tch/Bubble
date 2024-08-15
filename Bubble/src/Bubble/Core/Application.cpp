@@ -93,13 +93,6 @@ namespace Bubble {
 						layer->OnUpdate(timestep);
 				}
 
-				{
-					BG_PROFILE_SCOPE("LayerStack OnRender")
-
-						for (Layer* layer : m_LayerStack)
-							layer->OnRender(timestep);
-				}
-
 				m_ImGuiLayer->Begin();
 				{
 					BG_PROFILE_SCOPE("LayerStack OnImGuiRender")

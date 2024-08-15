@@ -1,15 +1,16 @@
 #include "EditorLayer.h"
 
 #include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../assets/scripts/CameraController.h"
+
 namespace Bubble {
 
     EditorLayer::EditorLayer()
-        : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
+        : Layer("EditorLayer")
     {
     }
 
@@ -24,9 +25,26 @@ namespace Bubble {
         fbSpec.Width = 1280; fbSpec.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
-        //m_Boundries.push_back({ {300, 100}, {300, 300} });
+        //m_CameraController.SetZoomLevel(5.f);
 
-        //m_CameraController.SetZoomLevel(500.f);
+        m_ActiveScene = CreateRef<Scene>();
+
+        m_SquareEntity = m_ActiveScene->CreateEntity("Square 1");
+        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4( 1.0f, 0.2f, 0.2f, 1.0f)).Texture = m_CheckerboardTexture;
+
+        m_Square2 = m_ActiveScene->CreateEntity("Square 2");
+        m_Square2.AddComponent<SpriteRendererComponent>().Texture = m_CheckerboardTexture;
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity.AddComponent<CameraComponent>();
+
+        m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+        m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
+
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDetach()
@@ -38,93 +56,29 @@ namespace Bubble {
     {
         BG_PROFILE_FUNCTION();
 
-
-        //if (m_ViewportFocused)
-        //{
-        //    glm::vec2 mousePos = Input::GetMousePosition() - m_WindowPos;
-        //    glm::vec2 screenDims = { m_Framebuffer->GetSpecification().Width, m_Framebuffer->GetSpecification().Height };
-        //    glm::vec2 cameraPos = m_CameraController.GetCameraPos();
-        //    float zoomLevel = m_CameraController.GetZoomLevel();
-
-        //    //BG_INFO("Mouse Pos: {0}, {1}", mousePos.x, mousePos.y);
-        //    //BG_INFO("Screen Dims: {0}, {1}", screenDims.x, screenDims.y);
-        //    //BG_INFO("Cam Pos: {0}, {1}", cameraPos.x, cameraPos.y);
-        //    //BG_INFO("Zoom Level: {0}", zoomLevel);
-
-        //    //Mouse Pos: 844, 174
-        //    //Screen Dims: 1280, 682
-        //    //Cam Pos: 0, 0
-        //    //Zoom Level: 500
-
-        //    //Expected Result 300, 300.
-
-        //    //Result: 0.408, 0.334
-
-        //    m_MouseWorldPos = Utils::ScreenToWorld(mousePos, screenDims, cameraPos, zoomLevel);
-
-        //    //BG_INFO("{0}, {1}", m_MouseWorldPos.x, m_MouseWorldPos.y);
-
-        //    /*if (m_FrameCount < 10)
-        //    {
-        //        m_FrameCount++;
-        //        Random::Next(ts);
-        //    }*/
-
-        //    //m_LoopTime += ts;
-    
-        //}
+        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification(); 
+            m_ViewportSize.x > 0.f && m_ViewportSize.y > 0.f &&
+            (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+        {
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        }
 
         m_FPS = 1.f / ts;
 
-        // Update
-        if (m_ViewportFocused)
-            m_CameraController.OnUpdate(ts);
-    }
-
-    void EditorLayer::OnRender(Timestep ts)
-    {
         Renderer2D::ResetStats();
         {
             BG_PROFILE_SCOPE("Renderer Prep");
             m_Framebuffer->Bind();
-            //RenderCommand::SetClearColor({ 1.f, 1.f, 1.f, 1 });
-            RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+            //RenderCommand::SetClearColor({ 1.f, 1.f, 1.f, 1.f });
+            RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
             RenderCommand::Clear();
         }
 
         {
             BG_PROFILE_SCOPE("Renderer Draw");
 
-            static float rotation = 0.0f;
-            rotation += ts * 50.0f;
-
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            Renderer2D::DrawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-            Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-            Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
-            Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
-            Renderer2D::DrawRotatedQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(rotation), m_CheckerboardTexture, 20.0f);
-            Renderer2D::EndScene();
-
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            for (float y = -5.0f; y < 5.0f; y += 0.5f)
-            {
-                for (float x = -5.0f; x < 5.0f; x += 0.5f)
-                {
-                    glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-                    Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-                }
-            }
-            Renderer2D::EndScene();
-
-            /*Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-            for (const Boundary& boundary : m_Boundries)
-            {
-                Renderer2D::DrawLine({ boundary.GetPosA().x, boundary.GetPosA().y, 0.f }, {boundary.GetPosB().x, boundary.GetPosB().y, 0.f }, { 1.f, 1.f, 1.f, 1.f });
-            }
-
-            Renderer2D::EndScene(); */
+            m_ActiveScene->OnUpdateRuntime(ts);
 
             m_Framebuffer->Unbind();
         }
@@ -181,6 +135,10 @@ namespace Bubble {
             ImGui::EndMenuBar();
         }
 
+        // Panels
+
+        m_SceneHierarchyPanel.OnImGuiRender();
+
         // Windows
 
         ImGui::Begin("Settings");
@@ -194,43 +152,12 @@ namespace Bubble {
 
         ImGui::Text("FPS: %f", m_FPS);
 
-        ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
-
-        //ImGui::Image((void*)m_CheckerboardTexture->GetRendererID(), ImVec2(256.f, 256.f));
-
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
         ImGui::Begin("Viewport");
-
-        m_ViewportFocused = ImGui::IsWindowFocused();
-        m_ViewportHovered = ImGui::IsWindowHovered();
-
-        ImGuiLayer* imGuiLayer = Application::Get().GetImGuiLayer();
-        imGuiLayer->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
-
-        /*ImGuiContext& g = *GImGui;
-        auto* focused = g.NavWindow;
-
-        if (ImGui::GetCurrentWindow() == focused)
-        {
-            BG_INFO("Focused");
-        }*/
-
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-        ImVec2 windowPos = ImGui::GetWindowPos();
-
-        m_WindowPos = *((glm::vec2*)&windowPos);
-        //BG_INFO("Window: {0}, {1}", m_WindowPos.x, m_WindowPos.y);
-
-        if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize) && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
-        {
-            m_Framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-            m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
-
-            //BG_WARN("Viewport Size: {0}, {1}", viewportPanelSize.x, viewportPanelSize.y); 
-            m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-        }
+        m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
         ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), 
                     { m_ViewportSize.x, m_ViewportSize.y },
@@ -244,11 +171,7 @@ namespace Bubble {
 
     void EditorLayer::OnEvent(Event& e)
     {
-        //EventDispatcher dispatcher(e);
-        //dispatcher.Dispatch<WindowCloseEvent>(BG_BIND_EVENT_FN(Application::OnWindowClose));
 
-
-        m_CameraController.OnEvent(e);
     }
 
 }
