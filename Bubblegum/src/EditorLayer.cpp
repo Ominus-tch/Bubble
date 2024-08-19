@@ -11,6 +11,8 @@
 
 #include "Bubble/Scene/SceneSerializer.h"
 
+#include "CodingTrain.h"
+
 namespace Bubble {
 
     EditorLayer::EditorLayer()
@@ -54,12 +56,18 @@ namespace Bubble {
         //SceneSerializer serializer(m_ActiveScene);
         //serializer.Serialize("assets/scenes/Example.bubble");
 
-        Segment* a = new Segment({ 0.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, {}, m_Animate);
-        m_EndSegment = a;
+        //m_Y = { 100.f, 100.f, 100.f, -100.f, -100.f, -100.f, 100.f, 100.f, 100.f, -100.f, -100.f, -100.f };
 
-        //BG_INFO("{0}, {1}", m_EndSegment->B().x, m_EndSegment->B().y);
-        a->m_Completed = true;
-        m_Segments.push_back(a);
+        const int skip = 8;
+        for (int i = 0; i < drawing->size(); i += skip)
+        {
+            glm::vec2& a = drawing[0][i];
+            m_X.push_back(a.x);
+            m_Y.push_back(a.y);
+        }
+
+        m_FourierX = dft(m_X);
+        m_FourierY = dft(m_Y);
     }
 
     void EditorLayer::OnDetach()
@@ -102,19 +110,58 @@ namespace Bubble {
 
             Renderer2D::BeginScene(comp.Camera, transform.GetTransform());
 
-            for (int i = 0; i < m_Segments.size(); i++)
+            //glm::vec3 pos;
+
+            //for (int i = 0; i < m_FourierY.size(); i++)
+            //{
+            //    prevPos = pos;
+
+            //    /*int n = i * 2 + 1;
+            //    float r = 75.f * (4 / (n * PI));
+            //    pos += glm::vec3(
+            //        r * cosf(n * m_Time),
+            //        r * sinf(n * m_Time),
+            //        0.f
+            //    );
+            //    
+            //    Renderer2D::DrawCircle(prevPos, r * 2.f, {1.f, 1.f, 1.f, 0.4f});
+            //    Renderer2D::DrawLine(prevPos, pos);
+
+            //    if ((i + 1) % 30000 == 0)
+            //    {
+            //        Renderer2D::EndScene();
+            //        Renderer2D::BeginScene(comp.Camera, transform.GetTransform());
+            //    }*/
+            //}
+
+            glm::vec3 posX = { -100.f, 0.f, 0.f };
+            glm::vec3 posY = { 0.f, 100.f, 0.f };
+
+            glm::vec3 vx = EpiCycles(posX, 0, m_FourierX);
+            glm::vec3 vy = EpiCycles(posY, PI / 2, m_FourierY);
+            glm::vec2 v = { vx.x, vy.y };
+            m_Path.insert(m_Path.begin(), v);
+            Renderer2D::DrawLine({ vx.x, vx.y, 0.f }, { v.x, v.y, 0.f });
+            Renderer2D::DrawLine({ vy.x, vy.y, 0.f }, { v.x, v.y, 0.f });
+
+            glm::vec2 prevPos;
+            for (int i = 0; i < m_Path.size(); i++)
             {
-                Segment* segment = m_Segments[i];
-
-                segment->Update(ts);
-                segment->Draw();
-
-                if (i % 30000 == 0)
+                glm::vec2 pos = m_Path[i];
+                
+                if (i != 0)
                 {
-                    Renderer2D::EndScene();
-                    Renderer2D::BeginScene(comp.Camera, transform.GetTransform());
+                    Renderer2D::DrawLine({ prevPos.x, prevPos.y, 0.f }, { pos.x, pos.y, 0.f });
                 }
+                prevPos = pos;
             }
+
+            if (m_Time > PI * 2.f)
+            {
+                m_Time = 0.f;
+                m_Path.clear();
+            }
+
 
             Renderer2D::EndScene();
 
@@ -218,10 +265,6 @@ namespace Bubble {
         ImGui::Text("Time Elasped: %fs", m_Time);
         ImGui::Text("FPS: %f", m_FPS);
 
-        
-        ImGui::Text("Segments: %d", m_Segments.size());
-
-        if (ImGui::Button("Iteration")) Iteration();
         ImGui::Checkbox("Animate", &m_Animate);
 
         ImGui::End();
@@ -265,18 +308,22 @@ namespace Bubble {
         return false;
     }
 
-    void EditorLayer::Iteration()
+    glm::vec3 EditorLayer::EpiCycles(glm::vec3 pos, float rotation, std::vector<fourier> Fourier)
     {
-        std::vector<Segment*> newSegments;
-
-        for (const Segment* segment : m_Segments)
+        for (int i = 0; i < Fourier.size(); i++)
         {
-            glm::vec3 endPoint = m_Segments.size() == 1 ? m_EndSegment->B() : m_EndSegment->A();
-            newSegments.push_back(new Segment(segment->A(), segment->B(), endPoint, m_Animate));
-        }
+            glm::vec3 prevPos = pos;
+            fourier f = Fourier[i];
+            pos += glm::vec3(
+                f.amp * cosf(f.freq * m_Time + f.phase + rotation),
+                f.amp * sinf(f.freq * m_Time + f.phase + rotation),
+                0.f
+            );
 
-        m_EndSegment = newSegments[0];
-        m_Segments.insert(m_Segments.end(), newSegments.begin(), newSegments.end());
+            Renderer2D::DrawCircle(prevPos, f.amp * 2.f);
+            Renderer2D::DrawLine(prevPos, pos);
+        }
+        return pos;
     }
 
     bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)

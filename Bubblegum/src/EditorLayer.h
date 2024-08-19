@@ -8,82 +8,37 @@
 
 namespace Bubble {
 
-	class Segment
+	struct fourier
 	{
-	public:
-		Segment(glm::vec3 a, glm::vec3 b, glm::vec3 origin, bool animate = false)
-		{
-			m_A = a;
-			m_B = b;
-
-			m_StartA = a;
-			m_StartB = b;
-
-			m_Origin = origin;
-
-			if (!animate)
-			{
-				m_Angle = 90.f;
-				m_Completed = true;
-
-				glm::vec3 va = m_StartA - m_Origin;
-				glm::vec3 vb = m_StartB - m_Origin;
-
-				float angle = glm::radians(m_Angle);
-				glm::vec3 axis(0.0f, 0.0f, 1.0f);
-
-				glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, axis);
-				va = glm::vec3(rotationMatrix * glm::vec4(va, 1.0f));
-				vb = glm::vec3(rotationMatrix * glm::vec4(vb, 1.0f));
-
-				m_A = m_Origin + va;
-				m_B = m_Origin + vb;
-			}
-		}
-
-		void Draw() const
-		{
-			Renderer2D::DrawLine(m_A, m_B, { 1.f, 1.f, 1.f, 1.f });
-		}
-
-		void Update(Timestep ts)
-		{
-			if (!m_Completed)
-			{
-				m_Angle += ts * 90.f; // 2 seconds (90 / 45)
-				BG_INFO(m_Angle);
-				if (m_Angle >= 90.f)
-				{
-					m_Angle = 90.f;
-					m_Completed = true;
-				}
-
-				glm::vec3 va = m_StartA - m_Origin;
-				glm::vec3 vb = m_StartB - m_Origin;
-
-				float angle = glm::radians(m_Angle);
-				glm::vec3 axis(0.0f, 0.0f, 1.0f);
-
-				glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, axis);
-				va = glm::vec3(rotationMatrix * glm::vec4(va, 1.0f));
-				vb = glm::vec3(rotationMatrix * glm::vec4(vb, 1.0f));
-
-				m_A = m_Origin + va;
-				m_B = m_Origin + vb;
-			}
-		}
-
-		glm::vec3 A() const { return m_A; }
-		glm::vec3 B() const { return m_B; }
-
-		bool m_Completed = false;
-	private:
-		glm::vec3 m_StartA, m_StartB;
-		glm::vec3 m_A, m_B;
-		glm::vec3 m_Origin;
-
-		float m_Angle = 0.f;
+		float re;
+		float im;
+		size_t freq;
+		float amp;
+		float phase;
 	};
+
+	static std::vector<fourier> dft(std::vector<float> x) {
+		std::vector<fourier> X;
+		size_t N = x.size();
+		X.reserve(N);
+		for (size_t k = 0; k < N; k++) {
+			float re = 0.f;
+			float im = 0.f;
+			for (size_t n = 0; n < N; n++) {
+				float phi = (PI * 2.f * k * n) / N;
+				re += x[n] * cosf(phi);
+				im -= x[n] * sinf(phi);
+			}
+			re = re / N;
+			im = im / N;
+
+			size_t freq = k;
+			float amp = sqrtf(re * re + im * im);
+			float phase = atan2f(im, re);
+			X[k] = { re, im, freq, amp, phase };
+		}
+		return X;
+	}
 
 	class EditorLayer : public Layer
 	{
@@ -98,7 +53,7 @@ namespace Bubble {
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 
-		void Iteration();
+		glm::vec3 EpiCycles(glm::vec3 pos, float rotation, std::vector<fourier> fourier);
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
@@ -135,8 +90,16 @@ namespace Bubble {
 		bool m_PrimaryCamera = true;
 
 		// App
-		std::vector<Segment*> m_Segments;
-		Segment* m_EndSegment;
+		std::vector<fourier> m_FourierX;
+		std::vector<fourier> m_FourierY;
+
+		std::vector<float> m_X;
+		std::vector<float> m_Y;
+
+		std::vector<glm::vec2> m_Path;
+
+		std::vector<float> m_Wave;
+
 		bool m_Animate = true;
 
 		Ref<Texture2D> m_CheckerboardTexture;

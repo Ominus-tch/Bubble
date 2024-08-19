@@ -32,6 +32,7 @@
       <Filter>Panels</Filter>
     </ClInclude>
     <ClInclude Include="assets\scripts\CameraController.h" />
+    <ClInclude Include="src\CodingTrain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BubblegumApp.cpp" />
