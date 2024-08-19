@@ -11,3 +11,6 @@
 	path = Bubble/vendor/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
+[submodule "Bubble/vendor/yaml-cpp"]
+	path = Bubble/vendor/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
