@@ -27,7 +27,7 @@ Bubble::Application* Bubble::CreateApplication(Bubble::ApplicationCommandLineArg
 {
 	ApplicationSpecification spec;
 	spec.Name = "Sandbox";
-	//spec.WorkingDirectory = "../Hazelnut";
+	//spec.WorkingDirectory = "../Bubblegum";
 	spec.CommandLineArgs = args;
 
 	return new Bubblegum(spec);

@@ -409,7 +409,7 @@ namespace Bubble {
 		//}
 		//catch (YAML::ParserException e)
 		//{
-		//	BG_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
+		//	BG_CORE_ERROR("Failed to load .bubble file '{0}'\n     {1}", filepath, e.what());
 		//	return false;
 		//}
 
@@ -488,7 +488,7 @@ namespace Bubble {
 
 		//		//				ScriptFieldInstance& fieldInstance = entityFields[name];
 
-		//		//				// TODO(Yan): turn this assert into Hazelnut log warning
+		//		//				// TODO(Yan): turn this assert into Bubblegum log warning
 		//		//				BG_CORE_ASSERT(fields.find(name) != fields.end());
 
 		//		//				if (fields.find(name) == fields.end())

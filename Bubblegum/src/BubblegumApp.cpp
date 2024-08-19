@@ -28,7 +28,7 @@ namespace Bubble {
 	{
 		ApplicationSpecification spec;
 		spec.Name = "Bubblegum";
-		//spec.WorkingDirectory = "../Hazelnut";
+		//spec.WorkingDirectory = "../Bubblegum";
 		spec.CommandLineArgs = args;
 
 		return new Bubblegum(spec);
