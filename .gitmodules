@@ -4,9 +4,6 @@
 [submodule "Bubble/vendor/glm"]
 	path = Bubble/vendor/glm
 	url = https://github.com/g-truc/glm
-[submodule "Bubble/vendor/yaml-cpp"]
-	path = Bubble/vendor/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp
 [submodule "Bubble/vendor/GLFW"]
 	path = Bubble/vendor/GLFW
 	url = https://github.com/glfw/glfw
