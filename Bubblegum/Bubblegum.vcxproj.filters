@@ -1,23 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Black Hole Simulation">
-      <UniqueIdentifier>{6FF6EB56-DB62-A751-A456-3FAF1082C9B9}</UniqueIdentifier>
+    <Filter Include="Panels">
+      <UniqueIdentifier>{A80D95C9-94AF-BF9F-7D6A-D3F369AB46F0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Default Editor Layer">
-      <UniqueIdentifier>{2EF3E525-1A82-6FEF-C3A0-83EAAF0E8095}</UniqueIdentifier>
+    <Filter Include="Projects">
+      <UniqueIdentifier>{4FB858A2-3B85-B3AD-649E-A15550CAE83B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Projects\Black Hole Simulation">
+      <UniqueIdentifier>{68B50F0C-54DB-D972-3D21-5F3E29E6FE3E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projects\Collatz Conjecture">
+      <UniqueIdentifier>{E909214B-5517-4F31-DEFD-4A1C4A0A1BE8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projects\Default Editor Layer">
+      <UniqueIdentifier>{0737A123-734F-884D-3CFC-17E7A8D31CE7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projects\Particle Base">
+      <UniqueIdentifier>{6D411F95-593B-48E7-42A8-DEF72E41AE53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projects\Text Rendering">
+      <UniqueIdentifier>{E1661286-4D9E-5A1D-56A8-BE40C25E8116}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\EditorLayer.h" />
+    <ClInclude Include="src\Panels\ContentBrowserPanel.h">
+      <Filter>Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Panels\SceneHierarchyPanel.h">
+      <Filter>Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="assets\scripts\CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BubblegumApp.cpp" />
     <ClCompile Include="src\EditorLayer.cpp" />
-    <ClCompile Include="src\Panels\SceneHierarchyPanel.cpp" />
-    <ClCompile Include="src\Panels\ContentBrowserPanel.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="assets\scripts\CameraController.h" />
-    <ClInclude Include="src\EditorLayer.h" />
-    <ClInclude Include="src\Panels\SceneHierarchyPanel.h" />
-    <ClInclude Include="src\Panels\ContentBrowserPanel.h" />
+    <ClCompile Include="src\Panels\ContentBrowserPanel.cpp">
+      <Filter>Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Panels\SceneHierarchyPanel.cpp">
+      <Filter>Panels</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

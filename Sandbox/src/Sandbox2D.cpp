@@ -65,11 +65,6 @@ void EditorLayer::OnUpdate(Bubble::Timestep ts)
 	m_CameraController.OnUpdate(ts);
 }
 
-void EditorLayer::OnRender(Bubble::Timestep ts)
-{
-
-}
-
 void EditorLayer::OnImGuiRender()
 {
     BG_PROFILE_FUNCTION()

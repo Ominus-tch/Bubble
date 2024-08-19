@@ -19,6 +19,9 @@
     <Filter Include="src\Bubble\ImGui">
       <UniqueIdentifier>{F261179F-DE5A-36F1-078D-1B76F3E415FD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Bubble\Project">
+      <UniqueIdentifier>{0EE3C6EB-FAC6-8741-6327-82944F2A72C3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Bubble\Renderer">
       <UniqueIdentifier>{6E5BB051-DABC-8D5F-632A-D411CF8AC41E}</UniqueIdentifier>
     </Filter>
@@ -96,6 +99,9 @@
     <ClInclude Include="src\Bubble\Core\Timestep.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Core\UUID.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Core\Window.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
@@ -117,7 +123,19 @@
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h">
       <Filter>src\Bubble\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Project\Project.h">
+      <Filter>src\Bubble\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Project\ProjectSerializer.h">
+      <Filter>src\Bubble\Project</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Buffer.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\Camera.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\EditorCamera.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Framebuffer.h">
@@ -160,6 +178,21 @@
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Scene\Components.h">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\Entity.h">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\Scene.h">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\SceneCamera.h">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\SceneSerializer.h">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scene\ScriptableEntity.h">
       <Filter>src\Bubble\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
@@ -1443,14 +1476,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Scene\Scene.h" />
-    <ClInclude Include="src\Bubble\Core\UUID.h" />
-    <ClInclude Include="src\Bubble\Renderer\Camera.h" />
-    <ClInclude Include="src\Bubble\Renderer\EditorCamera.h" />
-    <ClInclude Include="src\Bubble\Scene\Entity.h" />
-    <ClInclude Include="src\Bubble\Scene\SceneCamera.h" />
-    <ClInclude Include="src\Bubble\Scene\ScriptableEntity.h" />
-    <ClInclude Include="src\Bubble\Scene\SceneSerializer.h" />
+    <ClInclude Include="src\Bubble\Utils\PlatformUtils.h" />
+    <ClInclude Include="src\Bubble\Core\Assert.h" />
+    <ClInclude Include="src\Bubble\Core\PlatformDetection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
@@ -1468,13 +1496,25 @@
     <ClCompile Include="src\Bubble\Core\Random.cpp">
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Core\UUID.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp">
       <Filter>src\Bubble\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp">
       <Filter>src\Bubble\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Project\Project.cpp">
+      <Filter>src\Bubble\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Project\ProjectSerializer.cpp">
+      <Filter>src\Bubble\Project</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Buffer.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\EditorCamera.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Framebuffer.cpp">
@@ -1513,6 +1553,18 @@
     <ClCompile Include="src\Bubble\Renderer\VertexArray.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Scene\Entity.cpp">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Scene\Scene.cpp">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Scene\SceneCamera.cpp">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Scene\SceneSerializer.cpp">
+      <Filter>src\Bubble\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1549,11 +1601,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bubble\Core\UUID.cpp" />
-    <ClCompile Include="src\Bubble\Renderer\EditorCamera.cpp" />
-    <ClCompile Include="src\Bubble\Scene\Entity.cpp" />
-    <ClCompile Include="src\Bubble\Scene\Scene.cpp" />
-    <ClCompile Include="src\Bubble\Scene\SceneCamera.cpp" />
-    <ClCompile Include="src\Bubble\Scene\SceneSerializer.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
   </ItemGroup>
 </Project>

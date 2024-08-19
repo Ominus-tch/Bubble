@@ -592,7 +592,7 @@ namespace Bubble {
 	void Renderer2D::DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color)
 	{
 		auto transform = glm::translate(glm::mat4(1.0f), pos) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(r, r, 1.0f));
+			glm::scale(glm::mat4(1.0f), glm::vec3(r * 2.f, r * 2.f, 1.0f));
 		
 		DrawCircleFilled(glm::mat4(transform), color);
 	}
@@ -638,6 +638,12 @@ namespace Bubble {
 	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID)
 	{
 		BG_PROFILE_FUNCTION();
+
+		if (s_Data.LineVertexCount > s_Data.MaxVertices)
+		{
+			BG_CORE_ERROR("MAX LINE VERTICES REACHED!");
+			return;
+		}
 
 		s_Data.LineVertexBufferPtr->Position = p0;
 		s_Data.LineVertexBufferPtr->Color = color;

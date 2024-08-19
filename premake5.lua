@@ -24,11 +24,13 @@ IncludeDir["ImGui"] = "Bubble/vendor/imgui"
 IncludeDir["glm"] = "Bubble/vendor/glm"
 IncludeDir["stb_image"] = "Bubble/vendor/stb_image"
 IncludeDir["entt"] = "Bubble/vendor/entt/include"
+IncludeDir["yaml_cpp"] = "Bubble/vendor/yaml-cpp/include"
 
 group "Dependencies"
     include "Bubble/vendor/GLFW"
     include "Bubble/vendor/Glad"
     include "Bubble/vendor/imgui"
+    include "Bubble/vendor/yaml-cpp"
 
 group ""
 
@@ -60,7 +62,8 @@ project "Bubble"
     defines
     {
         "_CRT_SECURE_NO_WARNINGS",
-        "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
+        "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS",
+        "GLFW_INCLUDE_NONE"
     }
 
     includedirs
@@ -72,7 +75,8 @@ project "Bubble"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.entt}"
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.yaml_cpp}"
     }
 
     links 
@@ -80,6 +84,7 @@ project "Bubble"
         "GLFW",
         "Glad",
         "ImGui",
+        "yaml-cpp",
         "opengl32.lib"
     }
 

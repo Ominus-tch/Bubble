@@ -14,7 +14,6 @@ public:
 	virtual void OnDetach() override;
 
 	void OnUpdate(Bubble::Timestep ts) override;
-	void OnRender(Bubble::Timestep ts) override;
 	virtual void OnImGuiRender() override;
 	void OnEvent(Bubble::Event& e) override;
 

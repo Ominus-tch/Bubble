@@ -1,45 +1,25 @@
 #pragma once
 
+#include "Bubble/Core/PlatformDetection.h"
+
 #include <memory>
 
-#ifdef _WIN32
-	#ifdef _WIN64
-		#define BG_PLATFORM_WINDOWS
-	#else
-		#error "x86 Builds are not supported!"
-	#endif
-#elif defined(__APPLE__) || defined(__MACH__)
-	#include <TargetConditionals.h>
-	#if TARGET_IPHONE_SIMULATOR == 1
-		#define BG_PLATFORM_IOS
-		#error "IOS is not supported!"
-	#elif TARGET_OS_MAC == 1
-		#define BG_PLATFORM_MACOS
-		#error "MacOS is not supported!"
-	#else
-		#error "Unknown Apple platform!"
-	#endif
-#elif defined(__ANDROID__)
-	#define BG_PLATFORM_ANDROID
-	#error "Android is not supported!"
-#elif defined(__linux__)
-	#define BG_PLATFORM_LINUX
-	#error "Linux is not supported!"
-#else
-	#error "Unknown platform!"
-#endif
-
 #ifdef BG_DBG
+	#if defined(BG_PLATFORM_WINDOWS)
+		#define BG_DEBUGBREAK() __debugbreak()
+	#elif defined(BG_PLATFORM_LINUX)
+		#include <signal.h>
+		#define BG_DEBUGBREAK() raise(SIGTRAP)
+	#else
+		#error "Platform doesn't support debugbreak yet!"
+	#endif
 	#define BG_ENABLE_ASSERTS
+#else
+	#define BG_DEBUGBREAK()
 #endif
 
-#ifdef BG_ENABLE_ASSERTS
-	#define BG_ASSERT(x, ...) { if(!(x)) { BG_ERROR("Assertion Failed {0}", __VA_ARGS__); __debugbreak(); } }
-	#define BG_CORE_ASSERT(x, ...) { if(!(x)) { BG_CORE_ERROR("Assertion Failed {0}", __VA_ARGS__); __debugbreak(); } }
-#else
-	#define BG_ASSERT(x, ...)
-	#define BG_CORE_ASSERT(x, ...)
-#endif
+#define BG_EXPAND_MACRO(x) x
+#define BG_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1 << x)
 
@@ -64,3 +44,6 @@ namespace Bubble {
 	}
 
 }
+
+#include "Bubble/Core/Log.h"
+#include "Bubble/Core/Assert.h"

@@ -1,4 +1,6 @@
 #include "EditorLayer.h"
+#include "Bubble/Scene/SceneSerializer.h"
+#include "Bubble/Utils/PlatformUtils.h"
 
 #include <imgui/imgui.h>
 
@@ -6,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../assets/scripts/CameraController.h"
+
+#include "Bubble/Scene/SceneSerializer.h"
 
 namespace Bubble {
 
@@ -29,22 +33,33 @@ namespace Bubble {
 
         m_ActiveScene = CreateRef<Scene>();
 
-        m_SquareEntity = m_ActiveScene->CreateEntity("Square 1");
-        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4( 1.0f, 0.2f, 0.2f, 1.0f)).Texture = m_CheckerboardTexture;
+        //m_SquareEntity = m_ActiveScene->CreateEntity("Square 1");
+        //m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4( 1.0f, 0.2f, 0.2f, 1.0f)).Texture = m_CheckerboardTexture;
 
-        m_Square2 = m_ActiveScene->CreateEntity("Square 2");
-        m_Square2.AddComponent<SpriteRendererComponent>().Texture = m_CheckerboardTexture;
+        //m_Square2 = m_ActiveScene->CreateEntity("Square 2");
+        //m_Square2.AddComponent<SpriteRendererComponent>().Texture = m_CheckerboardTexture;
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-        m_CameraEntity.AddComponent<CameraComponent>();
+        m_CameraEntity.AddComponent<CameraComponent>().Camera.SetOrthographicSize(4.f);
+        //m_CameraEntity.GetComponent<TransformComponent>().Translation.x = 10.f;
 
-        m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
-        m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
+        //m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+        //m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
 
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-        m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        //m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+        //SceneSerializer serializer(m_ActiveScene);
+        //serializer.Serialize("assets/scenes/Example.bubble");
+
+        Segment* a = new Segment({ 0.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, {}, m_Animate);
+        m_EndSegment = a;
+
+        //BG_INFO("{0}, {1}", m_EndSegment->B().x, m_EndSegment->B().y);
+        a->m_Completed = true;
+        m_Segments.push_back(a);
     }
 
     void EditorLayer::OnDetach()
@@ -56,7 +71,7 @@ namespace Bubble {
     {
         BG_PROFILE_FUNCTION();
 
-        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification(); 
+        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.f && m_ViewportSize.y > 0.f &&
             (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
         {
@@ -65,6 +80,8 @@ namespace Bubble {
         }
 
         m_FPS = 1.f / ts;
+        m_TimeSinceLastRender = ts;
+        m_Time += ts;
 
         Renderer2D::ResetStats();
         {
@@ -80,8 +97,31 @@ namespace Bubble {
 
             m_ActiveScene->OnUpdateRuntime(ts);
 
+            CameraComponent comp = m_CameraEntity.GetComponent<CameraComponent>();
+            TransformComponent transform = m_CameraEntity.GetComponent<TransformComponent>();
+
+            Renderer2D::BeginScene(comp.Camera, transform.GetTransform());
+
+            for (int i = 0; i < m_Segments.size(); i++)
+            {
+                Segment* segment = m_Segments[i];
+
+                segment->Update(ts);
+                segment->Draw();
+
+                if (i % 30000 == 0)
+                {
+                    Renderer2D::EndScene();
+                    Renderer2D::BeginScene(comp.Camera, transform.GetTransform());
+                }
+            }
+
+            Renderer2D::EndScene();
+
             m_Framebuffer->Unbind();
         }
+
+        m_FrameCount++;
     }
 
     void EditorLayer::OnImGuiRender()
@@ -128,6 +168,28 @@ namespace Bubble {
         {
             if (ImGui::BeginMenu("File"))
             {
+                if (ImGui::MenuItem("Save Project"))
+                    SaveProject();
+
+                if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+                    OpenProject();
+
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Open Scene"))
+                    OpenScene();
+
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+                    NewScene();
+
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+                    SaveScene();
+
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+                    SaveSceneAs();
+
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("Exit")) Application::Get().Close();
                 ImGui::EndMenu();
             }
@@ -150,7 +212,17 @@ namespace Bubble {
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
+        ImGui::Separator();
+
+        ImGui::Text("Time Since Last Render: %fms", m_TimeSinceLastRender * 1000.f);
+        ImGui::Text("Time Elasped: %fs", m_Time);
         ImGui::Text("FPS: %f", m_FPS);
+
+        
+        ImGui::Text("Segments: %d", m_Segments.size());
+
+        if (ImGui::Button("Iteration")) Iteration();
+        ImGui::Checkbox("Animate", &m_Animate);
 
         ImGui::End();
 
@@ -159,9 +231,9 @@ namespace Bubble {
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-        ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), 
-                    { m_ViewportSize.x, m_ViewportSize.y },
-                    {0, 1}, {1, 0});
+        ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(),
+            { m_ViewportSize.x, m_ViewportSize.y },
+            { 0, 1 }, { 1, 0 });
 
         ImGui::End();
         ImGui::PopStyleVar();
@@ -171,7 +243,239 @@ namespace Bubble {
 
     void EditorLayer::OnEvent(Event& e)
     {
+        //m_CameraController.OnEvent(e);
+        //if (m_SceneState == SceneState::Edit)
+        //{
+        //    m_EditorCamera.OnEvent(e);
+        //}
 
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<MouseScrolledEvent>(BG_BIND_EVENT_FN(EditorLayer::OnMouseScroll));
+        //dispatcher.Dispatch<KeyPressedEvent>(BG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(BG_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+    }
+
+    bool EditorLayer::OnMouseScroll(MouseScrolledEvent& e)
+    {
+        float y = e.GetYOffset();
+
+        auto& cam = m_CameraEntity.GetComponent<CameraComponent>().Camera;
+        cam.SetOrthographicSize(cam.GetOrthographicSize() - y);
+
+        return false;
+    }
+
+    void EditorLayer::Iteration()
+    {
+        std::vector<Segment*> newSegments;
+
+        for (const Segment* segment : m_Segments)
+        {
+            glm::vec3 endPoint = m_Segments.size() == 1 ? m_EndSegment->B() : m_EndSegment->A();
+            newSegments.push_back(new Segment(segment->A(), segment->B(), endPoint, m_Animate));
+        }
+
+        m_EndSegment = newSegments[0];
+        m_Segments.insert(m_Segments.end(), newSegments.begin(), newSegments.end());
+    }
+
+    bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+    {
+        
+
+        return false;
+    }
+
+    //bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+    //{
+    //    // Shortcuts
+    //    if (e.IsRepeat())
+    //        return false;
+
+    //    bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+    //    bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+    //    switch (e.GetKeyCode())
+    //    {
+    //    case Key::N:
+    //    {
+    //        if (control)
+    //            NewScene();
+
+    //        break;
+    //    }
+    //    case Key::O:
+    //    {
+    //        if (control)
+    //            OpenProject();
+
+    //        break;
+    //    }
+    //    case Key::S:
+    //    {
+    //        if (control)
+    //        {
+    //            if (shift)
+    //                SaveSceneAs();
+    //            else
+    //                SaveScene();
+    //        }
+
+    //        break;
+    //    }
+
+    //    // Scene Commands
+    //    case Key::D:
+    //    {
+    //        if (control)
+    //            OnDuplicateEntity();
+
+    //        break;
+    //    }
+
+    //    // Gizmos
+    //    case Key::Q:
+    //    {
+    //        if (!ImGuizmo::IsUsing())
+    //            m_GizmoType = -1;
+    //        break;
+    //    }
+    //    case Key::W:
+    //    {
+    //        if (!ImGuizmo::IsUsing())
+    //            m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+    //        break;
+    //    }
+    //    case Key::E:
+    //    {
+    //        if (!ImGuizmo::IsUsing())
+    //            m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+    //        break;
+    //    }
+    //    case Key::R:
+    //    {
+    //        if (control)
+    //        {
+    //            ScriptEngine::ReloadAssembly();
+    //        }
+    //        else
+    //        {
+    //            if (!ImGuizmo::IsUsing())
+    //                m_GizmoType = ImGuizmo::OPERATION::SCALE;
+    //        }
+    //        break;
+    //    }
+    //    case Key::Delete:
+    //    {
+    //        if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+    //        {
+    //            Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+    //            if (selectedEntity)
+    //            {
+    //                m_SceneHierarchyPanel.SetSelectedEntity({});
+    //                m_ActiveScene->DestroyEntity(selectedEntity);
+    //            }
+    //        }
+    //        break;
+    //    }
+    //    }
+
+    //    return false;
+    //}
+
+    void EditorLayer::NewProject()
+    {
+        //Project::New();
+    }
+
+    void EditorLayer::OpenProject(const std::filesystem::path& path)
+    {
+        /*if (Project::Load(path))
+        {
+            ScriptEngine::Init();
+
+            OpenScene(startScenePath);
+            auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+            m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+
+        }*/
+    }
+
+    bool EditorLayer::OpenProject()
+    {
+        std::string filepath = FileDialogs::OpenFile("Bubble Project (*.bproj)\0*.bproj\0");
+        if (filepath.empty())
+            return false;
+
+        OpenProject(filepath);
+        return true;
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        // Project::SaveActive();
+    }
+
+    void EditorLayer::NewScene()
+    {
+        m_ActiveScene = CreateRef<Scene>();
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+        m_EditorScenePath = std::filesystem::path();
+    }
+
+    void EditorLayer::OpenScene()
+    {
+        std::string filepath = FileDialogs::OpenFile("Bubble Scene (*.bubble)\0*.bubble\0");
+        if (!filepath.empty())
+            OpenScene(filepath);
+    }
+
+    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    {
+        //if (m_SceneState != SceneState::Edit)
+        //    OnSceneStop();
+
+        if (path.extension().string() != ".bubble")
+        {
+            BG_WARN("Could not load {0} - not a scene file", path.filename().string());
+            return;
+        }
+
+        Ref<Scene> newScene = CreateRef<Scene>();
+        SceneSerializer serializer(newScene);
+        if (serializer.Deserialize(path.string()))
+        {
+            m_EditorScene = newScene;
+            m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+            m_ActiveScene = m_EditorScene;
+            m_EditorScenePath = path;
+        }
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        if (!m_EditorScenePath.empty())
+            SerializeScene(m_ActiveScene, m_EditorScenePath);
+        else
+            SaveSceneAs();
+    }
+
+    void EditorLayer::SaveSceneAs()
+    {
+        std::string filepath = FileDialogs::SaveFile("Bubble Scene (*.bubble)\0*.bubble\0");
+        if (!filepath.empty())
+        {
+            SerializeScene(m_ActiveScene, filepath);
+            m_EditorScenePath = filepath;
+        }
+    }
+
+    void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
+    {
+        SceneSerializer serializer(scene);
+        serializer.Serialize(path.string());
     }
 
 }
