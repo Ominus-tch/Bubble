@@ -1,220 +1,48 @@
+include "./vendor/premake/premake_customization/solution_items.lua"
+include "Dependencies.lua"
+
 workspace "Bubble"
-    architecture "x86_64"
-    startproject "Sandbox"
+	architecture "x86_64"
+	startproject "Bubblegum"
 
-    configurations
-    {
-        "Debug",
-        "Release",
-        "Dist"
-    }
+	configurations
+	{
+		"Debug",
+		"Release",
+		"Dist"
+	}
 
-    flags
-    {
-        "MultiProcessorCompile"
-    }
+	solution_items
+	{
+		".editorconfig"
+	}
+
+	flags
+	{
+		"MultiProcessorCompile"
+	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
--- Include directiories relative to root folder (solution directory)
-IncludeDir = {}
-IncludeDir["GLFW"] = "Bubble/vendor/GLFW/include"
-IncludeDir["Glad"] = "Bubble/vendor/Glad/include"
-IncludeDir["ImGui"] = "Bubble/vendor/imgui"
-IncludeDir["glm"] = "Bubble/vendor/glm"
-IncludeDir["stb_image"] = "Bubble/vendor/stb_image"
-IncludeDir["entt"] = "Bubble/vendor/entt/include"
-IncludeDir["yaml_cpp"] = "Bubble/vendor/yaml-cpp/include"
-
 group "Dependencies"
-    include "Bubble/vendor/GLFW"
-    include "Bubble/vendor/Glad"
-    include "Bubble/vendor/imgui"
-    include "Bubble/vendor/yaml-cpp"
-
+	include "vendor/premake"
+	--include "Bubble/vendor/Box2D"
+	include "Bubble/vendor/GLFW"
+	include "Bubble/vendor/Glad"
+	--include "Bubble/vendor/msdf-atlas-gen"
+	include "Bubble/vendor/imgui"
+	include "Bubble/vendor/yaml-cpp"
 group ""
 
-project "Bubble"
-    location "Bubble"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++20"
-    staticruntime "on"
+group "Core"
+	include "Bubble"
+	--include "Bubble-ScriptCore"
+group ""
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+group "Tools"
+	include "Bubblegum"
+group ""
 
-    pchheader "bgpch.h"
-    pchsource "Bubble/src/bgpch.cpp"
-
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-
-        "%{prj.name}/vendor/stb_image/**.h",
-        "%{prj.name}/vendor/stb_image/**.cpp",
-
-        "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
-    }
-
-    defines
-    {
-        "_CRT_SECURE_NO_WARNINGS",
-        "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS",
-        "GLFW_INCLUDE_NONE"
-    }
-
-    includedirs
-    {
-        "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}",
-        "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}",
-        "%{IncludeDir.entt}",
-        "%{IncludeDir.yaml_cpp}"
-    }
-
-    links 
-    {
-        "GLFW",
-        "Glad",
-        "ImGui",
-        "yaml-cpp",
-        "opengl32.lib"
-    }
-
-
-    filter "system:windows"
-        systemversion "latest"
-
-        defines 
-        {
-            "BG_BUILD_DLL",
-            "GLFW_INCLUDE_NONE"
-        }
-
-    filter "configurations:Debug"
-        defines "BG_DBG"
-        runtime "Debug"
-        symbols "on"
-
-    filter "configurations:Release"
-        defines "BG_RELEASE"
-        runtime "Release"
-        optimize "on"
-
-    filter "configurations:Dist"
-        defines "BG_DIST"
-        runtime "Release"
-        optimize "on"
-
-project "Sandbox"
-    location "Sandbox"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++20"
-    staticruntime "on"
-
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs
-    {
-        "Bubble/vendor/spdlog/include",
-        "Bubble/src",
-        "Bubble/vendor",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.entt}"
-    }
-
-    links
-    {
-        "Bubble"
-    }
-
-    filter "system:windows"
-        systemversion "latest"
-
-        defines 
-        {
-            "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
-        }
-
-    filter "configurations:Debug"
-        defines "BG_DBG"
-        runtime "Debug"
-        symbols "on"
-
-    filter "configurations:Release"
-        defines "BG_RELEASE"
-        runtime "Release"
-        optimize "on"
-
-    filter "configurations:Dist"
-        defines "BG_DIST"
-        runtime "Release"
-        optimize "on"
-
-project "Bubblegum"
-    location "Bubblegum"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++20"
-    staticruntime "on"
-
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs
-    {
-        "Bubble/vendor/spdlog/include",
-        "Bubble/src",
-        "Bubble/vendor",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.entt}"
-    }
-
-    links
-    {
-        "Bubble"
-    }
-
-    filter "system:windows"
-        systemversion "latest"
-
-        defines 
-        {
-            "_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
-        }
-
-    filter "configurations:Debug"
-        defines "BG_DBG"
-        runtime "Debug"
-        symbols "on"
-
-    filter "configurations:Release"
-        defines "BG_RELEASE"
-        runtime "Release"
-        optimize "on"
-
-    filter "configurations:Dist"
-        defines "BG_DIST"
-        runtime "Release"
-        optimize "on"
+group "Misc"
+	include "Sandbox"
+group ""
