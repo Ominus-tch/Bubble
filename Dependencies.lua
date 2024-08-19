@@ -17,7 +17,7 @@ IncludeDir["entt"] = "%{wks.location}/Bubble/vendor/entt/include"
 --IncludeDir["mono"] = "%{wks.location}/Bubble/vendor/mono/include"
 --IncludeDir["shaderc"] = "%{wks.location}/Bubble/vendor/shaderc/include"
 --IncludeDir["SPIRV_Cross"] = "%{wks.location}/Bubble/vendor/SPIRV-Cross"
--ncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 --IncludeDir["msdfgen"] = "%{wks.location}/Bubble/vendor/msdf-atlas-gen/msdfgen"
 --IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Bubble/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
