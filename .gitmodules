@@ -11,3 +11,6 @@
 [submodule "Bubble/vendor/GLFW"]
 	path = Bubble/vendor/GLFW
 	url = https://github.com/glfw/glfw
+[submodule "Bubble/vendor/imgui"]
+	path = Bubble/vendor/imgui
+	url = https://github.com/ocornut/imgui
