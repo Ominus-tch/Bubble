@@ -14,6 +14,3 @@
 [submodule "Bubble/vendor/yaml-cpp"]
 	path = Bubble/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
-[submodule "Bubble/vendor/ImGuizmo"]
-	path = Bubble/vendor/ImGuizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo
