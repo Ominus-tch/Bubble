@@ -1,32 +1,23 @@
 #pragma once
 
-#include "Bubble/Core/Base.h"
-#include "Bubble/Scene/Scene.h"
-#include "Bubble/Scene/Entity.h"
+#include "Bubble/Renderer/Texture.h"
+
+#include <filesystem>
 
 namespace Bubble {
 
 	class ContentBrowserPanel
 	{
 	public:
-		ContentBrowserPanel() = default;
-		ContentBrowserPanel(const Ref<Scene>& scene);
-
-		void SetContext(const Ref<Scene>& scene);
+		ContentBrowserPanel();
 
 		void OnImGuiRender();
-
-		Entity GetSelectedEntity() const { return m_SelectionContext; }
-		void SetSelectedEntity(Entity entity);
 	private:
-		template<typename T>
-		void DisplayAddComponentEntry(const std::string& entryName);
+		std::filesystem::path m_BaseDirectory;
+		std::filesystem::path m_CurrentDirectory;
 
-		void DrawEntityNode(Entity entity);
-		void DrawComponents(Entity entity);
-	private:
-		Ref<Scene> m_Context;
-		Entity m_SelectionContext;
+		Ref<Texture2D> m_DirectoryIcon;
+		Ref<Texture2D> m_FileIcon;
 	};
 
 }

@@ -45,6 +45,14 @@ inline OStream& operator<<(OStream& os, glm::qua<T, Q> quaternion)
 	return os << glm::to_string(quaternion);
 }
 
+template <>
+struct fmt::formatter<std::filesystem::path> : fmt::formatter<std::string> {
+	template <typename FormatContext>
+	auto format(const std::filesystem::path& path, FormatContext& ctx) {
+		return fmt::formatter<std::string>::format(path.string(), ctx);
+	}
+};
+
 // Core log macros
 #define BG_CORE_ERROR(...)	 ::Bubble::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define BG_CORE_WARN(...)	 ::Bubble::Log::GetCoreLogger()->warn(__VA_ARGS__)

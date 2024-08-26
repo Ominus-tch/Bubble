@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bgpch.h"
-
 #include "Bubble/Core/Base.h"
 #include "Bubble/Events/Event.h"
+
+#include <sstream>
 
 namespace Bubble
 {
