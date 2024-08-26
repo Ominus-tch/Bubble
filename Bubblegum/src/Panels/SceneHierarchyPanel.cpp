@@ -1,5 +1,7 @@
 #include "SceneHierarchyPanel.h"
+
 #include "Bubble/Scene/Components.h"
+#include "Bubble/Utils/PlatformUtils.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -238,6 +240,7 @@ namespace Bubble {
 			DisplayAddComponentEntry<CameraComponent>("Camera");
 			//DisplayAddComponentEntry<ScriptComponent>("Script");
 			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
+			DisplayAddComponentEntry<MeshComponent>("Mesh");
 			//DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			//DisplayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
 			//DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
@@ -328,6 +331,7 @@ namespace Bubble {
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
 						std::filesystem::path texturePath(path);
+						BG_INFO(texturePath.string());
 						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;
@@ -338,6 +342,51 @@ namespace Bubble {
 				}
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+			});
+
+		DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& component)
+			{
+				ImGui::Text("Path: %s", component.Path.c_str());
+				ImGui::Button("Model", ImVec2(100.0f, 0.0f));
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path modelPath(path);
+						component.Load(modelPath.string());
+						//BG_WARN("Could not load texture {0}", texturePath.filename().string());
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::Checkbox("Draw Mesh", &component.DrawMesh);
+				ImGui::Checkbox("Draw Wireframe", &component.DrawWireframe);
+
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+
+				for (int i = 0; i < component.Meshes.size(); i++)
+				{
+					const auto& mesh = component.Meshes[i];
+					if (ImGui::TreeNodeEx((void*)mesh.get(), flags, "Mesh Part #%d", i))
+					{
+						glm::vec3 translation = mesh->GetTranslation();
+						glm::vec3 rotation = glm::degrees(mesh->GetRotation());
+						glm::vec3 scale = mesh->GetScale();
+
+						DrawVec3Control("Translation", translation);
+						DrawVec3Control("Rotation", rotation);
+						DrawVec3Control("Scale", scale, 1.0f);
+
+						ImGui::Text("Vertices: %d", mesh->GetNumVertices());
+						ImGui::Text("Indices: %d", mesh->GetNumIndices());
+
+						//rotation = glm::radians(rotation);
+						//mesh->updateTransform(translation, rotation, scale);
+
+						ImGui::TreePop();
+					}
+				}
 			});
 	}
 

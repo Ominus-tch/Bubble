@@ -3,42 +3,11 @@
 #include <Bubble.h>
 
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
-#include <filesystem>
+#include <deque>
 
 namespace Bubble {
-
-	struct fourier
-	{
-		float re;
-		float im;
-		size_t freq;
-		float amp;
-		float phase;
-	};
-
-	static std::vector<fourier> dft(std::vector<float> x) {
-		std::vector<fourier> X;
-		size_t N = x.size();
-		X.reserve(N);
-		for (size_t k = 0; k < N; k++) {
-			float re = 0.f;
-			float im = 0.f;
-			for (size_t n = 0; n < N; n++) {
-				float phi = (PI * 2.f * k * n) / N;
-				re += x[n] * cosf(phi);
-				im -= x[n] * sinf(phi);
-			}
-			re = re / N;
-			im = im / N;
-
-			size_t freq = k;
-			float amp = sqrtf(re * re + im * im);
-			float phase = atan2f(im, re);
-			X[k] = { re, im, freq, amp, phase };
-		}
-		return X;
-	}
 
 	class EditorLayer : public Layer
 	{
@@ -53,12 +22,14 @@ namespace Bubble {
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 
-		glm::vec3 EpiCycles(glm::vec3 pos, float rotation, std::vector<fourier> fourier);
+		void GenerateTerrainMesh();
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		bool OnMouseScroll(MouseScrolledEvent& e);
+
+		void OnOverlayRender();
 
 		void NewProject();
 		bool OpenProject();
@@ -72,33 +43,45 @@ namespace Bubble {
 		void SaveSceneAs();
 
 		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
+
+		void OnScenePlay();
+		void OnSceneSimulate();
+		void OnSceneStop();
+		void OnScenePause();
+
+		void OnDuplicateEntity();
+
+		// UI Panels
+		void UI_Toolbar();
 	private:
-		glm::vec2 m_ViewportSize = { 0.f, 0.f };
 
 		float m_FPS = 0.f;
+		std::deque<float> m_FPSCache;
+		float m_FPSSum = 0.0f;
+		const size_t MaxCacheSize = 250;
+
+		float m_FPSCap = 240.f;
 
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_EditorScene;
 		std::filesystem::path m_EditorScenePath;
-		Entity m_SquareEntity;
-		Entity m_Square2;
+
+		Entity m_HoveredEntity;
 
 		Entity m_CameraEntity;
-		Entity m_SecondCamera;
 		bool m_PrimaryCamera = true;
 
+		EditorCamera m_EditorCamera;
+
+		bool m_ViewportFocused = false, m_ViewportHovered = false;
+		glm::vec2 m_ViewportSize = { 0.f, 0.f };
+		glm::vec2 m_ViewportBounds[2];
+
 		// App
-		std::vector<fourier> m_FourierX;
-		std::vector<fourier> m_FourierY;
-
-		std::vector<float> m_X;
-		std::vector<float> m_Y;
-
-		std::vector<glm::vec2> m_Path;
-
-		std::vector<float> m_Wave;
+		Entity m_MeshTest;
+		Entity m_Cube;
 
 		bool m_Animate = true;
 
@@ -106,6 +89,8 @@ namespace Bubble {
 		uint32_t m_FrameCount = 0;
 		float m_TimeSinceLastRender = 0.f;
 		float m_Time = 0.f;
+
+		int m_GizmoType = -1;
 
 		enum class SceneState
 		{
@@ -115,7 +100,10 @@ namespace Bubble {
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
+		// Editor resources
+		Ref<Texture2D> m_IconPlay, m_IconPause, m_IconStep, m_IconSimulate, m_IconStop;
 	};
 
 }

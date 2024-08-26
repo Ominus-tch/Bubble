@@ -124,9 +124,9 @@ namespace Bubble {
 		m_Registry.destroy(entity);
 	}
 
-	//void Scene::OnRuntimeStart()
-	//{
-	//	m_IsRunning = true;
+	void Scene::OnRuntimeStart()
+	{
+		m_IsRunning = true;
 
 	//	OnPhysics2DStart();
 
@@ -142,26 +142,97 @@ namespace Bubble {
 	//			ScriptEngine::OnCreateEntity(entity);
 	//		}
 	//	}
-	//}
+	}
 
-	//void Scene::OnRuntimeStop()
-	//{
-	//	m_IsRunning = false;
+	void Scene::OnRuntimeStop()
+	{
+		m_IsRunning = false;
 
 	//	OnPhysics2DStop();
 
 	//	ScriptEngine::OnRuntimeStop();
-	//}
+	}
 
-	//void Scene::OnSimulationStart()
-	//{
+	void Scene::OnSimulationStart()
+	{
 	//	OnPhysics2DStart();
-	//}
+	}
 
-	//void Scene::OnSimulationStop()
-	//{
+	void Scene::OnSimulationStop()
+	{
 	//	OnPhysics2DStop();
-	//}
+	}
+
+	void Scene::OnUpdateRuntime(Timestep ts)
+	{
+		if (!m_IsPaused || m_StepFrames-- > 0)
+		{
+			// Update scripts
+			{
+				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+					{
+						// TODO: Move to Scene::OnScenePlay
+						if (!nsc.Instance)
+						{
+							nsc.Instance = nsc.InstantiateScript();
+							nsc.Instance->m_Entity = Entity{ entity, this };
+							nsc.Instance->OnCreate();
+						}
+
+						nsc.Instance->OnUpdate(ts);
+					});
+			}
+		}
+
+		// Render 2D
+
+		// Get Main Camera
+		Camera* mainCamera = nullptr;
+		glm::mat4 cameraTransform;
+		{
+
+			auto view = m_Registry.view<TransformComponent, CameraComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+
+				if (camera.Primary)
+				{
+					mainCamera = &camera.Camera;
+					cameraTransform = transform.GetTransform();
+					break;
+				}
+			}
+		}
+
+		if (mainCamera)
+		{
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+			// Draw sprites
+			{
+				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+				for (auto entity : group)
+				{
+					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+				}
+			}
+
+			// Draw Meshes
+			{
+				const auto view = m_Registry.view<TransformComponent, MeshComponent>();
+				for (const auto& entity : view)
+				{
+					const auto& [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
+
+					Renderer2D::DrawMesh(transform.GetTransform(), mesh, (int)entity);
+				}
+			}
+
+			Renderer2D::EndScene();
+		}
+	}
 
 	//void Scene::OnUpdateRuntime(Timestep ts)
 	//{
@@ -275,10 +346,10 @@ namespace Bubble {
 
 	//}
 
-	//void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
-	//{
-	//	if (!m_IsPaused || m_StepFrames-- > 0)
-	//	{
+	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
+	{
+		if (!m_IsPaused || m_StepFrames-- > 0)
+		{
 	//		// Physics
 	//		{
 	//			const int32_t velocityIterations = 6;
@@ -300,17 +371,17 @@ namespace Bubble {
 	//				transform.Rotation.z = body->GetAngle();
 	//			}
 	//		}
-	//	}
+		}
 
-	//	// Render
-	//	RenderScene(camera);
-	//}
+		// Render
+		RenderScene(camera);
+	}
 
-	//void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
-	//{
-	//	// Render
-	//	RenderScene(camera);
-	//}
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		// Render
+		RenderScene(camera);
+	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
@@ -377,9 +448,9 @@ namespace Bubble {
 		return {};
 	}
 
-	/*void Scene::OnPhysics2DStart()
+	void Scene::OnPhysics2DStart()
 	{
-		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+		/*m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
@@ -429,8 +500,8 @@ namespace Bubble {
 				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
 				body->CreateFixture(&fixtureDef);
 			}
-		}
-	}*/
+		}*/
+	}
 
 	void Scene::OnPhysics2DStop()
 	{
@@ -438,45 +509,56 @@ namespace Bubble {
 		m_PhysicsWorld = nullptr;
 	}
 
-	//void Scene::RenderScene(EditorCamera& camera)
-	//{
-	//	Renderer2D::BeginScene(camera);
+	void Scene::RenderScene(EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
 
-	//	// Draw sprites
-	//	{
-	//		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-	//		for (auto entity : group)
-	//		{
-	//			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+		// Draw sprites
+		{
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-	//			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-	//		}
-	//	}
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+			}
+		}
 
-	//	// Draw circles
-	//	{
-	//		auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-	//		for (auto entity : view)
-	//		{
-	//			auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+		// Draw Meshes
+		{
+			const auto view = m_Registry.view<TransformComponent, MeshComponent>();
+			for (const auto& entity : view)
+			{
+				const auto& [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
-	//			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
-	//		}
-	//	}
+				Renderer2D::DrawMesh(transform.GetTransform(), mesh, (int)entity);
+			}
+		}
 
-	//	// Draw text
-	//	{
-	//		auto view = m_Registry.view<TransformComponent, TextComponent>();
-	//		for (auto entity : view)
-	//		{
-	//			auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+		// Draw circles
+		//{
+		//	auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+		//	for (auto entity : view)
+		//	{
+		//		auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-	//			Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
-	//		}
-	//	}
+		//		Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+		//	}
+		//}
 
-	//	Renderer2D::EndScene();
-	//}
+		//// Draw text
+		//{
+		//	auto view = m_Registry.view<TransformComponent, TextComponent>();
+		//	for (auto entity : view)
+		//	{
+		//		auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+
+		//		Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+		//	}
+		//}
+
+		Renderer2D::EndScene();
+	}
 
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
@@ -497,8 +579,8 @@ namespace Bubble {
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
-		//if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
-		//	component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
+			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	/*template<>
@@ -508,6 +590,11 @@ namespace Bubble {
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<MeshComponent>(Entity entity, MeshComponent& component)
 	{
 	}
 
@@ -545,64 +632,5 @@ namespace Bubble {
 	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
 	{
 	}*/
-
-	void Scene::OnUpdateRuntime(Timestep ts)
-	{
-		if (!m_IsPaused || m_StepFrames-- > 0)
-		{
-			// Update scripts
-			{
-				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-					{
-						// TODO: Move to Scene::OnScenePlay
-						if (!nsc.Instance)
-						{
-							nsc.Instance = nsc.InstantiateScript();
-							nsc.Instance->m_Entity = Entity{ entity, this };
-							nsc.Instance->OnCreate();
-						}
-
-						nsc.Instance->OnUpdate(ts);
-					});
-			}
-		}
-
-		// Render 2D
-
-		// Get Main Camera
-		Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
-		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
-			for (auto entity : view)
-			{
-				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-
-				if (camera.Primary)
-				{
-					mainCamera = &camera.Camera;
-					cameraTransform = transform.GetTransform();
-					break;
-				}
-			}
-		}
-
-		if (mainCamera)
-		{
-			Renderer2D::BeginScene(*mainCamera, cameraTransform);
-			// Draw sprites
-			{
-				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-				for (auto entity : group)
-				{
-					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-				}
-			}
-
-			Renderer2D::EndScene();
-		}
-	}
 
 }

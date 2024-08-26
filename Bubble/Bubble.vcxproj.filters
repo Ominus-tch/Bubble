@@ -19,6 +19,9 @@
     <Filter Include="src\Bubble\ImGui">
       <UniqueIdentifier>{F261179F-DE5A-36F1-078D-1B76F3E415FD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Bubble\Math">
+      <UniqueIdentifier>{A1D87EAF-0D64-EC73-1675-6F68827F4874}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Bubble\Project">
       <UniqueIdentifier>{0EE3C6EB-FAC6-8741-6327-82944F2A72C3}</UniqueIdentifier>
     </Filter>
@@ -27,6 +30,9 @@
     </Filter>
     <Filter Include="src\Bubble\Scene">
       <UniqueIdentifier>{E559C79F-D152-E6F1-FA84-CB76E6DCC5FD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Bubble\Utils">
+      <UniqueIdentifier>{28EEF49F-14E7-13F2-3D19-F9762971F3FD}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
@@ -39,6 +45,12 @@
     </Filter>
     <Filter Include="vendor">
       <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\ImGuizmo">
+      <UniqueIdentifier>{73BF7F4C-DF4A-ED10-E85B-700554664911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\OpenFBX">
+      <UniqueIdentifier>{3441399B-200F-2DA1-09A3-9DC7F50F0906}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor\glm">
       <UniqueIdentifier>{829FC5A8-6E57-07F6-D75E-E051C335A2E6}</UniqueIdentifier>
@@ -69,6 +81,9 @@
     <ClInclude Include="src\Bubble\Core\Application.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Assert.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Core\Base.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
@@ -91,6 +106,9 @@
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\MouseCodes.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\PlatformDetection.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Random.h">
@@ -123,6 +141,9 @@
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h">
       <Filter>src\Bubble\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Math\Math.h">
+      <Filter>src\Bubble\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Project\Project.h">
       <Filter>src\Bubble\Project</Filter>
     </ClInclude>
@@ -142,6 +163,9 @@
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\GraphicsContext.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\Mesh.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\OrthographicCamera.h">
@@ -195,6 +219,9 @@
     <ClInclude Include="src\Bubble\Scene\ScriptableEntity.h">
       <Filter>src\Bubble\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Utils\PlatformUtils.h">
+      <Filter>src\Bubble\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
@@ -224,6 +251,15 @@
     </ClInclude>
     <ClInclude Include="src\bgpch.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h">
+      <Filter>vendor\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\OpenFBX\libdeflate.h">
+      <Filter>vendor\OpenFBX</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\OpenFBX\ofbx.h">
+      <Filter>vendor\OpenFBX</Filter>
     </ClInclude>
     <ClInclude Include="vendor\glm\glm\common.hpp">
       <Filter>vendor\glm\glm</Filter>
@@ -1476,9 +1512,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Utils\PlatformUtils.h" />
-    <ClInclude Include="src\Bubble\Core\Assert.h" />
-    <ClInclude Include="src\Bubble\Core\PlatformDetection.h" />
+    <ClInclude Include="src\Bubble\Core\Timer.h" />
+    <ClInclude Include="src\Bubble\Core\FileSystem.h" />
+    <ClInclude Include="src\Bubble\Core\Buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
@@ -1505,6 +1541,9 @@
     <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp">
       <Filter>src\Bubble\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Math\Math.cpp">
+      <Filter>src\Bubble\Math</Filter>
+    </ClCompile>
     <ClCompile Include="src\Bubble\Project\Project.cpp">
       <Filter>src\Bubble\Project</Filter>
     </ClCompile>
@@ -1518,6 +1557,9 @@
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\Framebuffer.cpp">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\Mesh.cpp">
       <Filter>src\Bubble\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Renderer\OrthographicCamera.cpp">
@@ -1592,15 +1634,28 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp">
+      <Filter>src\Platform\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\bgpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
+      <Filter>vendor\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\OpenFBX\libdeflate.c">
+      <Filter>vendor\OpenFBX</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\OpenFBX\ofbx.cpp">
+      <Filter>vendor\OpenFBX</Filter>
+    </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
+    <ClCompile Include="src\Bubble\Core\Window.cpp" />
+    <ClCompile Include="src\Bubble\Core\FileSystem.cpp" />
   </ItemGroup>
 </Project>

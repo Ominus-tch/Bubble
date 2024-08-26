@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bubble/Renderer/Texture.h"
+#include "Bubble/Renderer/Mesh.h"
 
 #include "Bubble/Core/UUID.h"
 
@@ -53,6 +54,36 @@ namespace Bubble {
 				* rotation
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
+
+		std::tuple <glm::vec3, glm::vec3, glm::vec3> GetDirectionVectors() const
+		{
+			glm::mat4 transform = GetTransform();
+			glm::vec3 forward = glm::normalize(glm::vec3(transform[2]));
+			glm::vec3 up = glm::normalize(glm::vec3(transform[1]));
+			glm::vec3 right = glm::normalize(glm::vec3(transform[0]));
+			return std::make_tuple(forward, up, right);
+		}
+
+		glm::vec3 GetForward() const
+		{
+			// Extract forward direction from the rotation matrix
+			glm::mat4 transform = GetTransform();
+			return glm::normalize(glm::vec3(transform[2])); // Z direction
+		}
+
+		glm::vec3 GetUp() const
+		{
+			// Extract up direction from the rotation matrix
+			glm::mat4 transform = GetTransform();
+			return glm::normalize(glm::vec3(transform[1])); // Y direction
+		}
+
+		glm::vec3 GetRight() const
+		{
+			// Extract right direction from the rotation matrix
+			glm::mat4 transform = GetTransform();
+			return glm::normalize(glm::vec3(transform[0])); // X direction
+		}
 	};
 
 	struct SpriteRendererComponent
@@ -65,6 +96,60 @@ namespace Bubble {
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
+	};
+
+	struct MeshComponent
+	{
+		std::vector<Ref<Mesh>> Meshes;
+		std::string Path = "";
+		bool DrawMesh = true;
+		bool DrawWireframe = false;
+
+		MeshComponent() = default;
+		MeshComponent(const MeshComponent&) = default;
+		MeshComponent(const std::string& path) { Meshes = Mesh::Create(path); Path = path; }
+		MeshComponent(const std::vector<Vertex>& verts,
+			const std::vector<glm::vec3>& norms,
+			const std::vector<glm::vec2>& texCoords,
+			const std::vector<uint32_t>& inds)
+		{
+			Meshes = Mesh::Create(verts, norms, texCoords, inds);
+		}
+
+		void Load(const std::string& path)
+		{
+			if (std::filesystem::path(path).extension().string() != ".fbx")
+			{
+				BG_WARN("Could not load {0} - not a model file", path);
+				return;
+			}
+
+			Clear();
+			Path = path;
+			Meshes = Mesh::Create(path);
+		}
+
+		void Clear()
+		{
+			Path = "";
+			for (auto& mesh : Meshes)
+			{
+				mesh->Clear();
+			}
+
+			Meshes.clear();
+		}
+
+		void AddMesh(Ref<Mesh> mesh)
+		{
+			Meshes.push_back(mesh);
+		}
+
+		void AddMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
+		{
+			Meshes.push_back(CreateRef<Mesh>(vertices, indices));
+		}
+
 	};
 
 	struct CameraComponent
@@ -102,5 +187,5 @@ namespace Bubble {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		NativeScriptComponent>;
+		NativeScriptComponent, MeshComponent, CameraComponent>;
 }

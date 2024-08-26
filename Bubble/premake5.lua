@@ -14,17 +14,24 @@ project "Bubble"
 	{
 		"src/**.h",
 		"src/**.cpp",
+
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
+
+		"vendor/OpenFBX/**.h",
+		"vendor/OpenFBX/**.cpp",
+		"vendor/OpenFBX/**.c",
+
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 
-		--"vendor/ImGuizmo/ImGuizmo.h",
-		--"vendor/ImGuizmo/ImGuizmo.cpp"
+		"vendor/ImGuizmo/ImGuizmo.h",
+		"vendor/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	defines
 	{
+		"YAML_CPP_STATIC_DEFINE",
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE"
 	}
@@ -42,11 +49,12 @@ project "Bubble"
 		--"%{IncludeDir.msdfgen}",
 		--"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.entt}",
 		--"%{IncludeDir.mono}",
 		"%{IncludeDir.yaml_cpp}",
-		--"%{IncludeDir.ImGuizmo}",
-		--"%{IncludeDir.VulkanSDK}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.VulkanSDK}"
 	}
 
 	links
@@ -62,8 +70,14 @@ project "Bubble"
 		--"%{Library.mono}",
 	}
 
-	--filter "files:vendor/ImGuizmo/**.cpp"
-	flags { "NoPCH" }
+	filter "files:vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
+		
+	filter "files:vendor/OpenFBX/**.cpp"
+		flags { "NoPCH" }
+
+	filter "files:vendor/OpenFBX/**.c"
+		flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"
@@ -87,9 +101,9 @@ project "Bubble"
 
 		links
 		{
-			--"%{Library.ShaderC_Debug}",
-			--"%{Library.SPIRV_Cross_Debug}",
-			--"%{Library.SPIRV_Cross_GLSL_Debug}"
+			"%{Library.ShaderC_Debug}",
+			"%{Library.SPIRV_Cross_Debug}",
+			"%{Library.SPIRV_Cross_GLSL_Debug}"
 		}
 
 	filter "configurations:Release"
@@ -99,9 +113,9 @@ project "Bubble"
 
 		links
 		{
-			--"%{Library.ShaderC_Release}",
-			--"%{Library.SPIRV_Cross_Release}",
-			--"%{Library.SPIRV_Cross_GLSL_Release}"
+			"%{Library.ShaderC_Release}",
+			"%{Library.SPIRV_Cross_Release}",
+			"%{Library.SPIRV_Cross_GLSL_Release}"
 		}
 
 	filter "configurations:Dist"
@@ -111,7 +125,7 @@ project "Bubble"
 
 		links
 		{
-			--"%{Library.ShaderC_Release}",
-			--"%{Library.SPIRV_Cross_Release}",
-			--"%{Library.SPIRV_Cross_GLSL_Release}"
+			"%{Library.ShaderC_Release}",
+			"%{Library.SPIRV_Cross_Release}",
+			"%{Library.SPIRV_Cross_GLSL_Release}"
 		}

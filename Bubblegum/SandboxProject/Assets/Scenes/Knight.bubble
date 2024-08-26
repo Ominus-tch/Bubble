@@ -1,0 +1,31 @@
+Scene: Untitled
+Entities:
+  - Entity: 4986380452871865627
+    TagComponent:
+      Tag: Camera Entity
+    TransformComponent:
+      Translation: [-1.83728445, -3.80168247, 1.54502964]
+      Rotation: [1.29811454, 0, -0.382772267]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 10000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 14127275985767233802
+    TagComponent:
+      Tag: Knight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshComponent:
+      ModelPath: C:/Dev/Bubble/BubbleGum/SandboxProject\Assets\Models\Knight.fbx
+      DrawMesh: true
+      DrawWireframe: true

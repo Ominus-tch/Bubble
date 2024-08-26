@@ -104,6 +104,15 @@ namespace Bubble {
 			}
 
 			m_Window->OnUpdate();
+
+			//float frameEndTime = (float)glfwGetTime();
+			//float frameDuration = frameEndTime - m_LastFrameTime;
+
+			//// Calculate sleep time to cap the FPS
+			//float sleepTime = (1.f / 120.f) - frameDuration;
+
+			//if (sleepTime > 0.0f)
+			//	std::this_thread::sleep_for(std::chrono::duration<float>(sleepTime * 0.5f));
 		}
 		OnExit();
 	}

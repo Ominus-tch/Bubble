@@ -1,0 +1,31 @@
+Scene: Untitled
+Entities:
+  - Entity: 15771183691597617526
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: C:/Dev/Bubble/BubbleGum/SandboxProject\Assets\Textures\Checkerboard.png
+      TilingFactor: 1
+  - Entity: 3753342529891106958
+    TagComponent:
+      Tag: Camera Entity
+    TransformComponent:
+      Translation: [-0.379999995, -3.93844652, 4.01298237]
+      Rotation: [0.796970844, 0, -0.0930933133]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 10000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false

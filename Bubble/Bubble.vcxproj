@@ -76,22 +76,21 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_DBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;BG_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;vendor\glm;vendor\stb_image;vendor\OpenFBX;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;C:\VulkanSDK\1.3.250.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Ws2_32.lib;Winmm.lib;Version.lib;Bcrypt.lib;C:\VulkanSDK\1.3.250.1\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -99,17 +98,16 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;BG_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;vendor\glm;vendor\stb_image;vendor\OpenFBX;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;C:\VulkanSDK\1.3.250.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,7 +115,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Ws2_32.lib;Winmm.lib;Version.lib;Bcrypt.lib;C:\VulkanSDK\1.3.250.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -125,17 +123,16 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>bgpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS;BG_BUILD_DLL;GLFW_INCLUDE_NONE;BG_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;BG_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;vendor\glm;vendor\stb_image;vendor\OpenFBX;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;C:\VulkanSDK\1.3.250.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,10 +140,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Ws2_32.lib;Winmm.lib;Version.lib;Bcrypt.lib;C:\VulkanSDK\1.3.250.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.3.250.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Bubble\Core\Buffer.h" />
+    <ClInclude Include="src\Bubble\Core\FileSystem.h" />
     <ClInclude Include="src\Bubble.h" />
     <ClInclude Include="src\Bubble\Core\Application.h" />
     <ClInclude Include="src\Bubble\Core\Assert.h" />
@@ -160,6 +159,7 @@
     <ClInclude Include="src\Bubble\Core\MouseCodes.h" />
     <ClInclude Include="src\Bubble\Core\PlatformDetection.h" />
     <ClInclude Include="src\Bubble\Core\Random.h" />
+    <ClInclude Include="src\Bubble\Core\Timer.h" />
     <ClInclude Include="src\Bubble\Core\Timestep.h" />
     <ClInclude Include="src\Bubble\Core\UUID.h" />
     <ClInclude Include="src\Bubble\Core\Window.h" />
@@ -169,6 +169,7 @@
     <ClInclude Include="src\Bubble\Events\KeyEvent.h" />
     <ClInclude Include="src\Bubble\Events\MouseEvent.h" />
     <ClInclude Include="src\Bubble\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Bubble\Math\Math.h" />
     <ClInclude Include="src\Bubble\Project\Project.h" />
     <ClInclude Include="src\Bubble\Project\ProjectSerializer.h" />
     <ClInclude Include="src\Bubble\Renderer\Buffer.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="src\Bubble\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Bubble\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Bubble\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Bubble\Renderer\Mesh.h" />
     <ClInclude Include="src\Bubble\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Bubble\Renderer\OrthographicCameraController.h" />
     <ClInclude Include="src\Bubble\Renderer\RenderCommand.h" />
@@ -204,6 +206,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\bgpch.h" />
+    <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="vendor\OpenFBX\libdeflate.h" />
+    <ClInclude Include="vendor\OpenFBX\ofbx.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_features.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_fixes.hpp" />
@@ -623,19 +628,23 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Bubble\Core\FileSystem.cpp" />
     <ClCompile Include="src\Bubble\Core\Application.cpp" />
     <ClCompile Include="src\Bubble\Core\Layer.cpp" />
     <ClCompile Include="src\Bubble\Core\LayerStack.cpp" />
     <ClCompile Include="src\Bubble\Core\Log.cpp" />
     <ClCompile Include="src\Bubble\Core\Random.cpp" />
     <ClCompile Include="src\Bubble\Core\UUID.cpp" />
+    <ClCompile Include="src\Bubble\Core\Window.cpp" />
     <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Bubble\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Bubble\Math\Math.cpp" />
     <ClCompile Include="src\Bubble\Project\Project.cpp" />
     <ClCompile Include="src\Bubble\Project\ProjectSerializer.cpp" />
     <ClCompile Include="src\Bubble\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Bubble\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\Bubble\Renderer\Framebuffer.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Bubble\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Bubble\Renderer\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Bubble\Renderer\RenderCommand.cpp" />
@@ -664,6 +673,15 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\bgpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\OpenFBX\libdeflate.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\OpenFBX\ofbx.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>

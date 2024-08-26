@@ -15,8 +15,20 @@
 #include "Bubble/Core/Random.h"
 // ---------------------------------
 
+// ----Math-------------------------
+#include "Bubble/Math/Math.h"
+// ---------------------------------
+
+// ----Utils------------------------
+#include "Bubble/Utils/PlatformUtils.h"
+// ---------------------------------
+
 // ----ImGui------------------------
 #include "Bubble/ImGui/ImGuiLayer.h"
+// ---------------------------------
+
+// ----Project----------------------
+#include "Bubble/Project/Project.h"
 // ---------------------------------
 
 // ----Renderer---------------------
@@ -29,6 +41,7 @@
 #include "Bubble/Renderer/Framebuffer.h"
 #include "Bubble/Renderer/Texture.h"
 #include "Bubble/Renderer/SubTexture2D.h"
+#include "Bubble/Renderer/Mesh.h"
 #include "Bubble/Renderer/VertexArray.h"
 
 #include "Bubble/Renderer/OrthographicCamera.h"
