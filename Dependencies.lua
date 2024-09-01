@@ -15,7 +15,7 @@ IncludeDir["ImGui"] = "%{wks.location}/Bubble/vendor/ImGui"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Bubble/vendor/ImGuizmo"
 IncludeDir["glm"] = "%{wks.location}/Bubble/vendor/glm"
 IncludeDir["entt"] = "%{wks.location}/Bubble/vendor/entt/include"
---IncludeDir["mono"] = "%{wks.location}/Bubble/vendor/mono/include"
+IncludeDir["mono"] = "%{wks.location}/Bubble/vendor/mono/include"
 IncludeDir["shaderc"] = "%{wks.location}/Bubble/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/Bubble/vendor/SPIRV-Cross"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
@@ -25,13 +25,13 @@ IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 LibraryDir = {}
 
 LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
---LibraryDir["mono"] = "%{wks.location}/Bubble/vendor/mono/lib/%{cfg.buildcfg}"
+LibraryDir["mono"] = "%{wks.location}/Bubble/vendor/mono/lib/%{cfg.buildcfg}"
 
 Library = {}
---Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
+Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
 
---Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
---Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
+Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
+Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
 
 Library["ShaderC_Debug"] = "%{LibraryDir.VulkanSDK}/shaderc_sharedd.lib"
 Library["SPIRV_Cross_Debug"] = "%{LibraryDir.VulkanSDK}/spirv-cross-cored.lib"

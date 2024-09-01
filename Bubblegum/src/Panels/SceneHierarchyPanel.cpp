@@ -3,6 +3,8 @@
 #include "Bubble/Scene/Components.h"
 #include "Bubble/Utils/PlatformUtils.h"
 
+#include "Bubble/Scripting/ScriptEngine.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -71,15 +73,43 @@ namespace Bubble {
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
+		static std::map<uint32_t, bool> selectionPending;
+
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
+		uint32_t entityID = (uint32_t)entity;
 
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
-		if (ImGui::IsItemClicked())
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entityID, flags, entity.GetName().c_str());
+
+		bool itemClicked = ImGui::IsItemClicked(ImGuiMouseButton_Left);
+		bool isDragging = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
+
+		if (itemClicked && !isDragging)
+		{
+			// Set the flag indicating that we intend to select this item
+			selectionPending[entityID] = true;
+		}
+
+		// Start drag-and-drop operation
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("ENTITY", &entityID, sizeof(uint32_t));
+
+			// Reset the selection flag because we're dragging, not selecting
+			selectionPending[entityID] = false;
+
+			// Optional: ImGui::Image((ImTextureID)icon->GetRendererID(), { thumbnailSize * 0.2f, thumbnailSize * 0.2f }, { 0, 1 }, { 1, 0 });
+
+			ImGui::EndDragDropSource();
+		}
+
+		// If the mouse button was released and we were not dragging, select the item
+		if (selectionPending[entityID] && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 		{
 			m_SelectionContext = entity;
+			selectionPending[entityID] = false; // Reset the selection flag
 		}
 
 		bool entityDeleted = false;
@@ -93,6 +123,7 @@ namespace Bubble {
 
 		if (opened)
 		{
+			ImGui::Text("%d", entityID);
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
 			if (opened)
@@ -108,8 +139,10 @@ namespace Bubble {
 		}
 	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
+		bool changed = false;
+
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
 
@@ -130,13 +163,15 @@ namespace Bubble {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushFont(boldFont);
-		if (ImGui::Button("X", buttonSize))
+		if (ImGui::Button("X", buttonSize)) {
 			values.x = resetValue;
+			changed = true;
+		}
 		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 
 		ImGui::SameLine();
-		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+		changed |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 
@@ -144,13 +179,15 @@ namespace Bubble {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Y", buttonSize))
+		if (ImGui::Button("Y", buttonSize)) {
 			values.y = resetValue;
+			changed = true;
+		}
 		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 
 		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+		changed |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 
@@ -158,13 +195,15 @@ namespace Bubble {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Z", buttonSize))
+		if (ImGui::Button("Z", buttonSize)) {
 			values.z = resetValue;
+			changed = true;
+		}
 		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 
 		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		changed |= ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
@@ -172,6 +211,8 @@ namespace Bubble {
 		ImGui::Columns(1);
 
 		ImGui::PopID();
+
+		return changed;
 	}
 
 	template<typename T, typename UIFunction>
@@ -238,7 +279,7 @@ namespace Bubble {
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			DisplayAddComponentEntry<CameraComponent>("Camera");
-			//DisplayAddComponentEntry<ScriptComponent>("Script");
+			DisplayAddComponentEntry<ScriptComponent>("Script");
 			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			DisplayAddComponentEntry<MeshComponent>("Mesh");
 			//DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
@@ -320,18 +361,255 @@ namespace Bubble {
 				}
 			});
 
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](ScriptComponent& component) mutable
+			{
+				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+				static char buffer[64];
+				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+
+				//UI::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.ClassName = buffer;
+					return;
+				}
+				if (ImGui::BeginDragDropTarget())
+				{
+					bool ret = false;
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path scriptPath(path);
+						std::string fullScriptName = Utils::ExtractNamespaceClass(scriptPath.string());
+						if (!fullScriptName.empty() && component.ClassName != fullScriptName)
+						{
+							component.ClassName = fullScriptName;
+							ret = true;
+						}
+					}
+					ImGui::EndDragDropTarget();
+					if (ret) return;
+				}
+
+				// Fields
+				bool sceneRunning = scene->IsRunning();
+				if (sceneRunning)
+				{
+					Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+					if (scriptInstance)
+					{
+						const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+						for (const auto& [name, field] : fields)
+						{
+							switch (field.Type) {
+								case ScriptFieldType::Float: {
+
+									float data = scriptInstance->GetFieldValue<float>(name);
+									if (ImGui::DragFloat(name.c_str(), &data))
+									{
+										scriptInstance->SetFieldValue(name, data);
+									}
+
+									break;
+								}
+								case ScriptFieldType::Int: {
+
+									int data = scriptInstance->GetFieldValue<int>(name);
+									if (ImGui::DragInt(name.c_str(), &data))
+									{
+										scriptInstance->SetFieldValue(name, data);
+									}
+
+									break;
+								}
+								case ScriptFieldType::Vector3: {
+									glm::vec3 data = scriptInstance->GetFieldValue<glm::vec3>(name);
+									if (DrawVec3Control(name, data))
+									{
+										scriptInstance->SetFieldValue(name, data);
+									}
+									break;
+								}
+								case ScriptFieldType::Entity: {
+									uint32_t data = scriptInstance->GetFieldValue<uint32_t>(name);
+									std::ostringstream entityLabel;
+									entityLabel << "Entity: ";
+									if (data != 0)
+									{
+										Entity entity(data, scene.get());
+										entityLabel << entity.GetName();
+									}
+									else
+									{
+										entityLabel << "None";
+									}
+
+									ImGui::Button(entityLabel.str().c_str());
+
+									if (ImGui::BeginDragDropTarget())
+									{
+										if (data != 0)
+											ImGui::SetDragDropPayload("ENTITY", &data, sizeof(uint32_t));
+										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+										{
+											uint32_t entityID = *(const uint32_t*)payload->Data;
+											if (entityID != data)
+												scriptInstance->SetFieldValue(name, entityID);
+										}
+										ImGui::EndDragDropTarget();
+									}
+
+									break;
+									
+								}
+								default: break;
+							}
+						}
+					}
+				}
+				else
+				{
+					if (scriptClassExists)
+					{
+						Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+						const auto& fields = entityClass->GetFields();
+
+						auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+						for (const auto& [name, field] : fields)
+						{
+							// Field has been set in editor
+							if (entityFields.find(name) != entityFields.end())
+							{
+								ScriptFieldInstance& scriptField = entityFields.at(name);
+
+								// Display control to set it maybe
+								switch (field.Type) {
+									case ScriptFieldType::Float: {
+										float data = scriptField.GetValue<float>();
+										if (ImGui::DragFloat(name.c_str(), &data))
+											scriptField.SetValue(data);
+										break;
+									}
+									case ScriptFieldType::Int: {
+										int data = scriptField.GetValue<int>();
+										if (ImGui::DragInt(name.c_str(), &data))
+											scriptField.SetValue(data);
+										break;
+									}
+									case ScriptFieldType::Vector3: {
+										glm::vec3 data = scriptField.GetValue<glm::vec3>();
+										if (DrawVec3Control(name, data))
+										{
+											scriptField.SetValue(data);
+										}
+										break;
+									}
+									case ScriptFieldType::Entity: {
+										uint32_t data = scriptField.GetValue<uint32_t>();
+										std::ostringstream entityLabel;
+										Entity entity(data, scene.get());
+										entityLabel << name << ": " << entity.GetName();
+
+										ImGui::Button(entityLabel.str().c_str());
+
+										if (ImGui::BeginDragDropTarget())
+										{
+											if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+											{
+												uint32_t entityID = *(const uint32_t*)payload->Data;
+												if (data != entityID)
+													scriptField.SetValue(entityID);
+											}
+											ImGui::EndDragDropTarget();
+										}
+										break;
+									}
+									default: break;
+								}
+							}
+							else
+							{
+								// Display control to set it maybe
+								switch (field.Type) {
+									case ScriptFieldType::Float: {
+										float data = 0.0f;
+										if (ImGui::DragFloat(name.c_str(), &data))
+										{
+											ScriptFieldInstance& fieldInstance = entityFields[name];
+											fieldInstance.Field = field;
+											fieldInstance.SetValue(data);
+										}
+										break;
+									}
+									case ScriptFieldType::Int: {
+										int data = 0;
+										if (ImGui::DragInt(name.c_str(), &data))
+										{
+											ScriptFieldInstance& fieldInstance = entityFields[name];
+											fieldInstance.Field = field;
+											fieldInstance.SetValue(data);
+										}
+										break;
+									}
+									case ScriptFieldType::Vector3: {
+										glm::vec3 data = {0.f, 0.f, 0.f};
+										if (DrawVec3Control(name, data))
+										{
+											ScriptFieldInstance& fieldInstance = entityFields[name];
+											fieldInstance.Field = field;
+											fieldInstance.SetValue(data);
+										}
+										break;
+									}
+									case ScriptFieldType::Entity: {
+										std::ostringstream entityLabel;
+										entityLabel << name.c_str() << ": None";
+										ImGui::Button(entityLabel.str().c_str());
+										if (ImGui::BeginDragDropTarget())
+										{
+											if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
+											{
+												uint32_t entityID = *(const uint32_t*)payload->Data;
+												ScriptFieldInstance& fieldInstance = entityFields[name];
+												fieldInstance.Field = field;
+												fieldInstance.SetValue(entityID);
+											}
+											ImGui::EndDragDropTarget();
+										}
+										break;
+									}
+									default: break;
+								}
+							}
+						}
+					}
+				}
+			});
+
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+				if (ImGui::Button("Texture", ImVec2(100.0f, 0.0f)))
+				{
+					std::string filepath = FileDialogs::OpenFile("Texture File (*.png)\0*.png\0");
+					if (!filepath.empty())
+					{
+						Ref<Texture2D> texture = Texture2D::Create(filepath);
+						if (texture->IsLoaded())
+							component.Texture = texture;
+						else
+							BG_WARN("Could not load texture {0}", filepath);
+					}
+				}
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
 						std::filesystem::path texturePath(path);
-						BG_INFO(texturePath.string());
 						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;
@@ -347,7 +625,14 @@ namespace Bubble {
 		DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& component)
 			{
 				ImGui::Text("Path: %s", component.Path.c_str());
-				ImGui::Button("Model", ImVec2(100.0f, 0.0f));
+				if (ImGui::Button("Model", ImVec2(100.0f, 0.0f)))
+				{
+					std::string filepath = FileDialogs::OpenFile("FBX Model (*.fbx)\0*.fbx\0");
+					if (!filepath.empty())
+					{
+						component.Load(filepath);
+					}
+				}
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -381,8 +666,7 @@ namespace Bubble {
 						ImGui::Text("Vertices: %d", mesh->GetNumVertices());
 						ImGui::Text("Indices: %d", mesh->GetNumIndices());
 
-						//rotation = glm::radians(rotation);
-						//mesh->updateTransform(translation, rotation, scale);
+						mesh->updateTransform(translation, rotation, scale);
 
 						ImGui::TreePop();
 					}

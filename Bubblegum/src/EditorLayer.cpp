@@ -1,6 +1,7 @@
 #include "EditorLayer.h"
 #include "Bubble/Scene/SceneSerializer.h"
 #include "Bubble/Utils/PlatformUtils.h"
+#include "Bubble/Scripting/ScriptEngine.h"
 
 #include <imgui/imgui.h>
 #include "ImGuizmo.h"
@@ -10,6 +11,9 @@
 #include "Bubble/Scene/SceneSerializer.h"
 
 #include <glm/gtc/type_ptr.hpp>
+
+// Temp
+#include <GLFW/include/GLFW/glfw3.h>
 
 namespace Bubble {
 
@@ -47,11 +51,12 @@ namespace Bubble {
 		}
 		else
 		{
-			OpenProject("C:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
-			// TODO(Yan): prompt the user to select a directory
+			// TEMP
+			//OpenProject("C:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
+			// TODO: prompt the user to select a directory
 			// NewProject();
 
-			// If no project is opened, close Hazelnut
+			// If no project is opened, close Bubblegum
 			// NOTE: this is while we don't have a new project path
 			//if (!OpenProject())
 			//	Application::Get().Close();
@@ -59,95 +64,7 @@ namespace Bubble {
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
-		// Application init
-  //      m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-		//////m_CameraEntity.AddComponent<CameraComponent>();
-		////// 
-
-		//auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
-		//cameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-		//cameraComponent.Camera.SetPerspectiveFarClip(10000.f);
-		//auto& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>();
-		//cameraTransform.Rotation.x = glm::radians(90.f);
-
-		//cameraTransform.Translation.x = -3.57f;
-		//cameraTransform.Translation.z = 3.f;
-
-  //      m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
-  //      m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-		//m_Cube = m_ActiveScene->CreateEntity("Cube");
-		////m_Cube.AddComponent<SpriteRendererComponent>().Texture = m_CheckerboardTexture;
-
-		//auto& mc = m_Cube.AddComponent<MeshComponent>();
-
-		//std::vector<Vertex> vertices = {
-		//	// Front face (red)
-		//	{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}}, // 0
-		//	{{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}}, // 1
-		//	{{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}}, // 2
-		//	{{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}}, // 3
-
-		//	// Back face (green)
-		//	{{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}}, // 4
-		//	{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}}, // 5
-		//	{{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}}, // 6
-		//	{{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}}, // 7
-
-		//	// Left face (blue)
-		//	{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}, // 8
-		//	{{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}, // 9
-		//	{{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}, // 10
-		//	{{-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}}, // 11
-
-		//	// Right face (yellow)
-		//	{{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}}, // 12
-		//	{{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}}, // 13
-		//	{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}}, // 14
-		//	{{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}}, // 15
-
-		//	// Top face (cyan)
-		//	{{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}}, // 16
-		//	{{ 0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}}, // 17
-		//	{{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}}, // 18
-		//	{{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}}, // 19
-
-		//	// Bottom face (magenta)
-		//	{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}, // 20
-		//	{{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}, // 21
-		//	{{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}, // 22
-		//	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}}, // 23
-		//};
-
-		//std::vector<uint32_t> indices = {
-		//	// Front face
-		//	0, 1, 2, 2, 3, 0,
-
-		//	// Back face
-		//	4, 5, 6, 6, 7, 4,
-
-		//	// Left face
-		//	8, 9, 10, 10, 11, 8,
-
-		//	// Right face
-		//	12, 13, 14, 14, 15, 12,
-
-		//	// Top face
-		//	16, 17, 18, 18, 19, 16,
-
-		//	// Bottom face
-		//	20, 21, 22, 22, 23, 20,
-		//};
-
-		//mc.AddMesh(vertices, indices);
-
-        // SceneSerializer serializer(m_ActiveScene);
-        //serializer.Serialize("assets/scenes/Example.bubble");
-
-		/*m_MeshTest = m_ActiveScene->CreateEntity("Mesh Test");
-		m_MeshTest.AddComponent<MeshComponent>("assets/models/tree.fbx");
-		m_MeshTest.GetComponent<TransformComponent>().Scale = { 0.001f, 0.001f , 0.001f };*/
+		//m_Shader = Shader::Create("SandboxProject/Assets/Shaders/TestShader.glsl");
     }
 
     void EditorLayer::OnDetach()
@@ -189,7 +106,11 @@ namespace Bubble {
         RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
         RenderCommand::Clear();
 
+		//m_Shader->Bind();
+
 		m_Framebuffer->ClearAttachment(1, -1);
+
+
 
 		switch (m_SceneState)
 		{
@@ -232,6 +153,8 @@ namespace Bubble {
 		}
 
 		OnOverlayRender();
+
+		//m_Shader->Unbind();
 		
         m_Framebuffer->Unbind();
         m_FrameCount++;
@@ -618,8 +541,8 @@ namespace Bubble {
         // Scene Commands
         case Key::D:
         {
-            //if (control)
-            //    OnDuplicateEntity();
+            if (control)
+               OnDuplicateEntity();
 
             break;
         }
@@ -647,7 +570,7 @@ namespace Bubble {
         {
             if (control)
             {
-                //ScriptEngine::ReloadAssembly();
+                ScriptEngine::ReloadAssembly();
             }
             else
             {
@@ -656,19 +579,19 @@ namespace Bubble {
             }
             break;
         }
-    //    case Key::Delete:
-    //    {
-    //        if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
-    //        {
-    //            Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-    //            if (selectedEntity)
-    //            {
-    //                m_SceneHierarchyPanel.SetSelectedEntity({});
-    //                m_ActiveScene->DestroyEntity(selectedEntity);
-    //            }
-    //        }
-    //        break;
-    //    }
+        case Key::Delete:
+        {
+            if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+            {
+                Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+                if (selectedEntity)
+                {
+                    m_SceneHierarchyPanel.SetSelectedEntity({});
+                    m_ActiveScene->DestroyEntity(selectedEntity);
+                }
+            }
+            break;
+        }
         }
 
         return false;
@@ -683,7 +606,7 @@ namespace Bubble {
     {
         if (Project::Load(path))
         {
-            //ScriptEngine::Init();
+            ScriptEngine::Init();
 
             auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
             OpenScene(startScenePath);

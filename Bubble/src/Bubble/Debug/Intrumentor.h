@@ -223,10 +223,10 @@ namespace Bubble {
 		#define BG_FUNC_SIG "BG_FUNC_SIG unknown!"
 	#endif
 
-	#define BG_PROFILE_BEGIN_SESSION(name, filepath) ::Hazel::Instrumentor::Get().BeginSession(name, filepath)
-	#define BG_PROFILE_END_SESSION() ::Hazel::Instrumentor::Get().EndSession()
-	#define BG_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Hazel::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-												   ::Hazel::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define BG_PROFILE_BEGIN_SESSION(name, filepath) ::Bubble::Instrumentor::Get().BeginSession(name, filepath)
+	#define BG_PROFILE_END_SESSION() ::Bubble::Instrumentor::Get().EndSession()
+	#define BG_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Bubble::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+												   ::Bubble::InstrumentationTimer timer##line(fixedName##line.Data)
 	#define BG_PROFILE_SCOPE_LINE(name, line) BG_PROFILE_SCOPE_LINE2(name, line)
 	#define BG_PROFILE_SCOPE(name) BG_PROFILE_SCOPE_LINE(name, __LINE__)
 	#define BG_PROFILE_FUNCTION() BG_PROFILE_SCOPE(BG_FUNC_SIG)

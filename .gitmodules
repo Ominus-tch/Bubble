@@ -17,3 +17,6 @@
 [submodule "Bubble/vendor/ImGuizmo"]
 	path = Bubble/vendor/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "Bubble/vendor/msdf-atlas-gen"]
+	path = Bubble/vendor/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen

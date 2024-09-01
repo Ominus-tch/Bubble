@@ -7,6 +7,7 @@
 
 #include <deque>
 
+
 namespace Bubble {
 
 	class EditorLayer : public Layer
@@ -21,9 +22,6 @@ namespace Bubble {
 		void OnUpdate(Timestep ts) override;
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
-
-		void GenerateTerrainMesh();
-
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
@@ -80,6 +78,11 @@ namespace Bubble {
 		glm::vec2 m_ViewportBounds[2];
 
 		// App
+		Fluid m_Fluid;
+
+		ShaderLibrary m_ShaderLib;
+		Ref<Shader> m_Shader;
+
 		Entity m_MeshTest;
 		Entity m_Cube;
 

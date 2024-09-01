@@ -1,0 +1,9 @@
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Sandbox.dll
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Sandbox.pdb
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Bubble-ScriptCore.dll
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Bubble-ScriptCore.pdb
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.AssemblyReference.cache
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CoreCompileInputs.cache
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CopyComplete
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
+C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb

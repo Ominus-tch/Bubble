@@ -8,4 +8,9 @@ namespace Bubble {
 	{
 	}
 
+	Entity::Entity(uint32_t handle, Scene* scene)
+		: m_EntityHandle((entt::entity)handle), m_Scene(scene)
+	{
+	}
+
 }

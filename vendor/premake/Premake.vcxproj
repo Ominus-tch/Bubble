@@ -77,11 +77,13 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\Bubble-ScriptCore\premake5.lua" />
     <None Include="..\..\Bubble\premake5.lua" />
     <None Include="..\..\Bubble\vendor\GLFW\premake5.lua" />
     <None Include="..\..\Bubble\vendor\Glad\premake5.lua" />
     <None Include="..\..\Bubble\vendor\imgui\premake5.lua" />
     <None Include="..\..\Bubble\vendor\yaml-cpp\premake5.lua" />
+    <None Include="..\..\Bubblegum\SandboxProject\Assets\Scripts\premake5.lua" />
     <None Include="..\..\Bubblegum\premake5.lua" />
     <None Include="..\..\Sandbox\premake5.lua" />
     <None Include="..\..\premake5.lua" />

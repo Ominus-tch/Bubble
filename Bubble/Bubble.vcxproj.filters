@@ -31,6 +31,9 @@
     <Filter Include="src\Bubble\Scene">
       <UniqueIdentifier>{E559C79F-D152-E6F1-FA84-CB76E6DCC5FD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Bubble\Scripting">
+      <UniqueIdentifier>{CA850F64-B614-992D-5F33-AD284BA1A9D3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Bubble\Utils">
       <UniqueIdentifier>{28EEF49F-14E7-13F2-3D19-F9762971F3FD}</UniqueIdentifier>
     </Filter>
@@ -87,7 +90,13 @@
     <ClInclude Include="src\Bubble\Core\Base.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Buffer.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Core\EntryPoint.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\FileSystem.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Input.h">
@@ -112,6 +121,9 @@
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Random.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Timer.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Timestep.h">
@@ -218,6 +230,12 @@
     </ClInclude>
     <ClInclude Include="src\Bubble\Scene\ScriptableEntity.h">
       <Filter>src\Bubble\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scripting\ScriptEngine.h">
+      <Filter>src\Bubble\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Scripting\ScriptGlue.h">
+      <Filter>src\Bubble\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Utils\PlatformUtils.h">
       <Filter>src\Bubble\Utils</Filter>
@@ -1512,12 +1530,12 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Timer.h" />
-    <ClInclude Include="src\Bubble\Core\FileSystem.h" />
-    <ClInclude Include="src\Bubble\Core\Buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\FileSystem.cpp">
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Core\Layer.cpp">
@@ -1533,6 +1551,9 @@
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Core\UUID.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\Window.cpp">
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp">
@@ -1607,6 +1628,12 @@
     <ClCompile Include="src\Bubble\Scene\SceneSerializer.cpp">
       <Filter>src\Bubble\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Scripting\ScriptEngine.cpp">
+      <Filter>src\Bubble\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Scripting\ScriptGlue.cpp">
+      <Filter>src\Bubble\Scripting</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1655,7 +1682,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bubble\Core\Window.cpp" />
-    <ClCompile Include="src\Bubble\Core\FileSystem.cpp" />
   </ItemGroup>
 </Project>

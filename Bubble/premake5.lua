@@ -51,7 +51,7 @@ project "Bubble"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.entt}",
-		--"%{IncludeDir.mono}",
+		"%{IncludeDir.mono}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.VulkanSDK}"
@@ -67,7 +67,7 @@ project "Bubble"
 		"yaml-cpp",
 		"opengl32.lib",
 
-		--"%{Library.mono}",
+		"%{Library.mono}",
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"

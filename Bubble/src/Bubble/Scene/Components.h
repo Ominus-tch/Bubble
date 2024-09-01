@@ -162,6 +162,14 @@ namespace Bubble {
 		CameraComponent(const CameraComponent&) = default;
 	};
 
+	struct ScriptComponent
+	{
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
 	// Forward declaration
 	class ScriptableEntity;
 
@@ -187,5 +195,6 @@ namespace Bubble {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		NativeScriptComponent, MeshComponent, CameraComponent>;
+		NativeScriptComponent, MeshComponent, CameraComponent,
+		ScriptComponent>;
 }

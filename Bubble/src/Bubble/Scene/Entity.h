@@ -13,6 +13,7 @@ namespace Bubble {
 	public:
 		Entity() = default;
 		Entity(entt::entity handle, Scene* scene);
+		Entity(uint32_t handle, Scene* scene);
 		Entity(const Entity& other) = default;
 
 		template<typename T, typename... Args>

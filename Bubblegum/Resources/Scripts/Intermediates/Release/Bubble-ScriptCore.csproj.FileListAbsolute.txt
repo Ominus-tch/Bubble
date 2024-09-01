@@ -1,0 +1,6 @@
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Intermediates\Release\Bubble-ScriptCore.csproj.AssemblyReference.cache
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Intermediates\Release\Bubble-ScriptCore.csproj.CoreCompileInputs.cache
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Intermediates\Release\Bubble-ScriptCore.dll
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Intermediates\Release\Bubble-ScriptCore.pdb
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Bubble-ScriptCore.dll
+C:\Dev\Bubble\Bubblegum\Resources\Scripts\Bubble-ScriptCore.pdb

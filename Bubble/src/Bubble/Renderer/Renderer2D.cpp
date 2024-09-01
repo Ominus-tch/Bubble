@@ -542,6 +542,8 @@ namespace Bubble {
 	{
 		BG_PROFILE_FUNCTION();
 
+		BG_CORE_ASSERT(S_Data.QuadVertexBufferPtr, "Please begin a scene before rendering!");
+
 		constexpr size_t quadVertexCount = 4;
 		const float textureIndex = 0.0f; // White Texture
 		constexpr glm::vec2 textureCoords[] = {  { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -572,6 +574,7 @@ namespace Bubble {
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 
+		BG_CORE_ASSERT(S_Data.QuadVertexBufferPtr, "Please begin a scene before rendering!");
 
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxQuadIndices)
 			NextBatch();
@@ -877,6 +880,11 @@ namespace Bubble {
 			// Draw the triangle for this segment
 			DrawTriangle(center, p1, p2, color);
 		}
+	}
+
+	void Renderer2D::DrawLine(const glm::vec2& p0, const glm::vec2& p1, const glm::vec4& color, int entityID)
+	{
+		DrawLine(glm::vec3(p0, 0.f), glm::vec3(p1, 0.f), color, entityID);
 	}
 
 	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID)

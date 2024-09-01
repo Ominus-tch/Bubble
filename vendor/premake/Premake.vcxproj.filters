@@ -22,14 +22,29 @@
     <Filter Include="..\Bubble\vendor\yaml-cpp">
       <UniqueIdentifier>{2B476471-9709-98FB-E0B9-26884CBB70D9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\Bubble-ScriptCore">
+      <UniqueIdentifier>{67CE0EE1-535D-98AA-FC7B-ACA5E8E9A850}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Bubblegum">
       <UniqueIdentifier>{A57D623F-91E0-F1E3-3A66-2A9A26A8BD66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Bubblegum\SandboxProject">
+      <UniqueIdentifier>{1A8AAD01-8697-DBE7-0F7E-D7D27B8AA79E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Bubblegum\SandboxProject\Assets">
+      <UniqueIdentifier>{BC2F70FA-A86B-7364-117E-8B5BFDD81B7F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Bubblegum\SandboxProject\Assets\Scripts">
+      <UniqueIdentifier>{F3120313-DF7A-C9E0-48E6-DDF6346DE0CC}</UniqueIdentifier>
     </Filter>
     <Filter Include="..\Sandbox">
       <UniqueIdentifier>{3F7B6B1D-2B33-AD6A-943A-86C68011485B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Bubble-ScriptCore\premake5.lua">
+      <Filter>..\Bubble-ScriptCore</Filter>
+    </None>
     <None Include="..\..\Bubble\premake5.lua">
       <Filter>..\Bubble</Filter>
     </None>
@@ -44,6 +59,9 @@
     </None>
     <None Include="..\..\Bubble\vendor\yaml-cpp\premake5.lua">
       <Filter>..\Bubble\vendor\yaml-cpp</Filter>
+    </None>
+    <None Include="..\..\Bubblegum\SandboxProject\Assets\Scripts\premake5.lua">
+      <Filter>..\Bubblegum\SandboxProject\Assets\Scripts</Filter>
     </None>
     <None Include="..\..\Bubblegum\premake5.lua">
       <Filter>..\Bubblegum</Filter>

@@ -61,6 +61,7 @@ namespace Bubble {
 		static void DrawArc(const glm::vec3& pos, float r, float startAngle, float endAngle, const glm::vec4& color);
 		static void DrawSemiCircle(const glm::vec3& position, float radius = 1.f, float angle = 0.f, float startAngle = 0.f, float endAngle = 180.f, const glm::vec4& color = glm::vec4(1.f), int segments = 50);
 
+		static void DrawLine(const glm::vec2& p0, const glm::vec2& p1, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 
 		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);

@@ -1,12 +1,13 @@
 #include "bgpch.h"
+#include "Bubble/Core/Application.h"
+
+#include "Bubble/Core/Log.h"
 
 #include "Bubble/Renderer/Renderer.h"
+#include "Bubble/Scripting/ScriptEngine.h"
 
-#include "Bubble/Core/Application.h"
 #include "Bubble/Core/Input.h"
-
-// Temp
-#include <GLFW/glfw3.h>
+#include "Bubble/Utils/PlatformUtils.h"
 
 namespace Bubble {
 
@@ -19,6 +20,10 @@ namespace Bubble {
 
 		BG_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
+
+		// Set working directory here
+		if (!m_Specification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
 		m_Window = Window::Create(WindowProps(m_Specification.Name));
 		m_Window->SetEventCallback(BG_BIND_EVENT_FN(Application::OnEvent));
@@ -34,6 +39,7 @@ namespace Bubble {
 	{
 		BG_PROFILE_FUNCTION();
 
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 
@@ -58,6 +64,13 @@ namespace Bubble {
 		m_Running = false;
 	}
 
+	void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		m_MainThreadQueue.emplace_back(function);
+	}
+
 	void Application::OnEvent(Event& e)
 	{
 		BG_PROFILE_FUNCTION();
@@ -80,7 +93,7 @@ namespace Bubble {
 
 		while (m_Running)
 		{
-			float time = (float)glfwGetTime(); // Platform::GetTime
+			float time = Time::GetTime(); // Platform::GetTime
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
@@ -140,5 +153,15 @@ namespace Bubble {
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
+	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		for (auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
 	}
 }

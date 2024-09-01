@@ -34,6 +34,10 @@ namespace Bubble {
 
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
+
+		void SetNearClip(float clip) { m_NearClip = clip; UpdateProjection(); }
+		void SetFarClip(float clip) { m_FarClip = clip; UpdateProjection(); }
+		void SetFOV(float fov) { m_FOV = fov; UpdateProjection(); }
 	private:
 		void UpdateProjection();
 		void UpdateView();

@@ -4,7 +4,7 @@
 
 #include "Components.h"
 #include "ScriptableEntity.h"
-//#include "Bubble/Scripting/ScriptEngine.h"
+#include "Bubble/Scripting/ScriptEngine.h"
 #include "Bubble/Renderer/Renderer2D.h"
 //#include "Bubble/Physics/Physics2D.h"
 
@@ -19,7 +19,7 @@
 //#include "box2d/b2_polygon_shape.h"
 //#include "box2d/b2_circle_shape.h"
 
-void print_vec3(glm::vec3& vec)
+static void print_vec3(const glm::vec3& vec)
 {
 	BG_INFO("{0}, {1}, {2}", vec.x, vec.y, vec.z);
 }
@@ -130,18 +130,18 @@ namespace Bubble {
 
 	//	OnPhysics2DStart();
 
-	//	// Scripting
-	//	{
-	//		ScriptEngine::OnRuntimeStart(this);
-	//		// Instantiate all script entities
+		// Scripting
+		{
+			ScriptEngine::OnRuntimeStart(this);
+			// Instantiate all script entities
 
-	//		auto view = m_Registry.view<ScriptComponent>();
-	//		for (auto e : view)
-	//		{
-	//			Entity entity = { e, this };
-	//			ScriptEngine::OnCreateEntity(entity);
-	//		}
-	//	}
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnCreateEntity(entity);
+			}
+		}
 	}
 
 	void Scene::OnRuntimeStop()
@@ -150,7 +150,7 @@ namespace Bubble {
 
 	//	OnPhysics2DStop();
 
-	//	ScriptEngine::OnRuntimeStop();
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnSimulationStart()
@@ -169,6 +169,14 @@ namespace Bubble {
 		{
 			// Update scripts
 			{
+				// C# Entity OnUpdate
+				auto view = m_Registry.view<ScriptComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				}
+
 				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 					{
 						// TODO: Move to Scene::OnScenePlay
@@ -583,10 +591,10 @@ namespace Bubble {
 			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
-	/*template<>
+	template<>
 	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
 	{
-	}*/
+	}
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)

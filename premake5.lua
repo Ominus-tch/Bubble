@@ -36,7 +36,7 @@ group ""
 
 group "Core"
 	include "Bubble"
-	--include "Bubble-ScriptCore"
+	include "Bubble-ScriptCore"
 group ""
 
 group "Tools"
