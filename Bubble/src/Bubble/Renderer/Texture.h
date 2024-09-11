@@ -39,6 +39,7 @@ namespace Bubble {
 		virtual void SetData(void* data, uint32_t size) = 0;
 
 		virtual void Bind(uint32_t slot = 0) const = 0;
+		virtual void BindAsImage(uint32_t unit, uint32_t level = 0, bool isWritable = true) const = 0;
 
 		virtual bool IsLoaded() const = 0;
 

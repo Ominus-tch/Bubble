@@ -80,6 +80,9 @@ namespace Bubble {
 		glm::vec2 m_ViewportBounds[2];
 
 		// App
+		Ref<Texture2D> Output;
+		Ref<Texture2D> TestTexture;
+
 		Entity m_MeshTest;
 		Entity m_Cube;
 

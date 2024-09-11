@@ -77,6 +77,10 @@ namespace Bubble {
 		static const uint32_t MaxTriVertices = MaxTris * 3;
 		static const uint32_t MaxTriIndices = MaxTris * 3;
 
+		static const uint32_t MaxCircles = 20000;
+		static const uint32_t MaxCircleVertices = MaxCircles * 4;
+		static const uint32_t MaxCircleIndices = MaxCircles * 6;
+
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<Shader> QuadShader;
@@ -817,8 +821,8 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		// TODO: implement for circles
-		// if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-		// 	NextBatch();
+		 if (s_Data.CircleIndexCount >= Renderer2DData::MaxCircleIndices)
+		 	NextBatch();
 
 		for (size_t i = 0; i < 4; i++)
 		{

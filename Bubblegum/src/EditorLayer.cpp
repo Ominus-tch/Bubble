@@ -47,7 +47,7 @@ namespace Bubble {
 		}
 		else
 		{
-			OpenProject("C:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
+			//OpenProject("D:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
 			// TODO(Yan): prompt the user to select a directory
 			// NewProject();
 
@@ -58,6 +58,8 @@ namespace Bubble {
 		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+		m_EditorCamera.SetDistance(50.f);
+		
 
 		// Application init
   //      m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
@@ -148,6 +150,40 @@ namespace Bubble {
 		/*m_MeshTest = m_ActiveScene->CreateEntity("Mesh Test");
 		m_MeshTest.AddComponent<MeshComponent>("assets/models/tree.fbx");
 		m_MeshTest.GetComponent<TransformComponent>().Scale = { 0.001f, 0.001f , 0.001f };*/
+
+
+		// Compute test
+
+		auto computeShader = Shader::Create("D:/Dev/Bubble/BubbleGum/SandboxProject/Assets/Shaders/RayMarching.glsl");
+
+		computeShader->Bind();
+
+		TestTexture = Texture2D::Create({ 512, 512, ImageFormat::RGBA8 });
+
+		uint32_t textureWidth = TestTexture->GetWidth();
+		uint32_t textureHeight = TestTexture->GetHeight();
+		uint32_t pixelSize = 4;  // RGBA8 = 4 bytes per pixel
+
+		// Create a buffer filled with white pixels (R=255, G=255, B=255, A=255)
+		std::vector<uint8_t> whiteData(textureWidth* textureHeight* pixelSize, 255);
+
+		TestTexture->SetData(whiteData.data(), whiteData.size());
+
+		Output = Texture2D::Create({ 512, 512, ImageFormat::RGBA32F });
+		Output->BindAsImage(1);
+
+		uint32_t localSizeX = 16;
+		uint32_t localSizeY = 16;
+
+		// Calculate the number of work groups to dispatch in X and Y directions
+		uint32_t numGroupsX = (Output->GetWidth() + localSizeX - 1) / localSizeX;
+		uint32_t numGroupsY = (Output->GetHeight() + localSizeY - 1) / localSizeY;
+
+		computeShader->Dispatch(numGroupsX, numGroupsY, 1);
+
+		computeShader->Unbind();
+
+		//Output->Bind(0);
     }
 
     void EditorLayer::OnDetach()
@@ -190,6 +226,18 @@ namespace Bubble {
         RenderCommand::Clear();
 
 		m_Framebuffer->ClearAttachment(1, -1);
+
+		// Begin App
+		Renderer2D::BeginScene(m_EditorCamera);
+
+		Renderer2D::DrawQuad({0.f, 0.f}, { 10.f, 10.f }, Output);
+		Renderer2D::DrawRect({ 0.f, 0.f, 0.f }, {10.f, 10.f}, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+
+		Renderer2D::DrawQuad({ 10.f, 0.f }, { 10.f, 10.f }, TestTexture);
+		Renderer2D::DrawRect({ 10.f, 0.f, 0.f }, { 10.f, 10.f }, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+
+		Renderer2D::EndScene();
+		// End app
 
 		switch (m_SceneState)
 		{
@@ -344,6 +392,8 @@ namespace Bubble {
         ImGui::Text("FPS: %i", (int)m_FPS);
 
         ImGui::Checkbox("Animate", &m_Animate);
+
+		
 
         ImGui::End();
 

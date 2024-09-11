@@ -25,6 +25,8 @@ namespace Bubble {
 
 		virtual const std::string& GetName() const = 0;
 
+		virtual void Dispatch(uint32_t numGroupsX, uint32_t numGroupsY, uint32_t numGroupsZ) const = 0;
+
 		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		static Ref<Shader> Create(const std::string& filepath);
 	};

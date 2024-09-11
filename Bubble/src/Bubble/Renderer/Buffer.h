@@ -127,4 +127,22 @@ namespace Bubble {
 		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 	};
 
+	class ComputeBuffer
+	{
+	public:
+		virtual ~ComputeBuffer() = default;
+
+		virtual void Bind(uint32_t bindingPoint) const = 0;
+		virtual void UnBind() const = 0;
+
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
+		virtual void* MapBufferRange(uint32_t size, uint32_t access) = 0;
+		virtual void UnmapBuffer() = 0;
+
+		virtual uint32_t GetSize() const = 0;
+
+		static Ref<ComputeBuffer> Create(uint32_t size, const void* data = nullptr);
+	};
+
 }

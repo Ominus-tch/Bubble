@@ -87,7 +87,13 @@
     <ClInclude Include="src\Bubble\Core\Base.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Buffer.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Core\EntryPoint.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\FileSystem.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Input.h">
@@ -112,6 +118,9 @@
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Random.h">
+      <Filter>src\Bubble\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\Core\Timer.h">
       <Filter>src\Bubble\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Core\Timestep.h">
@@ -1512,12 +1521,12 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bubble\Core\Timer.h" />
-    <ClInclude Include="src\Bubble\Core\FileSystem.h" />
-    <ClInclude Include="src\Bubble\Core\Buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\FileSystem.cpp">
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Core\Layer.cpp">
@@ -1533,6 +1542,9 @@
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\Core\UUID.cpp">
+      <Filter>src\Bubble\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bubble\Core\Window.cpp">
       <Filter>src\Bubble\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Bubble\ImGui\ImGuiBuild.cpp">
@@ -1655,7 +1667,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bubble\Core\Window.cpp" />
-    <ClCompile Include="src\Bubble\Core\FileSystem.cpp" />
   </ItemGroup>
 </Project>

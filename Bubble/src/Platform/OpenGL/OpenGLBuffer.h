@@ -38,4 +38,24 @@ namespace Bubble {
 		uint32_t m_Count;
 	};
 
+	class OpenGLComputeBuffer : public ComputeBuffer
+	{
+	public:
+		OpenGLComputeBuffer(uint32_t size, const void* data);
+		virtual ~OpenGLComputeBuffer();
+
+		virtual void Bind(uint32_t bindingPoint) const;
+		virtual void UnBind() const;
+
+		virtual void SetData(const void* data, uint32_t size) override;
+
+		virtual void* MapBufferRange(uint32_t size, uint32_t access) override;
+		virtual void UnmapBuffer() override;
+
+		virtual uint32_t GetSize() const override;
+	private:
+		uint32_t m_RendererID;
+		uint32_t m_Size;
+	};
+
 }

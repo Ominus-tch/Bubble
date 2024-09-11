@@ -21,6 +21,8 @@ namespace Bubble {
 				return GL_VERTEX_SHADER;
 			else if (type == "fragment" || type == "pixel" || type == "frag")
 				return GL_FRAGMENT_SHADER;
+			else if (type == "compute")
+				return GL_COMPUTE_SHADER;
 
 			BG_CORE_ASSERT(false, "Unknown shader type: {0}", type);
 			return GL_NONE;
@@ -32,6 +34,7 @@ namespace Bubble {
 			{
 				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+				case GL_COMPUTE_SHADER: return shaderc_glsl_compute_shader;
 			}
 			BG_CORE_ASSERT(false);
 			return (shaderc_shader_kind)0;
@@ -43,6 +46,7 @@ namespace Bubble {
 			{
 				case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 				case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+				case GL_COMPUTE_SHADER: return "GL_COMPUTE_SHADER";
 			}
 			BG_CORE_ASSERT(false);
 			return nullptr;
@@ -67,6 +71,7 @@ namespace Bubble {
 			{
 				case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
 				case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
+				case GL_COMPUTE_SHADER:  return ".cached_opengl.compute";
 			}
 			BG_CORE_ASSERT(false);
 			return "";
@@ -78,6 +83,7 @@ namespace Bubble {
 			{
 			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
 			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+			case GL_COMPUTE_SHADER:  return ".cached_vulkan.compute";
 			}
 			BG_CORE_ASSERT(false);
 			return "";
@@ -477,5 +483,30 @@ namespace Bubble {
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	}
+
+	void OpenGLShader::Dispatch(uint32_t numGroupsX, uint32_t numGroupsY, uint32_t numGroupsZ) const
+	{
+		GLenum error;
+
+		glUseProgram(m_RendererID);
+		/*error = glGetError();
+		if (error != GL_NO_ERROR) {
+			BG_CORE_ERROR("OpenGL Error: {0}", error);
+		}*/
+
+		glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
+		
+		/*error = glGetError();
+		if (error != GL_NO_ERROR) {
+			BG_CORE_ERROR("OpenGL Error: {0}", error);
+		}*/
+
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+		/*error = glGetError();
+		if (error != GL_NO_ERROR) {
+			BG_CORE_ERROR("OpenGL Error: {0}", error);
+		}*/
 	}
 }
