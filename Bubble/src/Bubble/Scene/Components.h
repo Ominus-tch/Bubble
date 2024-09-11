@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Bubble/Renderer/Texture.h"
-#include "Bubble/Renderer/Mesh.h"
-
-#include "Bubble/Core/UUID.h"
-
 #include "Bubble/Scene/SceneCamera.h"
 
+#include "Bubble/Core/UUID.h"
+#include "Bubble/Renderer/Texture.h"
+#include "Bubble/Renderer/Mesh.h"
+//#include "Bubble/Renderer/Font.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -187,6 +186,15 @@ namespace Bubble {
 			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
 		}
 	};
+
+	/*struct TextComponent
+	{
+		std::string TextString;
+		Ref<Font> FontAsset = Font::GetDefault();
+		glm::vec4 Color{ 1.0f };
+		float Kerning = 0.0f;
+		float LineSpacing = 0.0f;
+	};*/
 
 	template<typename... Component>
 	struct ComponentGroup

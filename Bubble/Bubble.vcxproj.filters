@@ -34,6 +34,9 @@
     <Filter Include="src\Bubble\Scripting">
       <UniqueIdentifier>{CA850F64-B614-992D-5F33-AD284BA1A9D3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Bubble\UI">
+      <UniqueIdentifier>{F5B44198-6175-BDCE-2AB0-064C962F02AB}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Bubble\Utils">
       <UniqueIdentifier>{28EEF49F-14E7-13F2-3D19-F9762971F3FD}</UniqueIdentifier>
     </Filter>
@@ -177,6 +180,9 @@
     <ClInclude Include="src\Bubble\Renderer\GraphicsContext.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\MSDFData.h">
+      <Filter>src\Bubble\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Bubble\Renderer\Mesh.h">
       <Filter>src\Bubble\Renderer</Filter>
     </ClInclude>
@@ -236,6 +242,9 @@
     </ClInclude>
     <ClInclude Include="src\Bubble\Scripting\ScriptGlue.h">
       <Filter>src\Bubble\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bubble\UI\UI.h">
+      <Filter>src\Bubble\UI</Filter>
     </ClInclude>
     <ClInclude Include="src\Bubble\Utils\PlatformUtils.h">
       <Filter>src\Bubble\Utils</Filter>
@@ -1530,6 +1539,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Bubble\Renderer\Material.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLComputeBuffer.h" />
+    <ClInclude Include="src\Bubble\Renderer\ComputeBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bubble\Core\Application.cpp">
@@ -1682,5 +1694,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bubble\Renderer\Material.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLComputeBuffer.cpp" />
+    <ClCompile Include="src\Bubble\Renderer\ComputeBuffer.cpp" />
   </ItemGroup>
 </Project>

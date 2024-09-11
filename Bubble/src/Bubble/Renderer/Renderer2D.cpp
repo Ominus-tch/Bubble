@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "MSDFData.h"
 
 namespace Bubble {
 
@@ -45,6 +46,18 @@ namespace Bubble {
 		int EntityID;
 	};
 
+	struct SphereVertex
+	{
+		glm::vec3 WorldPosition;
+		glm::vec3 LocalPosition;
+		glm::vec4 Color;
+		float Thickness;
+		float Fade;
+
+		// Editor-only
+		int EntityID;
+	};
+
 	struct LineVertex
 	{
 		glm::vec3 Position;
@@ -54,17 +67,17 @@ namespace Bubble {
 		int EntityID;
 	};
 
-	//struct TextVertex
-	//{
-	//	glm::vec3 Position;
-	//	glm::vec4 Color;
-	//	glm::vec2 TexCoord;
+	struct TextVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
 
-	//	// TODO: bg color for outline/bg
+		// TODO: bg color for outline/bg
 
-	//	// Editor-only
-	//	int EntityID;
-	//};
+		// Editor-only
+		int EntityID;
+	};
 
 	struct Renderer2DData
 	{
@@ -77,6 +90,11 @@ namespace Bubble {
 		static const uint32_t MaxTriVertices = MaxTris * 3;
 		static const uint32_t MaxTriIndices = MaxTris * 3;
 
+		static const uint32_t MaxCircles = 20000;
+		static const uint32_t MaxCircleIndices = MaxCircles * 6;
+
+		static const uint32_t MaxTextVertices = MaxQuads * 4;
+
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<Shader> QuadShader;
@@ -85,6 +103,10 @@ namespace Bubble {
 		Ref<VertexArray> CircleVertexArray;
 		Ref<VertexBuffer> CircleVertexBuffer;
 		Ref<Shader> CircleShader;
+
+		Ref<VertexArray> SphereVertexArray;
+		Ref<VertexBuffer> SphereVertexBuffer;
+		Ref<Shader> SphereShader;
 
 		Ref<VertexArray> TriVertexArray;
 		Ref<VertexBuffer> TriVertexBuffer;
@@ -110,18 +132,24 @@ namespace Bubble {
 		CircleVertex* CircleVertexBufferBase = nullptr;
 		CircleVertex* CircleVertexBufferPtr = nullptr;
 
+		uint32_t SphereIndexCount = 0;
+		SphereVertex* SphereVertexBufferBase = nullptr;
+		SphereVertex* SphereVertexBufferPtr = nullptr;
+
 		uint32_t LineVertexCount = 0;
 		LineVertex* LineVertexBufferBase = nullptr;
 		LineVertex* LineVertexBufferPtr = nullptr;
 
-		//uint32_t TextIndexCount = 0;
-		//TextVertex* TextVertexBufferBase = nullptr;
-		//TextVertex* TextVertexBufferPtr = nullptr;
+		uint32_t TextIndexCount = 0;
+		TextVertex* TextVertexBufferBase = nullptr;
+		TextVertex* TextVertexBufferPtr = nullptr;
 
 		float LineWidth = 2.0f;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = white texture
+
+		Ref<Texture2D> FontAtlasTexture;
 
 		glm::vec4 QuadVertexPositions[4];
 
@@ -221,6 +249,22 @@ namespace Bubble {
 		s_Data.CircleVertexArray->SetIndexBuffer(quadIB); // Use quad IB
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxQuadVertices];
 
+		// Spheres
+		s_Data.SphereVertexArray = VertexArray::Create();
+
+		s_Data.SphereVertexBuffer = VertexBuffer::Create(s_Data.MaxQuadVertices * sizeof(SphereVertex));
+		s_Data.SphereVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_WorldPosition" },
+			{ ShaderDataType::Float3, "a_LocalPosition" },
+			{ ShaderDataType::Float4, "a_Color"         },
+			{ ShaderDataType::Float,  "a_Thickness"     },
+			{ ShaderDataType::Float,  "a_Fade"          },
+			{ ShaderDataType::Int,    "a_EntityID"      }
+			});
+		s_Data.SphereVertexArray->AddVertexBuffer(s_Data.SphereVertexBuffer);
+		s_Data.SphereVertexArray->SetIndexBuffer(quadIB); // Use quad IB
+		s_Data.SphereVertexBufferBase = new SphereVertex[s_Data.MaxQuadVertices];
+
 		// Lines
 		s_Data.LineVertexArray = VertexArray::Create();
 
@@ -232,6 +276,20 @@ namespace Bubble {
 			});
 		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxQuadVertices];
+
+		// Text
+		s_Data.TextVertexArray = VertexArray::Create();
+
+		s_Data.TextVertexBuffer = VertexBuffer::Create(s_Data.MaxTextVertices * sizeof(TextVertex));
+		s_Data.TextVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position"     },
+			{ ShaderDataType::Float4, "a_Color"        },
+			{ ShaderDataType::Float2, "a_TexCoord"     },
+			{ ShaderDataType::Int,    "a_EntityID"     }
+			});
+		s_Data.TextVertexArray->AddVertexBuffer(s_Data.TextVertexBuffer);
+		s_Data.TextVertexArray->SetIndexBuffer(quadIB);
+		s_Data.TextVertexBufferBase = new TextVertex[s_Data.MaxTextVertices];
 
 		// White Texture
 		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
@@ -245,6 +303,7 @@ namespace Bubble {
 		s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
 		s_Data.TriShader = Shader::Create("assets/shaders/Renderer2D_Triangle.glsl");
 		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
+		s_Data.SphereShader = Shader::Create("assets/shaders/Renderer2D_Sphere.glsl");
 		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
 		//s_Data.TextShader = Shader::Create("assets/shaders/Renderer2D_Text.glsl");
 
@@ -272,7 +331,7 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjectionMatrix();
-		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer);
 
 		StartBatch();
 	}
@@ -282,7 +341,7 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
-		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer);
 
 		StartBatch();
 	}
@@ -292,7 +351,7 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
-		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer);
 
 		StartBatch();
 	}
@@ -317,11 +376,14 @@ namespace Bubble {
 		s_Data.CircleIndexCount = 0;
 		s_Data.CircleVertexBufferPtr = s_Data.CircleVertexBufferBase;
 
+		s_Data.SphereIndexCount = 0;
+		s_Data.SphereVertexBufferPtr = s_Data.SphereVertexBufferBase;
+
 		s_Data.LineVertexCount = 0;
 		s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
 
-		//s_Data.TextIndexCount = 0;
-		//s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
+		s_Data.TextIndexCount = 0;
+		s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
 
 		s_Data.TextureSlotIndex = 1;
 	}
@@ -361,6 +423,16 @@ namespace Bubble {
 
 			s_Data.CircleShader->Bind();
 			RenderCommand::DrawIndexed(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+			s_Data.Stats.DrawCalls++;
+		}
+		
+		if (s_Data.SphereIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.SphereVertexBufferPtr - (uint8_t*)s_Data.SphereVertexBufferBase);
+			s_Data.SphereVertexBuffer->SetData(s_Data.SphereVertexBufferBase, dataSize);
+
+			s_Data.SphereShader->Bind();
+			RenderCommand::DrawIndexed(s_Data.SphereVertexArray, s_Data.SphereIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 
@@ -820,8 +892,8 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		// TODO: implement for circles
-		// if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-		// 	NextBatch();
+		if (s_Data.CircleIndexCount >= Renderer2DData::MaxCircleIndices)
+			NextBatch();
 
 		for (size_t i = 0; i < 4; i++)
 		{
@@ -880,6 +952,37 @@ namespace Bubble {
 			// Draw the triangle for this segment
 			DrawTriangle(center, p1, p2, color);
 		}
+	}
+
+	void Renderer2D::DrawSphere(const glm::vec3& pos, float r, const glm::vec4 color, int entityID)
+	{
+		auto transform = glm::translate(glm::mat4(1.0f), pos) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(r * 2.f, r * 2.f, r * 2.f));
+
+		DrawSphere(glm::mat4(transform), color, 1.f, 0.005f, entityID);
+	}
+
+	void Renderer2D::DrawSphere(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int entityID)
+	{
+		BG_PROFILE_FUNCTION();
+
+		if (s_Data.SphereIndexCount >= Renderer2DData::MaxCircleIndices)
+			NextBatch();
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			s_Data.SphereVertexBufferPtr->WorldPosition = transform * s_Data.QuadVertexPositions[i];
+			s_Data.SphereVertexBufferPtr->LocalPosition = s_Data.QuadVertexPositions[i] * 2.0f;
+			s_Data.SphereVertexBufferPtr->Color = color;
+			s_Data.SphereVertexBufferPtr->Thickness = thickness;
+			s_Data.SphereVertexBufferPtr->Fade = fade;
+			s_Data.SphereVertexBufferPtr->EntityID = entityID;
+			s_Data.SphereVertexBufferPtr++;
+		}
+
+		s_Data.SphereIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawLine(const glm::vec2& p0, const glm::vec2& p1, const glm::vec4& color, int entityID)
@@ -1079,6 +1182,124 @@ namespace Bubble {
 			}
 		}
 	}
+
+	//void Renderer2D::DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams, int entityID)
+	//{
+	//	const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
+	//	const auto& metrics = fontGeometry.getMetrics();
+	//	Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
+
+	//	s_Data.FontAtlasTexture = fontAtlas;
+
+	//	double x = 0.0;
+	//	double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+	//	double y = 0.0;
+
+	//	const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+	//	for (size_t i = 0; i < string.size(); i++)
+	//	{
+	//		char character = string[i];
+	//		if (character == '\r')
+	//			continue;
+
+	//		if (character == '\n')
+	//		{
+	//			x = 0;
+	//			y -= fsScale * metrics.lineHeight + textParams.LineSpacing;
+	//			continue;
+	//		}
+
+	//		if (character == ' ')
+	//		{
+	//			float advance = spaceGlyphAdvance;
+	//			if (i < string.size() - 1)
+	//			{
+	//				char nextCharacter = string[i + 1];
+	//				double dAdvance;
+	//				fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+	//				advance = (float)dAdvance;
+	//			}
+
+	//			x += fsScale * advance + textParams.Kerning;
+	//			continue;
+	//		}
+
+	//		if (character == '\t')
+	//		{
+	//			// NOTE(Yan): is this right?
+	//			x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
+	//			continue;
+	//		}
+
+	//		auto glyph = fontGeometry.getGlyph(character);
+	//		if (!glyph)
+	//			glyph = fontGeometry.getGlyph('?');
+	//		if (!glyph)
+	//			return;
+
+	//		double al, ab, ar, at;
+	//		glyph->getQuadAtlasBounds(al, ab, ar, at);
+	//		glm::vec2 texCoordMin((float)al, (float)ab);
+	//		glm::vec2 texCoordMax((float)ar, (float)at);
+
+	//		double pl, pb, pr, pt;
+	//		glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+	//		glm::vec2 quadMin((float)pl, (float)pb);
+	//		glm::vec2 quadMax((float)pr, (float)pt);
+
+	//		quadMin *= fsScale, quadMax *= fsScale;
+	//		quadMin += glm::vec2(x, y);
+	//		quadMax += glm::vec2(x, y);
+
+	//		float texelWidth = 1.0f / fontAtlas->GetWidth();
+	//		float texelHeight = 1.0f / fontAtlas->GetHeight();
+	//		texCoordMin *= glm::vec2(texelWidth, texelHeight);
+	//		texCoordMax *= glm::vec2(texelWidth, texelHeight);
+
+	//		// render here
+	//		s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+	//		s_Data.TextVertexBufferPtr->Color = textParams.Color;
+	//		s_Data.TextVertexBufferPtr->TexCoord = texCoordMin;
+	//		s_Data.TextVertexBufferPtr->EntityID = entityID;
+	//		s_Data.TextVertexBufferPtr++;
+
+	//		s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+	//		s_Data.TextVertexBufferPtr->Color = textParams.Color;
+	//		s_Data.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+	//		s_Data.TextVertexBufferPtr->EntityID = entityID;
+	//		s_Data.TextVertexBufferPtr++;
+
+	//		s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+	//		s_Data.TextVertexBufferPtr->Color = textParams.Color;
+	//		s_Data.TextVertexBufferPtr->TexCoord = texCoordMax;
+	//		s_Data.TextVertexBufferPtr->EntityID = entityID;
+	//		s_Data.TextVertexBufferPtr++;
+
+	//		s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+	//		s_Data.TextVertexBufferPtr->Color = textParams.Color;
+	//		s_Data.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+	//		s_Data.TextVertexBufferPtr->EntityID = entityID;
+	//		s_Data.TextVertexBufferPtr++;
+
+	//		s_Data.TextIndexCount += 6;
+	//		s_Data.Stats.QuadCount++;
+
+	//		if (i < string.size() - 1)
+	//		{
+	//			double advance = glyph->getAdvance();
+	//			char nextCharacter = string[i + 1];
+	//			fontGeometry.getAdvance(advance, character, nextCharacter);
+
+	//			x += fsScale * advance + textParams.Kerning;
+	//		}
+	//	}
+	//}
+
+	//void Renderer2D::DrawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entityID)
+	//{
+	//	DrawString(string, component.FontAsset, transform, { component.Color, component.Kerning, component.LineSpacing }, entityID);
+	//}
 
 	float Renderer2D::GetLineWidth()
 	{

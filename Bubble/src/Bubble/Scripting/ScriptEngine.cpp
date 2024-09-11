@@ -15,7 +15,7 @@
 #include "mono/metadata/mono-debug.h"
 #include "mono/metadata/threads.h"
 
-//#include "FileWatch.h"
+#include "FileWatch.h"
 
 #include "Bubble/Core/Application.h"
 #include "Bubble/Core/Timer.h"
@@ -116,20 +116,6 @@ namespace Bubble {
 			return it->second;
 		}
 
-		/*static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
-		{
-			if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified)
-			{
-				s_Data->AssemblyReloadPending = true;
-
-				Application::Get().SubmitToMainThread([]()
-					{
-						s_Data->AppAssemblyFileWatcher.reset();
-						ScriptEngine::ReloadAssembly();
-					});
-			}
-		}*/
-
 	}
 
 	struct ScriptEngineData
@@ -152,7 +138,7 @@ namespace Bubble {
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
-		//Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
 
 #ifdef BG_DBG
@@ -166,6 +152,20 @@ namespace Bubble {
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
+
+	static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+	{
+		if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified)
+		{
+			s_Data->AssemblyReloadPending = true;
+
+			Application::Get().SubmitToMainThread([]()
+				{
+					s_Data->AppAssemblyFileWatcher.reset();
+					ScriptEngine::ReloadAssembly();
+				});
+		}
+	}
 
 	void ScriptEngine::Init()
 	{
@@ -272,7 +272,7 @@ namespace Bubble {
 
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 
-		//s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
 		return true;
 	}

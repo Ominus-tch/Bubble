@@ -5,6 +5,16 @@ namespace Bubble {
 
     std::mt19937 Random::s_RandomEngine;
 
+	glm::vec3 Random::Vec3()
+	{
+		return glm::vec3(Float(), Float(), Float());
+	}
+
+	glm::vec2 Random::Vec2()
+	{
+		return glm::vec2(Float(), Float());
+	}
+
     void Random::Init()
     {
         s_RandomEngine.seed(std::random_device()());

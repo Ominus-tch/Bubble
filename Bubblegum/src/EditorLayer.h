@@ -10,6 +10,26 @@
 
 namespace Bubble {
 
+	class CelestialBody
+	{
+	public:
+		CelestialBody(const glm::vec3& pos, const glm::vec3& vel, float r)
+			: m_Pos(pos), m_Vel(vel), m_R(r)
+		{
+
+		}
+
+		void Draw()
+		{
+			Renderer2D::DrawSphere(m_Pos, m_R);
+		}
+
+	private:
+		glm::vec3 m_Pos;
+		glm::vec3 m_Vel;
+		float m_R;
+	};
+
 	class EditorLayer : public Layer
 	{
 	public:
@@ -78,10 +98,12 @@ namespace Bubble {
 		glm::vec2 m_ViewportBounds[2];
 
 		// App
-		Fluid m_Fluid;
+
 
 		ShaderLibrary m_ShaderLib;
 		Ref<Shader> m_Shader;
+
+		Ref<ComputeBuffer> m_Buffer;
 
 		Entity m_MeshTest;
 		Entity m_Cube;

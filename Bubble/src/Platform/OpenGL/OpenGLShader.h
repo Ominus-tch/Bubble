@@ -11,7 +11,7 @@ namespace Bubble {
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc, const std::string& computeSrc);
 		OpenGLShader(const std::string& filepath);
 		virtual ~OpenGLShader();
 
@@ -28,6 +28,12 @@ namespace Bubble {
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) override;
 
+		virtual void DispatchCompute(uint32_t x, uint32_t y, uint32_t z) override;
+		virtual void SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer) override;
+		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) override;
+
+		virtual void TestFunction() override;
+	private:
 		void UploadUniformInt(const std::string& name, int value);
 		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
 
@@ -38,7 +44,6 @@ namespace Bubble {
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
-	private:
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<UINT, std::string> PreProcess(const std::string& source);
 

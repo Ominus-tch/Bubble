@@ -9,6 +9,8 @@ namespace Bubble {
     public:
         static void Init();
         static float Float();
+        static glm::vec3 Vec3();
+        static glm::vec2 Vec2();
         static int Int(int min, int max);
         static int Next(float oldNumber);
 

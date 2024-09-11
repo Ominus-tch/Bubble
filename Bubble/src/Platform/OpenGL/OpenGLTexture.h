@@ -4,6 +4,8 @@
 
 #include <glad/glad.h>
 
+typedef unsigned int GLenum;
+
 namespace Bubble {
 
 	class OpenGLTexture2D : public Texture2D
@@ -24,6 +26,7 @@ namespace Bubble {
 		virtual void SetData(void* data, uint32_t size) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
+		virtual void BindAsImage(uint32_t unit, GLenum access) const override;
 
 		virtual bool IsLoaded() const override { return m_IsLoaded; }
 

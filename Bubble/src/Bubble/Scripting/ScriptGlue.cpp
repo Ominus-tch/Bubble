@@ -20,7 +20,7 @@ namespace Bubble {
 
 	namespace Utils {
 
-		std::string MonoStringToString(MonoString* string)
+		static std::string MonoStringToString(MonoString* string)
 		{
 			char* cStr = mono_string_to_utf8(string);
 			std::string str(cStr);
@@ -32,7 +32,7 @@ namespace Bubble {
 
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
 
-#define HZ_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Bubble.InternalCalls::" #Name, Name)
+#define BG_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Bubble.InternalCalls::" #Name, Name)
 
 	static void NativeLog(MonoString* string, int parameter)
 	{
@@ -300,17 +300,17 @@ namespace Bubble {
 
 	void ScriptGlue::RegisterFunctions()
 	{
-		HZ_ADD_INTERNAL_CALL(NativeLog);
-		HZ_ADD_INTERNAL_CALL(NativeLog_Vector);
-		HZ_ADD_INTERNAL_CALL(NativeLog_VectorDot);
+		BG_ADD_INTERNAL_CALL(NativeLog);
+		BG_ADD_INTERNAL_CALL(NativeLog_Vector);
+		BG_ADD_INTERNAL_CALL(NativeLog_VectorDot);
 
-		HZ_ADD_INTERNAL_CALL(GetScriptInstance);
+		BG_ADD_INTERNAL_CALL(GetScriptInstance);
 
-		HZ_ADD_INTERNAL_CALL(Entity_HasComponent);
-		HZ_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		BG_ADD_INTERNAL_CALL(Entity_HasComponent);
+		BG_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
-		HZ_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
-		HZ_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+		BG_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
+		BG_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
 
 		/*HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
 		HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
@@ -327,7 +327,7 @@ namespace Bubble {
 		HZ_ADD_INTERNAL_CALL(TextComponent_GetLineSpacing);
 		HZ_ADD_INTERNAL_CALL(TextComponent_SetLineSpacing);*/
 
-		HZ_ADD_INTERNAL_CALL(Input_IsKeyDown);
+		BG_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
 
 }

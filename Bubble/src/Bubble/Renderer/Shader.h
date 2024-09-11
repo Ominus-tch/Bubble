@@ -5,6 +5,9 @@
 
 #include <unordered_map>
 
+#include "ComputeBuffer.h"
+#include "UniformBuffer.h"
+
 namespace Bubble {
 
 	class Shader
@@ -23,9 +26,17 @@ namespace Bubble {
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
 
+		virtual void DispatchCompute(uint32_t x, uint32_t y, uint32_t z) = 0;
+
+		virtual void SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer) = 0;
+		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) = 0;
+
 		virtual const std::string& GetName() const = 0;
 
+		virtual void TestFunction() = 0;
+
 		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		//static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& computeSrc);
 		static Ref<Shader> Create(const std::string& filepath);
 	};
 

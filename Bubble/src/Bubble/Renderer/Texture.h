@@ -4,6 +4,8 @@
 
 #include "Bubble/Core/Base.h"
 
+typedef unsigned int GLenum;
+
 namespace Bubble {
 
 	enum class ImageFormat
@@ -39,6 +41,7 @@ namespace Bubble {
 		virtual void SetData(void* data, uint32_t size) = 0;
 
 		virtual void Bind(uint32_t slot = 0) const = 0;
+		virtual void BindAsImage(uint32_t unit, GLenum access) const = 0;
 
 		virtual bool IsLoaded() const = 0;
 

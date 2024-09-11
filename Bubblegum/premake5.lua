@@ -19,7 +19,7 @@ project "BubbleGum"
 		"%{wks.location}/Bubble/src",
 		"%{wks.location}/Bubble/vendor",
 		"%{IncludeDir.entt}",
-		--"%{IncludeDir.filewatch}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGuizmo}"
 	}

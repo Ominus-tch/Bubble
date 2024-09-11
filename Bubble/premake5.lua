@@ -41,7 +41,7 @@ project "Bubble"
 		"src",
 		"vendor/spdlog/include",
 		--"%{IncludeDir.Box2D}",
-		--"%{IncludeDir.filewatch}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",

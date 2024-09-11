@@ -1,9 +1,18 @@
-#type fragment
+#type compute
 #version 450 core
 
-layout(location = 0) out vec4 o_Color;
+layout(local_size_x = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer
+{
+	uint data[];
+};
 
 void main()
 {
-	o_Color = vec4(1, 0, 0, 1);
+	// Get the global invocation ID, which is a unique index for each thread
+	uint index = gl_GlobalInvocationID.x;
+
+	// Store the index in the output buffer
+	data[index] = index;
 }

@@ -21,6 +21,8 @@ namespace Bubble {
 				return GL_VERTEX_SHADER;
 			else if (type == "fragment" || type == "pixel" || type == "frag")
 				return GL_FRAGMENT_SHADER;
+			else if (type == "compute")
+				return GL_COMPUTE_SHADER;
 
 			BG_CORE_ASSERT(false, "Unknown shader type: {0}", type);
 			return GL_NONE;
@@ -30,8 +32,9 @@ namespace Bubble {
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
-				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+			case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
+			case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+			case GL_COMPUTE_SHADER: return shaderc_glsl_compute_shader;
 			}
 			BG_CORE_ASSERT(false);
 			return (shaderc_shader_kind)0;
@@ -41,8 +44,9 @@ namespace Bubble {
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
-				case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+			case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
+			case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+			case GL_COMPUTE_SHADER: return "GL_COMPUTE_SHADER";
 			}
 			BG_CORE_ASSERT(false);
 			return nullptr;
@@ -65,8 +69,9 @@ namespace Bubble {
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
-				case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
+			case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
+			case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
+			case GL_COMPUTE_SHADER:  return ".cached_opengl.compute";
 			}
 			BG_CORE_ASSERT(false);
 			return "";
@@ -78,6 +83,7 @@ namespace Bubble {
 			{
 			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
 			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+			case GL_COMPUTE_SHADER:  return ".cached_vulkan.compute";
 			}
 			BG_CORE_ASSERT(false);
 			return "";
@@ -111,7 +117,7 @@ namespace Bubble {
 		m_Name = filepath.substr(lastSlash, count);
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragSrc, const std::string& computeSrc)
 		: m_Name(name)
 	{
 		BG_PROFILE_FUNCTION();
@@ -119,6 +125,7 @@ namespace Bubble {
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragSrc;
+		sources[GL_COMPUTE_SHADER] = computeSrc;
 
 		CompileOrGetVulkanBinaries(sources);
 		CompileOrGetOpenGLBinaries();
@@ -366,6 +373,17 @@ namespace Bubble {
 			BG_CORE_TRACE("    Binding = {0}", binding);
 			BG_CORE_TRACE("    Members = {0}", memberCount);
 		}
+
+		for (const auto& resource : resources.storage_buffers)
+		{
+			std::string resourceName = compiler.get_name(resource.id);
+			if (resourceName.empty()) {
+				BG_CORE_WARN("Warning: Storage buffer has an empty or missing name.");
+				resourceName = "[Unnamed]";
+			}
+
+			BG_CORE_TRACE("Storage Buffer: {0}", resourceName);
+		}
 	}
 
 	void OpenGLShader::Bind() const
@@ -429,6 +447,64 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		UploadUniformMat4(name, value);
+	}
+
+	void OpenGLShader::DispatchCompute(uint32_t x, uint32_t y, uint32_t z)
+	{
+		BG_PROFILE_FUNCTION();
+
+		glDispatchCompute(x, y, z);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	}
+
+	void OpenGLShader::SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer)
+	{
+		//GLuint blockIndex = glGetProgramResourceIndex(m_RendererID, GL_SHADER_STORAGE_BLOCK, name.c_str());
+		//if (blockIndex == GL_INVALID_INDEX)
+		//{
+		//	BG_CORE_ERROR("Buffer name '{0}' not found in shader '{1}'", name, m_Name);
+		//	return;
+		//}
+
+		//// Get the binding point of the shader storage block
+		//GLint binding = -1;
+		//GLenum properties[] = { GL_BUFFER_BINDING };
+		//glGetProgramResourceiv(m_RendererID, GL_SHADER_STORAGE_BLOCK, blockIndex, 1, properties, 1, nullptr, &binding);
+
+		//if (binding == -1)
+		//{
+		//	BG_CORE_ERROR("Failed to retrieve binding point for buffer name '{0}' in shader '{1}'", name, m_Name);
+		//	return;
+		//}
+
+		// Bind the buffer to the retrieved binding point
+		buffer->Bind(slot);
+	}
+
+	void OpenGLShader::SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer)
+	{
+		/*GLuint blockIndex = glGetUniformBlockIndex(m_RendererID, name.c_str());
+		if (blockIndex == GL_INVALID_INDEX)
+		{
+			BG_CORE_ERROR("Uniform block '{0}' not found in shader '{1}'", name, m_Name);
+			return;
+		}*/
+
+		// Bind the buffer to the block index
+		glUniformBlockBinding(m_RendererID, 0, buffer->GetBinding());
+	}
+
+	void OpenGLShader::TestFunction()
+	{
+		GLint numBlocks = 0;
+		glGetProgramInterfaceiv(m_RendererID, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
+
+		for (int i = 0; i < numBlocks; ++i) {
+			char name[256];
+			GLsizei length;
+			glGetProgramResourceName(m_RendererID, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), &length, name);
+			std::cout << "Shader Storage Block #" << i << ": " << name << std::endl;
+		}
 	}
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)

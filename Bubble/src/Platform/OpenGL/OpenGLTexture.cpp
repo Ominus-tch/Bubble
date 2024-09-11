@@ -16,9 +16,10 @@ namespace Bubble {
 			{
 			case ImageFormat::RGB8:  return GL_RGB;
 			case ImageFormat::RGBA8: return GL_RGBA;
+			case ImageFormat::RGBA32F:  return GL_RGBA;
 			}
 
-			BG_CORE_ASSERT(false, "");
+			BG_CORE_ASSERT(false, "Unknown ImageFormat!");
 			return 0;
 		}
 
@@ -28,9 +29,10 @@ namespace Bubble {
 			{
 			case ImageFormat::RGB8:  return GL_RGB8;
 			case ImageFormat::RGBA8: return GL_RGBA8;
+			case ImageFormat::RGBA32F:  return GL_RGBA32F;
 			}
 
-			BG_CORE_ASSERT(false, "");
+			BG_CORE_ASSERT(false, "Unknown ImageFormat!");
 			return 0;
 		}
 
@@ -127,6 +129,13 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION()
 
 		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	void OpenGLTexture2D::BindAsImage(uint32_t unit, GLenum access = GL_WRITE_ONLY) const
+	{
+		BG_PROFILE_FUNCTION()
+
+		glBindImageTexture(unit, m_RendererID, 0, GL_FALSE, 0, access, m_InternalFormat);
 	}
 
 }

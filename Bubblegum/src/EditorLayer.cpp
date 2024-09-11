@@ -3,6 +3,9 @@
 #include "Bubble/Utils/PlatformUtils.h"
 #include "Bubble/Scripting/ScriptEngine.h"
 
+#include "Bubble/Renderer/ComputeBuffer.h"
+#include "Bubble/Renderer/UniformBuffer.h"
+
 #include <imgui/imgui.h>
 #include "ImGuizmo.h"
 
@@ -16,6 +19,13 @@
 #include <GLFW/include/GLFW/glfw3.h>
 
 namespace Bubble {
+
+	static float height = 100.f;
+	static float width = 100.f;
+
+	static int s_Depth = 10;
+	static float s_Angle = PI/4;
+	static float s_LenScalar = 0.67f;
 
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
@@ -65,12 +75,72 @@ namespace Bubble {
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
 		//m_Shader = Shader::Create("SandboxProject/Assets/Shaders/TestShader.glsl");
+
+		//uint32_t numElements = 1024;
+		//Ref<ComputeBuffer> outputBuffer = ComputeBuffer::Create(numElements, sizeof(uint32_t));
+
+		//// Initialize the buffer with zeroes (optional)
+		//std::vector<uint32_t> initialData(numElements, 0);
+		//outputBuffer->SetData(initialData.data());
+
+		//m_Shader->SetBuffer(0, "OutputBuffer", outputBuffer);
+
+		//m_Shader->Bind();
+		//m_Shader->DispatchCompute(numElements, 1, 1);
+		//m_Shader->Unbind();
+
+		//std::vector<uint32_t> outputData(numElements);
+		//outputBuffer->GetData(outputData.data());
+
+		//for (uint32_t i = 0; i < 10; ++i) {
+		//	std::cout << "outputData[" << i << "] = " << outputData[i] << std::endl;
+		//}
     }
 
     void EditorLayer::OnDetach()
     {
         BG_PROFILE_FUNCTION();
     }
+
+	static void branch(const glm::vec2& pos, glm::vec2 direction, float len, int depth = 0)
+	{
+		if (depth >= s_Depth) return;
+
+		glm::vec2 newPos;
+
+		//// Handle the initial case where the starting position is (0, 0)
+		//if (depth == 0 && glm::length(pos) == 0.0f)
+		//{
+		//	direction = glm::vec2(0.0f, 1.0f); // Start direction pointing upwards (along y-axis)
+		//}
+
+		direction = glm::normalize(direction);
+
+		// Calculate the new position after moving in the current direction
+		newPos = pos + direction * len;
+
+		// Draw the line from the current position to the new position
+		Renderer2D::DrawLine(pos, newPos);
+
+		// Rotate the direction vector by 45 degrees (PI/4 radians) clockwise and counterclockwise
+		float angle = s_Angle;
+		glm::mat2 rotationMatrixClockwise = glm::mat2(
+			glm::cos(-angle), -glm::sin(-angle),
+			glm::sin(-angle), glm::cos(-angle)
+		);
+
+		glm::mat2 rotationMatrixCounterclockwise = glm::mat2(
+			glm::cos(angle), -glm::sin(angle),
+			glm::sin(angle), glm::cos(angle)
+		);
+
+		// Increase depth
+		depth++;
+
+		// Recursive calls for the two branches
+		branch(newPos, rotationMatrixClockwise * direction, len * s_LenScalar, depth);
+		branch(newPos, rotationMatrixCounterclockwise * direction, len * s_LenScalar, depth);
+	}
 
     void EditorLayer::OnUpdate(Timestep ts)
     {
@@ -103,14 +173,21 @@ namespace Bubble {
 
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
+        //RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
         RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
         RenderCommand::Clear();
 
-		//m_Shader->Bind();
-
 		m_Framebuffer->ClearAttachment(1, -1);
 
+		if (m_Animate)
+			s_Angle += ts;
 
+		Renderer2D::BeginScene(m_EditorCamera);
+
+		CelestialBody cb = CelestialBody({}, {}, 0.1f);
+		cb.Draw();
+		
+		Renderer2D::EndScene();
 
 		switch (m_SceneState)
 		{
@@ -153,8 +230,6 @@ namespace Bubble {
 		}
 
 		OnOverlayRender();
-
-		//m_Shader->Unbind();
 		
         m_Framebuffer->Unbind();
         m_FrameCount++;
@@ -267,6 +342,10 @@ namespace Bubble {
         ImGui::Text("FPS: %i", (int)m_FPS);
 
         ImGui::Checkbox("Animate", &m_Animate);
+		ImGui::InputInt("Depth", &s_Depth);
+
+		ImGui::DragFloat("Angle", &s_Angle, 0.01f, -PI, PI);
+		ImGui::DragFloat("Len", &s_LenScalar, 0.01f);
 
         ImGui::End();
 
@@ -359,6 +438,9 @@ namespace Bubble {
 
 	void EditorLayer::UI_Toolbar()
 	{
+		if (!m_ActiveScene)
+			return;
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));

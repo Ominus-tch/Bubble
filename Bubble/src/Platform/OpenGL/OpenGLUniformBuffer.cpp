@@ -7,12 +7,13 @@
 namespace Bubble {
 
 	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t binding)
+		: m_Size(size), m_Binding(binding)
 	{
 		BG_PROFILE_FUNCTION()
 
 		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferData(m_RendererID, size, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
+		glNamedBufferData(m_RendererID, m_Size, nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, m_Binding, m_RendererID);
 	}
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
@@ -22,12 +23,21 @@ namespace Bubble {
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
+	uint32_t OpenGLUniformBuffer::GetSize()
+	{
+		return m_Size;
+	}
 
-	void OpenGLUniformBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
+	uint32_t OpenGLUniformBuffer::GetBinding()
+	{
+		return m_Binding;
+	}
+
+	void OpenGLUniformBuffer::SetData(const void* data, uint32_t offset)
 	{
 		BG_PROFILE_FUNCTION()
 
-		glNamedBufferSubData(m_RendererID, offset, size, data);
+		glNamedBufferSubData(m_RendererID, offset, m_Size, data);
 	}
 
 }

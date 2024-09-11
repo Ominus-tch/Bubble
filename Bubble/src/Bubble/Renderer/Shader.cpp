@@ -12,7 +12,7 @@ namespace Bubble {
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:	BG_CORE_ASSERT(false, "RendererAPI::None is not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc, "");
 		}
 
 		BG_CORE_ASSERT(false, "Unknown RendererAPI");
