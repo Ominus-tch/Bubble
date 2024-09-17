@@ -156,16 +156,17 @@ namespace Bubble {
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
-		BG_PROFILE_FUNCTION()
+		BG_PROFILE_FUNCTION();
 
-		glBindTextureUnit(slot, m_RendererID);
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	}
 
-	void OpenGLTexture2D::BindAsImage(uint32_t unit, GLenum access = GL_WRITE_ONLY) const
+	void OpenGLTexture2D::BindAsImage(uint32_t unit, GLenum access = GL_READ_WRITE) const
 	{
 		BG_PROFILE_FUNCTION()
 
-		glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+		glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, access, GL_RGBA8);
 	}
 
 }

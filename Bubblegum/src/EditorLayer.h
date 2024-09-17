@@ -145,8 +145,9 @@ namespace Bubble {
 		Ref<UniformBuffer> m_WorldDataBuffer;
 
 		struct QuadVert {
-			glm::vec3 Position;  // 3D position in normalized device coordinates (NDC)
-			glm::vec2 UV;        // UV coordinates
+			glm::vec3 Position;
+			glm::vec2 UV;
+			int EntityID;
 		};
 
 		struct ShaderData
@@ -161,14 +162,19 @@ namespace Bubble {
 
 		const QuadVert s_QuadVertices[6] = {
 			// Positions          // UVs
-			{{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},  // Top-left
-			{{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
-			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+			{ {-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}, -1 },  // Top-left
+			{ {-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, -1 },  // Bottom-left
+			{ { 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, -1 },  // Bottom-right
 
-			{{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},  // Top-left
-			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
-			{{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}}   // Top-right
+			{ {-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}, -1 },  // Top-left
+			{ { 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, -1 },  // Bottom-right
+			{ { 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}, -1 }   // Top-right
 		};
+
+		Entity m_ControlPoint1;
+		Entity m_ControlPoint2;
+		Entity m_ControlPoint3;
+		Entity m_ControlPoint4;
 
 		Ref<VertexBuffer> m_VertexBuffer;
 		Ref<VertexArray> m_VertexArray;

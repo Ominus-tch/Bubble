@@ -555,14 +555,12 @@ namespace Bubble {
 				auto meshComponent = entity["MeshComponent"];
 				if (meshComponent)
 				{
-					auto& src = deserializedEntity.AddComponent<MeshComponent>();
-					//src.Color = meshComponent["Color"].as<glm::vec4>();
+					std::string path = "";
 					if (meshComponent["ModelPath"])
-					{
-						std::string modelPath = meshComponent["ModelPath"].as<std::string>();
-						//auto path = texturePath.c_str();
-						src.Load(modelPath);
-					}
+						path = meshComponent["ModelPath"].as<std::string>();
+
+					auto& src = deserializedEntity.AddComponent<MeshComponent>(path);
+					//src.Color = meshComponent["Color"].as<glm::vec4>();
 
 					if (meshComponent["DrawMesh"])
 						src.DrawMesh = meshComponent["DrawMesh"].as<bool>();

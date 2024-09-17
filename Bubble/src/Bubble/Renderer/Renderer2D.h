@@ -67,6 +67,9 @@ namespace Bubble {
 		static void DrawLine(const glm::vec2& p0, const glm::vec2& p1, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 
+		static void DrawQuadraticBezier(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec4& color = glm::vec4(1.f), int segments = 20, int entityID = -1);
+		static void DrawCubicBezier(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec4& color = glm::vec4(1.f), int segments = 20, int entityID = -1);
+
 		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 

@@ -133,7 +133,7 @@ namespace Bubble {
 
 	glm::vec3 EditorCamera::CalculatePosition() const
 	{
-		return m_FocalPoint - GetForwardDirection() * m_Distance;
+		return m_FocalPoint + GetForwardDirection() * m_Distance;
 	}
 
 	glm::quat EditorCamera::GetOrientation() const

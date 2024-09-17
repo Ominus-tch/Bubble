@@ -1012,6 +1012,39 @@ namespace Bubble {
 		s_Data.Stats.LineCount++;
 	}
 
+	void Renderer2D::DrawQuadraticBezier(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec4& color, int segments, int entityID)
+	{
+		glm::vec3 previousPoint = p0;
+
+		for (int i = 1; i <= segments; ++i)
+		{
+			float t = i / (float)segments;
+			glm::vec3 point = (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+
+			DrawLine(previousPoint, point, color, entityID);
+			previousPoint = point;
+		}
+	}
+
+	void Renderer2D::DrawCubicBezier(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec4& color, int segments, int entityID)
+	{
+		glm::vec3 previousPoint = p0;
+
+		for (int i = 1; i <= segments; ++i)
+		{
+			float t = i / (float)segments;
+			glm::vec3 point = (1 - t) * (1 - t) * (1 - t) * p0
+				+ 3 * (1 - t) * (1 - t) * t * p1
+				+ 3 * (1 - t) * t * t * p2
+				+ t * t * t * p3;
+
+			DrawLine(previousPoint, point, color, entityID);
+			previousPoint = point;
+		}
+	}
+
+
+
 	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID)
 	{
 		BG_PROFILE_FUNCTION();

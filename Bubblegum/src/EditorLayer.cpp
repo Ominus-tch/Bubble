@@ -72,7 +72,7 @@ namespace Bubble {
 		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-		//m_EditorCamera.SetDistance(10.f);
+		m_EditorCamera.SetDistance(10.f);
 
 		//m_CameraEntity = m_ActiveScene->CreateEntity("Main Camera");
 		//auto& cc = m_CameraEntity.AddComponent<CameraComponent>();
@@ -165,13 +165,16 @@ namespace Bubble {
 
 		m_VertexBuffer = VertexBuffer::Create(sizeof(QuadVert) * 6);
 		m_VertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position" },  // 3D position
-			{ ShaderDataType::Float2, "a_UV" }        // UV coordinates
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_UV" },
+			{ ShaderDataType::Int,    "a_EntityID" }
 		});
 		m_VertexBuffer->SetData(s_QuadVertices, sizeof(QuadVert) * 6);
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-		//Test = Texture2D::Create("SandboxProject/Assets/Textures/street.png");
+		Test = Texture2D::Create("SandboxProject/Assets/Textures/street.png");
+
+		auto test = m_ActiveScene->CreateEntity("Test");
 	}
 
     void EditorLayer::OnDetach()
@@ -280,7 +283,9 @@ namespace Bubble {
 
 		m_ShaderDataBuffer->SetData(&m_ShaderData);
 
+
 		m_Shader->Bind();
+		m_Shader->SetTexture(1, "iTexture", Test);
 
 		//Test->Bind(0);
 		m_VertexArray->Bind();
@@ -290,6 +295,7 @@ namespace Bubble {
 
 		m_VertexArray->UnBind();
 		m_Shader->Unbind();
+
 		// End RayTracing
 
 		//std::vector<glm::vec4> data(width * height);
@@ -326,8 +332,8 @@ namespace Bubble {
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			//int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			//m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
 		OnOverlayRender();

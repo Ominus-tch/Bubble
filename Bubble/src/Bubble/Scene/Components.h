@@ -128,6 +128,11 @@ namespace Bubble {
 			Meshes = Mesh::Create(path);
 		}
 
+		void Load()
+		{
+			Load(Path);
+		}
+
 		void Clear()
 		{
 			Path = "";

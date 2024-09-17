@@ -53,7 +53,7 @@ namespace Bubble {
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}
 
-		operator bool() const { return m_EntityHandle != entt::null && (int)m_EntityHandle != 0; }
+		operator bool() const { return m_EntityHandle != entt::null && (int)m_EntityHandle != -1; }
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 		operator int() const { return (int)m_EntityHandle; }

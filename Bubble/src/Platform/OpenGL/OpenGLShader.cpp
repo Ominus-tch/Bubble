@@ -517,12 +517,16 @@ namespace Bubble {
 	void OpenGLShader::SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture)
 	{
 		// Bind the texture to the specified slot
-		texture->BindAsImage(slot, GL_READ_ONLY);
+		//texture->BindAsImage(slot, GL_READ_ONLY);
+
+		texture->Bind(slot);
+
 
 		//// Find the location of the uniform sampler in the shader
 		//GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-
 		//BG_INFO(location);
+		//glUniform1i(location, slot);
+
 
 		//// Set the uniform sampler to use the specified slot
 		//glUniform1i(location, slot);
