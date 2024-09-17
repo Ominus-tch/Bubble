@@ -5,3 +5,12 @@ bin-int/
 
 # Files
 *.user
+*.pyc
+
+scripts/__pycache__/
+Bubble/vendor/GLFW
+Bubble/vendor/imgui
+Bubble/vendor/ImGuizmo
+Bubble/vendor/msdf-atlas-gen
+Bubble/vendor/yaml-cpp
+Bubblegum/Resources/Scripts/Intermediates/Debug/DesignTimeResolveAssemblyReferencesInput.cache
