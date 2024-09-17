@@ -54,8 +54,8 @@ namespace Bubble {
 		//static void DrawTriangleFilled(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4 color = glm::vec4(1.f), int entityID = -1);
 		static void DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 
-		static void DrawCircle(const glm::vec3 pos, const float r, const glm::vec4 color = glm::vec4(1.f));
-		static void DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color = glm::vec4(1.f));
+		static void DrawCircle(const glm::vec3 pos, const float r, const glm::vec4 color = glm::vec4(1.f), int entityID = -1);
+		static void DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color = glm::vec4(1.f), int entityID = -1);
 		static void DrawCircleFilled(const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.f), float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
 
 		static void DrawArc(const glm::vec3& pos, float r, float startAngle, float endAngle, const glm::vec4& color);
@@ -69,6 +69,9 @@ namespace Bubble {
 
 		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.f), int entityID = -1);
+
+		static void DrawFrustum(const TransformComponent& tc, float verticalFOV, float aspectRatio, float nearClip, float farClip, int entityID = -1);
+		static void DrawFrustum(const TransformComponent& tc, const SceneCamera& camera, int entityID = -1);
 
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& src, int entityID);
 		static void DrawMesh(const glm::mat4& transform, const MeshComponent& mesh, int entityID);

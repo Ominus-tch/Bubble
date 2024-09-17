@@ -26,10 +26,15 @@ namespace Bubble {
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		glm::mat4 GetViewProjection() const { return m_Projection * m_ViewMatrix; }
 
+		glm::mat4 GetCameraToWorldMatrix() const { return m_CameraToWorld; }
+		glm::mat4 GetInverseProjectionMatrix() const { return glm::inverse(m_Projection); }
+		glm::mat4 GetInverseViewProjectionMatrix() const { return glm::inverse(m_Projection * m_ViewMatrix); }
+
 		glm::vec3 GetUpDirection() const;
 		glm::vec3 GetRightDirection() const;
 		glm::vec3 GetForwardDirection() const;
 		const glm::vec3& GetPosition() const { return m_Position; }
+		const glm::vec3& GetRotation() const { return glm::vec3(m_Pitch, m_Yaw, 0.0f); }
 		glm::quat GetOrientation() const;
 
 		float GetPitch() const { return m_Pitch; }
@@ -37,6 +42,8 @@ namespace Bubble {
 
 		float GetFOV() const { return m_FOV; }
 		float GetAspectRatio() const { return m_AspectRatio; }
+		float GetNearClip() const { return m_NearClip; }
+		float GetFarClip() const { return m_FarClip; }
 
 		void SetNearClip(float clip) { m_NearClip = clip; UpdateProjection(); }
 		void SetFarClip(float clip) { m_FarClip = clip; UpdateProjection(); }
@@ -59,7 +66,7 @@ namespace Bubble {
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 1000.0f;
 
-		glm::mat4 m_ViewMatrix;
+		glm::mat4 m_ViewMatrix, m_CameraToWorld;
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 

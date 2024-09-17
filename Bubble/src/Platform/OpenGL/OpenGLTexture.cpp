@@ -117,11 +117,41 @@ namespace Bubble {
 
 	void OpenGLTexture2D::SetData(void* data, uint32_t size)
 	{
-		BG_PROFILE_FUNCTION()
+		BG_PROFILE_FUNCTION();
 
-		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
+		uint32_t bpp;
+		GLenum type = GL_UNSIGNED_BYTE;
+
+		// Handle different formats, assuming m_DataFormat is GL_RGBA or GL_RGBA32F
+		if (m_InternalFormat == GL_RGBA32F) {
+			bpp = 4 * sizeof(float);
+			type = GL_FLOAT;
+		}
+		else if (m_InternalFormat == GL_RGBA) {
+			bpp = 4;
+			type = GL_UNSIGNED_BYTE;
+		}
+		else {
+			if (m_InternalFormat == GL_RGB32F) {
+				bpp = 3 * sizeof(float);
+				type = GL_FLOAT;
+			}
+			else if (m_InternalFormat == GL_RGB) {
+				bpp = 3;
+				type = GL_UNSIGNED_BYTE;
+			}
+		}
+
 		BG_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!");
-		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, type, data);
+	}
+
+	void OpenGLTexture2D::GetData(void* data)
+	{
+		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
+		uint32_t size = m_Width * m_Height * bpp;
+
+		glGetTextureImage(m_RendererID, 0, m_DataFormat, GL_UNSIGNED_BYTE, size, data);
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
@@ -135,7 +165,7 @@ namespace Bubble {
 	{
 		BG_PROFILE_FUNCTION()
 
-		glBindImageTexture(unit, m_RendererID, 0, GL_FALSE, 0, access, m_InternalFormat);
+		glBindImageTexture(0, m_RendererID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 	}
 
 }

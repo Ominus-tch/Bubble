@@ -10,26 +10,6 @@
 
 namespace Bubble {
 
-	class CelestialBody
-	{
-	public:
-		CelestialBody(const glm::vec3& pos, const glm::vec3& vel, float r)
-			: m_Pos(pos), m_Vel(vel), m_R(r)
-		{
-
-		}
-
-		void Draw()
-		{
-			Renderer2D::DrawSphere(m_Pos, m_R);
-		}
-
-	private:
-		glm::vec3 m_Pos;
-		glm::vec3 m_Vel;
-		float m_R;
-	};
-
 	class EditorLayer : public Layer
 	{
 	public:
@@ -87,6 +67,7 @@ namespace Bubble {
 		std::filesystem::path m_EditorScenePath;
 
 		Entity m_HoveredEntity;
+		glm::vec2 m_MouseLastClicked;
 
 		Entity m_CameraEntity;
 		bool m_PrimaryCamera = true;
@@ -99,11 +80,100 @@ namespace Bubble {
 
 		// App
 
-
 		ShaderLibrary m_ShaderLib;
-		Ref<Shader> m_Shader;
 
-		Ref<ComputeBuffer> m_Buffer;
+		Ref<Shader> m_Shader;
+		Ref<Texture2D> m_OutputTexture;
+		Ref<Texture2D> m_TestTexture;
+
+		Ref<ComputeBuffer> m_DestinationTexture;
+
+		struct RayTracingMaterial
+		{
+			glm::vec4 colour;
+			glm::vec4 emissionColour;
+			glm::vec4 specularColour;
+			float emissionStrength;
+			float smoothness;
+			float specularProbability;
+			int flag;
+		};
+
+		struct Sphere
+		{
+			glm::vec3 position;
+			float radius;
+			RayTracingMaterial material;
+		};
+		std::vector<Sphere> m_Spheres;
+		Ref<ComputeBuffer> m_SphereBuffer;
+
+		Ref<Texture2D> Test;
+
+		struct CameraData
+		{
+			glm::vec4 u_CameraPosition;
+			glm::vec4 u_ViewParams;
+			glm::mat4 u_CameraToWorld;
+		};
+		CameraData m_CameraData;
+		Ref<UniformBuffer> m_CameraBuffer;
+
+		struct EnvironmentSettings
+		{
+			glm::vec4 GroundColour = glm::vec4(0.3, 0.2, 0.1, 1.0);
+			glm::vec4 SkyColourHorizon = glm::vec4(0.7, 0.9, 1.0, 1.0);
+			glm::vec4 SkyColourZenith = glm::vec4(0.2, 0.4, 0.8, 1.0);
+			int EnvironmentEnabled = 1;
+			float SunFocus = 32.f;
+			float SunIntensity = 5.f;
+		};
+		EnvironmentSettings m_EnvironmentSettings;
+		Ref<UniformBuffer> m_EnvironmentBuffer;
+
+		void DrawMaterialControls(RayTracingMaterial& mat);
+
+		struct WorldData
+		{
+			int MaxBounceCount = 1;
+			int NumRaysPerPixel = 1;
+			int Frame = 0;
+			int NumSpheres;
+			glm::ivec2 PixelCount;
+		};
+		WorldData m_WorldData;
+		Ref<UniformBuffer> m_WorldDataBuffer;
+
+		struct QuadVert {
+			glm::vec3 Position;  // 3D position in normalized device coordinates (NDC)
+			glm::vec2 UV;        // UV coordinates
+		};
+
+		struct ShaderData
+		{
+			glm::vec4 Resolution;
+			glm::vec4 Mouse;
+			float Time;
+			int Frame;
+		};
+		ShaderData m_ShaderData;
+		Ref<UniformBuffer> m_ShaderDataBuffer;
+
+		const QuadVert s_QuadVertices[6] = {
+			// Positions          // UVs
+			{{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},  // Top-left
+			{{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},  // Bottom-left
+			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+
+			{{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},  // Top-left
+			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},  // Bottom-right
+			{{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}}   // Top-right
+		};
+
+		Ref<VertexBuffer> m_VertexBuffer;
+		Ref<VertexArray> m_VertexArray;
+
+		// End app
 
 		Entity m_MeshTest;
 		Entity m_Cube;

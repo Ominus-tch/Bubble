@@ -24,6 +24,7 @@ namespace Bubble {
 		virtual const std::string& GetPath() const override { return m_Path; }
 
 		virtual void SetData(void* data, uint32_t size) override;
+		virtual void GetData(void* data) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 		virtual void BindAsImage(uint32_t unit, GLenum access) const override;

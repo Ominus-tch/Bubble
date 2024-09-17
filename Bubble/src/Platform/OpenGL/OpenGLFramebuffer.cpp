@@ -224,4 +224,17 @@ namespace Bubble {
 			Utils::BubbleFBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
 	}
 
+	void OpenGLFramebuffer::SetColorAttachmentTexture(uint32_t textureID, uint32_t index)
+	{
+		//BG_CORE_ASSERT(index < m_ColorAttachments.size(), "Invalid color attachment index!");
+		//if (index < m_ColorAttachments.size())
+		//	BG_CORE_WARN("Invalid color attachment index!");
+
+		//glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, textureID, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_ColorAttachments[index] = textureID;
+	}
+
 }

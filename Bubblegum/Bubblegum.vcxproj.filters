@@ -24,4 +24,7 @@
       <Filter>Panels</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SandboxProject\Assets\Shaders\Shader.glsl" />
+  </ItemGroup>
 </Project>

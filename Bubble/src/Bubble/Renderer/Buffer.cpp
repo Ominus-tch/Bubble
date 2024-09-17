@@ -43,4 +43,16 @@ namespace Bubble {
 		return nullptr;
 	}
 
+	Ref<ComputeBuffer> ComputeBuffer::Create(uint32_t count, uint32_t stride)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None: BG_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL: return CreateRef<OpenGLComputeBuffer>(count, stride);
+		}
+
+		BG_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
 }

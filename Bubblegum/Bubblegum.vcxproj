@@ -150,6 +150,9 @@
       <Project>{911D50AA-7DBF-7A80-667A-8ED452BB01D1}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SandboxProject\Assets\Shaders\Shader.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

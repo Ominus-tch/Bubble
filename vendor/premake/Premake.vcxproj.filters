@@ -19,12 +19,6 @@
     <Filter Include="..\Bubble\vendor\imgui">
       <UniqueIdentifier>{8318D4AE-6F12-FD00-587F-93114418636D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..\Bubble\vendor\msdf-atlas-gen">
-      <UniqueIdentifier>{1B81DCB4-8764-EBF4-9067-1931FCC9B145}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\Bubble\vendor\msdf-atlas-gen\msdfgen">
-      <UniqueIdentifier>{8EE41B09-FA73-DDF3-0370-BE0B6F7E1800}</UniqueIdentifier>
-    </Filter>
     <Filter Include="..\Bubble\vendor\yaml-cpp">
       <UniqueIdentifier>{2B476471-9709-98FB-E0B9-26884CBB70D9}</UniqueIdentifier>
     </Filter>
@@ -62,12 +56,6 @@
     </None>
     <None Include="..\..\Bubble\vendor\imgui\premake5.lua">
       <Filter>..\Bubble\vendor\imgui</Filter>
-    </None>
-    <None Include="..\..\Bubble\vendor\msdf-atlas-gen\msdfgen\premake5.lua">
-      <Filter>..\Bubble\vendor\msdf-atlas-gen\msdfgen</Filter>
-    </None>
-    <None Include="..\..\Bubble\vendor\msdf-atlas-gen\premake5.lua">
-      <Filter>..\Bubble\vendor\msdf-atlas-gen</Filter>
     </None>
     <None Include="..\..\Bubble\vendor\yaml-cpp\premake5.lua">
       <Filter>..\Bubble\vendor\yaml-cpp</Filter>

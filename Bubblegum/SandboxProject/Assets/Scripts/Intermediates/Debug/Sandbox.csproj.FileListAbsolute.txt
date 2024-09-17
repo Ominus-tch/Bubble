@@ -7,3 +7,12 @@ C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbo
 C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CopyComplete
 C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
 C:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Sandbox.dll
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Sandbox.pdb
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Bubble-ScriptCore.dll
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Binaries\Bubble-ScriptCore.pdb
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.AssemblyReference.cache
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CoreCompileInputs.cache
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.Up2Date
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
+D:\Dev\Bubble\Bubblegum\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb

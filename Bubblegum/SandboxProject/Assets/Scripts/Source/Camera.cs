@@ -15,30 +15,15 @@ namespace Sandbox
 
 		public float DistanceFromPlayer = 5.0f;
 
-		private Entity m_Player;
-
-		public Camera()
-		{
-			Console.WriteLine("Test");
-		}
-
 		void OnCreate()
 		{
-			Console.WriteLine("Hello");
-			PrintCustomMessage("Is this working?");
 
-			m_Player = FindEntityByName("Player");
-		}
-
-		public void PrintCustomMessage(string message)
-		{
-			Console.Write($"C# says: {message}");
 		}
 
 		void OnUpdate(float ts)
 		{
-			if (m_Player != null)
-				Translation = new Vector3(m_Player.Translation.XY, DistanceFromPlayer);
+			if (OtherEntity != null)
+				Translation = new Vector3(OtherEntity.Translation.XY, DistanceFromPlayer);
 
 			float speed = 1.0f;
 			Vector3 velocity = Vector3.Zero;

@@ -5,8 +5,9 @@
 
 #include <unordered_map>
 
-#include "ComputeBuffer.h"
+#include "Buffer.h"
 #include "UniformBuffer.h"
+#include "Texture.h"
 
 namespace Bubble {
 
@@ -18,6 +19,7 @@ namespace Bubble {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual void SetBool(const std::string& name, bool value) = 0;
 		virtual void SetInt(const std::string& name, int value) = 0;
 		virtual void SetIntArray(const std::string& name, int* values, uint32_t count) = 0;
 		virtual void SetFloat(const std::string& name, float value) = 0;
@@ -29,6 +31,7 @@ namespace Bubble {
 		virtual void DispatchCompute(uint32_t x, uint32_t y, uint32_t z) = 0;
 
 		virtual void SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer) = 0;
+		virtual void SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture) = 0;
 		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) = 0;
 
 		virtual const std::string& GetName() const = 0;

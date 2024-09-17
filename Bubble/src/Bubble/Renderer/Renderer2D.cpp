@@ -865,7 +865,7 @@ namespace Bubble {
 		s_Data.Stats.TriCount++;
 	}
 
-	void Renderer2D::DrawCircle(const glm::vec3 pos, const float r, const glm::vec4 color)
+	void Renderer2D::DrawCircle(const glm::vec3 pos, const float r, const glm::vec4 color, int entityID)
 	{
 		int segments = 100;
 		float angleStep = 2 * PI / segments;
@@ -874,17 +874,17 @@ namespace Bubble {
 		for (int i = 1; i <= segments; ++i) {
 			float angle = i * angleStep;
 			glm::vec3 newPoint = pos + glm::vec3(r * cos(angle), r * sin(angle), 0.f);
-			DrawLine(previousPoint, newPoint, color);
+			DrawLine(previousPoint, newPoint, color, entityID);
 			previousPoint = newPoint;
 		}
 	}
 
-	void Renderer2D::DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color)
+	void Renderer2D::DrawCircleFilled(const glm::vec3 pos, const float r, const glm::vec4 color, int entityID)
 	{
 		auto transform = glm::translate(glm::mat4(1.0f), pos) *
 			glm::scale(glm::mat4(1.0f), glm::vec3(r * 2.f, r * 2.f, 1.0f));
 		
-		DrawCircleFilled(glm::mat4(transform), color);
+		DrawCircleFilled(glm::mat4(transform), color, 1.f, 0.005f, entityID);
 	}
 
 	void Renderer2D::DrawCircleFilled(const glm::mat4& transform, const glm::vec4& color, float thickness /*= 1.0f*/, float fade /*= 0.005f*/, int entityID /*= -1*/)
@@ -1038,6 +1038,55 @@ namespace Bubble {
 		DrawLine(lineVertices[1], lineVertices[2], color, entityID);
 		DrawLine(lineVertices[2], lineVertices[3], color, entityID);
 		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
+	}
+
+	void Renderer2D::DrawFrustum(const TransformComponent& tc, float verticalFOV, float aspectRatio, float nearClip, float farClip, int entityID)
+	{
+		float nearHeight = 2.0f * tanf(verticalFOV * 0.5f) * nearClip;
+		float farHeight = 2.0f * tanf(verticalFOV * 0.5f) * farClip;
+		float nearWidth = nearHeight * aspectRatio;
+		float farWidth = farHeight * aspectRatio;
+
+		auto [forward, up, right] = tc.GetDirectionVectors();
+
+		glm::vec3 nearCenter = tc.Translation + forward * nearClip;
+		glm::vec3 farCenter = tc.Translation + forward * farClip;
+
+		glm::vec3 nearTopLeft = nearCenter + (up * (nearHeight * 0.5f)) - (right * (nearWidth * 0.5f));
+		glm::vec3 nearTopRight = nearCenter + (up * (nearHeight * 0.5f)) + (right * (nearWidth * 0.5f));
+		glm::vec3 nearBottomLeft = nearCenter - (up * (nearHeight * 0.5f)) - (right * (nearWidth * 0.5f));
+		glm::vec3 nearBottomRight = nearCenter - (up * (nearHeight * 0.5f)) + (right * (nearWidth * 0.5f));
+
+		// Calculate the 4 corners of the far plane
+		glm::vec3 farTopLeft = farCenter + (up * (farHeight * 0.5f)) - (right * (farWidth * 0.5f));
+		glm::vec3 farTopRight = farCenter + (up * (farHeight * 0.5f)) + (right * (farWidth * 0.5f));
+		glm::vec3 farBottomLeft = farCenter - (up * (farHeight * 0.5f)) - (right * (farWidth * 0.5f));
+		glm::vec3 farBottomRight = farCenter - (up * (farHeight * 0.5f)) + (right * (farWidth * 0.5f));
+
+		glm::vec4 col = glm::vec4(1.f);
+
+		// Draw lines connecting the near plane corners
+		DrawLine(nearTopLeft, nearTopRight, col, entityID);
+		DrawLine(nearTopRight, nearBottomRight, col, entityID);
+		DrawLine(nearBottomRight, nearBottomLeft, col, entityID);
+		DrawLine(nearBottomLeft, nearTopLeft, col, entityID);
+
+		// Draw lines connecting the far plane corners
+		DrawLine(farTopLeft, farTopRight, col, entityID);
+		DrawLine(farTopRight, farBottomRight, col, entityID);
+		DrawLine(farBottomRight, farBottomLeft, col, entityID);
+		DrawLine(farBottomLeft, farTopLeft, col, entityID);
+
+		// Draw lines connecting near and far plane corners
+		DrawLine(nearTopLeft, farTopLeft, col, entityID);
+		DrawLine(nearTopRight, farTopRight, col, entityID);
+		DrawLine(nearBottomLeft, farBottomLeft, col, entityID);
+		DrawLine(nearBottomRight, farBottomRight, col, entityID);
+	}
+
+	void Renderer2D::DrawFrustum(const TransformComponent& tc, const SceneCamera& camera, int entityID)
+	{
+		DrawFrustum(tc, camera.GetPerspectiveVerticalFOV(), camera.GetAspectRatio(), camera.GetPerspectiveNearClip(), camera.GetPerspectiveFarClip(), entityID);
 	}
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& src, int entityID)

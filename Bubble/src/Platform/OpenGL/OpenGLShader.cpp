@@ -88,13 +88,22 @@ namespace Bubble {
 			BG_CORE_ASSERT(false);
 			return "";
 		}
+	}
 
+	static void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+	{
+		BG_CORE_ERROR("GL CALLBACK: {0}", message);
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 		: m_FilePath(filepath)
 	{
 		BG_PROFILE_FUNCTION();
+
+#if 0
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(MessageCallback, 0);
+#endif
 
 		Utils::CreateCacheDirectoryIfNeeded();
 
@@ -374,9 +383,26 @@ namespace Bubble {
 			BG_CORE_TRACE("    Members = {0}", memberCount);
 		}
 
+		BG_CORE_TRACE("Storage Images:");
+		for (const auto& resource : resources.storage_images)
+		{
+			std::string resourceName = compiler.get_name(resource.id);
+			if (resourceName.empty()) {
+				BG_CORE_WARN("Warning: Storage image has an empty or missing name.");
+				resourceName = "[Unnamed]";
+			}
+
+			BG_CORE_TRACE("Storage Image: {0}", resourceName);
+		}
+
 		for (const auto& resource : resources.storage_buffers)
 		{
 			std::string resourceName = compiler.get_name(resource.id);
+
+			// Debug the storage buffer properties
+			BG_CORE_TRACE("Storage Buffer ID: {0}", resource.id);
+			BG_CORE_TRACE("Storage Buffer Base Type ID: {0}", resource.base_type_id);
+
 			if (resourceName.empty()) {
 				BG_CORE_WARN("Warning: Storage buffer has an empty or missing name.");
 				resourceName = "[Unnamed]";
@@ -398,6 +424,13 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		glUseProgram(0);
+	}
+
+	void OpenGLShader::SetBool(const std::string& name, bool value)
+	{
+		BG_PROFILE_FUNCTION();
+
+		UploadUniformBool(name, value);
 	}
 
 	void OpenGLShader::SetInt(const std::string& name, int value)
@@ -454,7 +487,7 @@ namespace Bubble {
 		BG_PROFILE_FUNCTION();
 
 		glDispatchCompute(x, y, z);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 	}
 
 	void OpenGLShader::SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer)
@@ -481,6 +514,20 @@ namespace Bubble {
 		buffer->Bind(slot);
 	}
 
+	void OpenGLShader::SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture)
+	{
+		// Bind the texture to the specified slot
+		texture->BindAsImage(slot, GL_READ_ONLY);
+
+		//// Find the location of the uniform sampler in the shader
+		//GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+
+		//BG_INFO(location);
+
+		//// Set the uniform sampler to use the specified slot
+		//glUniform1i(location, slot);
+	}
+
 	void OpenGLShader::SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer)
 	{
 		/*GLuint blockIndex = glGetUniformBlockIndex(m_RendererID, name.c_str());
@@ -496,7 +543,8 @@ namespace Bubble {
 
 	void OpenGLShader::TestFunction()
 	{
-		GLint numBlocks = 0;
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		/*GLint numBlocks = 0;
 		glGetProgramInterfaceiv(m_RendererID, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
 
 		for (int i = 0; i < numBlocks; ++i) {
@@ -504,7 +552,13 @@ namespace Bubble {
 			GLsizei length;
 			glGetProgramResourceName(m_RendererID, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), &length, name);
 			std::cout << "Shader Storage Block #" << i << ": " << name << std::endl;
-		}
+		}*/
+	}
+
+	void OpenGLShader::UploadUniformBool(const std::string& name, bool value)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1i(location, static_cast<GLint>(value));
 	}
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)

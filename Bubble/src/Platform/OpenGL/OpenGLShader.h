@@ -20,6 +20,7 @@ namespace Bubble {
 
 		virtual const std::string& GetName() const override { return m_Name; }
 
+		virtual void SetBool(const std::string& name, bool value) override;
 		virtual void SetInt(const std::string& name, int value) override;
 		virtual void SetIntArray(const std::string& name, int* values, uint32_t count) override;
 		virtual void SetFloat(const std::string& name, float value) override;
@@ -30,10 +31,12 @@ namespace Bubble {
 
 		virtual void DispatchCompute(uint32_t x, uint32_t y, uint32_t z) override;
 		virtual void SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer) override;
+		virtual void SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture) override;
 		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) override;
 
 		virtual void TestFunction() override;
 	private:
+		void UploadUniformBool(const std::string& name, bool value);
 		void UploadUniformInt(const std::string& name, int value);
 		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
 

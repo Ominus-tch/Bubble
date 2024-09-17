@@ -3,7 +3,6 @@
 #include "Bubble/Utils/PlatformUtils.h"
 #include "Bubble/Scripting/ScriptEngine.h"
 
-#include "Bubble/Renderer/ComputeBuffer.h"
 #include "Bubble/Renderer/UniformBuffer.h"
 
 #include <imgui/imgui.h>
@@ -18,14 +17,9 @@
 // Temp
 #include <GLFW/include/GLFW/glfw3.h>
 
+#define DEG2RAD PI / 180.f
+
 namespace Bubble {
-
-	static float height = 100.f;
-	static float width = 100.f;
-
-	static int s_Depth = 10;
-	static float s_Angle = PI/4;
-	static float s_LenScalar = 0.67f;
 
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
@@ -53,6 +47,11 @@ namespace Bubble {
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
 
+		//Project::New();
+		//ScriptEngine::Init();
+		//m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		//m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
 		{
@@ -62,7 +61,7 @@ namespace Bubble {
 		else
 		{
 			// TEMP
-			//OpenProject("C:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
+			OpenProject("D:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
 			// TODO: prompt the user to select a directory
 			// NewProject();
 
@@ -73,121 +72,231 @@ namespace Bubble {
 		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+		//m_EditorCamera.SetDistance(10.f);
 
-		//m_Shader = Shader::Create("SandboxProject/Assets/Shaders/TestShader.glsl");
+		//m_CameraEntity = m_ActiveScene->CreateEntity("Main Camera");
+		//auto& cc = m_CameraEntity.AddComponent<CameraComponent>();
+		//cc.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
 
-		//uint32_t numElements = 1024;
-		//Ref<ComputeBuffer> outputBuffer = ComputeBuffer::Create(numElements, sizeof(uint32_t));
+		//cc.Camera.SetPerspectiveNearClip(1.f);
+		//cc.Camera.SetPerspectiveFarClip(10.f);
 
-		//// Initialize the buffer with zeroes (optional)
-		//std::vector<uint32_t> initialData(numElements, 0);
-		//outputBuffer->SetData(initialData.data());
+		// RayTracing
+		//m_Shader = Shader::Create("SandboxProject/Assets/Shaders/RayTracing.glsl");
+		////CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraData), 1);
 
-		//m_Shader->SetBuffer(0, "OutputBuffer", outputBuffer);
+		//m_VertexArray = VertexArray::Create();
 
-		//m_Shader->Bind();
-		//m_Shader->DispatchCompute(numElements, 1, 1);
-		//m_Shader->Unbind();
+		//m_VertexBuffer = VertexBuffer::Create(sizeof(QuadVert) * 6);
+		//m_VertexBuffer->SetLayout({
+		//	{ ShaderDataType::Float3, "a_Position" },  // 3D position
+		//	{ ShaderDataType::Float2, "a_UV" }        // UV coordinates
+		//});
+		//m_VertexBuffer->SetData(s_QuadVertices, sizeof(QuadVert) * 6);
+		//m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		// 
+		//m_CameraBuffer = UniformBuffer::Create(sizeof(CameraData), 0);
+		//m_EnvironmentBuffer = UniformBuffer::Create(sizeof(EnvironmentSettings), 1);
+		//m_WorldDataBuffer = UniformBuffer::Create(sizeof(WorldData), 2);
 
-		//std::vector<uint32_t> outputData(numElements);
-		//outputBuffer->GetData(outputData.data());
+		//RayTracingMaterial redMat = {
+		//	glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),  // colour (red)
+		//	glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // emissionColour (no emission)
+		//	glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  // specularColour (white specular reflection)
+		//	0.0f,                               // emissionStrength (no emission)
+		//	0.5f,                               // smoothness (moderate smoothness)
+		//	0.3f,                               // specularProbability (low probability of specular reflection)
+		//	0                                   // flag (no special material flag)
+		//};
 
-		//for (uint32_t i = 0; i < 10; ++i) {
-		//	std::cout << "outputData[" << i << "] = " << outputData[i] << std::endl;
-		//}
-    }
+		//RayTracingMaterial greenMat = {
+		//	glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),  // colour (green)
+		//	glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // emissionColour (no emission)
+		//	glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  // specularColour (white specular reflection)
+		//	0.0f,                               // emissionStrength (no emission)
+		//	0.5f,                               // smoothness (moderate smoothness)
+		//	0.3f,                               // specularProbability (low probability of specular reflection)
+		//	0                                   // flag (no special material flag)
+		//};
+
+		//RayTracingMaterial blueMat = {
+		//	glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // colour (blue)
+		//	glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  // emissionColour (no emission)
+		//	glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  // specularColour (white specular reflection)
+		//	1.0f,                               // emissionStrength (no emission)
+		//	0.5f,                               // smoothness (moderate smoothness)
+		//	0.3f,                               // specularProbability (low probability of specular reflection)
+		//	0                                   // flag (no special material flag)
+		//};
+
+		//Sphere sphere1 = {
+		//	glm::vec3(0.0f, 0.0f, 5.0f),  // position (centered, 5 units in front of the camera)
+		//	1.0f,                          // radius (1 unit)
+		//	redMat                         // material (red)
+		//};
+
+		//// Sphere 2: Green sphere
+		//Sphere sphere2 = {
+		//	glm::vec3(2.0f, 0.0f, 6.0f),  // position (slightly to the right and further away)
+		//	1.5f,                          // radius (1.5 units)
+		//	greenMat                       // material (green)
+		//};
+
+		//// Sphere 3: Blue sphere
+		//Sphere sphere3 = {
+		//	glm::vec3(-2.0f, 0.0f, 4.0f), // position (slightly to the left and closer)
+		//	0.8f,                          // radius (0.8 units)
+		//	blueMat                        // material (blue)
+		//};
+
+		//m_Spheres.push_back(sphere1);
+		//m_Spheres.push_back(sphere2);
+		//m_Spheres.push_back(sphere3);
+
+		//m_SphereBuffer = ComputeBuffer::Create(m_Spheres.size(), sizeof(Sphere));
+		// End RayTracing
+
+		// General Shader Tests
+		m_Shader = Shader::Create("SandboxProject/Assets/Shaders/Shader.glsl");
+
+		m_ShaderDataBuffer = UniformBuffer::Create(sizeof(ShaderData), 0);
+
+		m_VertexArray = VertexArray::Create();
+
+		m_VertexBuffer = VertexBuffer::Create(sizeof(QuadVert) * 6);
+		m_VertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" },  // 3D position
+			{ ShaderDataType::Float2, "a_UV" }        // UV coordinates
+		});
+		m_VertexBuffer->SetData(s_QuadVertices, sizeof(QuadVert) * 6);
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+
+		//Test = Texture2D::Create("SandboxProject/Assets/Textures/street.png");
+	}
 
     void EditorLayer::OnDetach()
     {
         BG_PROFILE_FUNCTION();
     }
 
-	static void branch(const glm::vec2& pos, glm::vec2 direction, float len, int depth = 0)
-	{
-		if (depth >= s_Depth) return;
-
-		glm::vec2 newPos;
-
-		//// Handle the initial case where the starting position is (0, 0)
-		//if (depth == 0 && glm::length(pos) == 0.0f)
-		//{
-		//	direction = glm::vec2(0.0f, 1.0f); // Start direction pointing upwards (along y-axis)
-		//}
-
-		direction = glm::normalize(direction);
-
-		// Calculate the new position after moving in the current direction
-		newPos = pos + direction * len;
-
-		// Draw the line from the current position to the new position
-		Renderer2D::DrawLine(pos, newPos);
-
-		// Rotate the direction vector by 45 degrees (PI/4 radians) clockwise and counterclockwise
-		float angle = s_Angle;
-		glm::mat2 rotationMatrixClockwise = glm::mat2(
-			glm::cos(-angle), -glm::sin(-angle),
-			glm::sin(-angle), glm::cos(-angle)
-		);
-
-		glm::mat2 rotationMatrixCounterclockwise = glm::mat2(
-			glm::cos(angle), -glm::sin(angle),
-			glm::sin(angle), glm::cos(angle)
-		);
-
-		// Increase depth
-		depth++;
-
-		// Recursive calls for the two branches
-		branch(newPos, rotationMatrixClockwise * direction, len * s_LenScalar, depth);
-		branch(newPos, rotationMatrixCounterclockwise * direction, len * s_LenScalar, depth);
-	}
-
     void EditorLayer::OnUpdate(Timestep ts)
     {
         BG_PROFILE_FUNCTION();
 
+		uint32_t width = (uint32_t)m_ViewportSize.x;
+		uint32_t height = (uint32_t)m_ViewportSize.y;
+
+		//uint32_t width = 1280;
+		//uint32_t height = 720;
+
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
-            m_ViewportSize.x > 0.f && m_ViewportSize.y > 0.f &&
-            (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+			width > 0 && height > 0 &&
+            (spec.Width != width || spec.Height != height))
         {
-            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-        }
+            m_Framebuffer->Resize(width, height);
+            m_ActiveScene->OnViewportResize(width, height);
+			m_EditorCamera.SetViewportSize(width, height);
 
-		float fps = 1.f / ts;
+			m_OutputTexture = Texture2D::Create({ width, height, ImageFormat::RGBA32F });
+			m_DestinationTexture = ComputeBuffer::Create(width * height, sizeof(glm::vec4));
 
-		m_FPSCache.push_front(fps);
-		m_FPSSum += fps;
-
-		if (m_FPSCache.size() > MaxCacheSize)
-		{
-			m_FPSSum -= m_FPSCache.back();
-			m_FPSCache.pop_back();
+			//BG_INFO(width);
+			//BG_INFO(height);
+			//m_OutputTexture->(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		m_FPS = m_FPSSum / m_FPSCache.size();
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		my = viewportSize.y - my;
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
 
-        m_TimeSinceLastRender = ts;
-		m_Time += ts;
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			m_MouseLastClicked = { mouseY, mouseX };
+		}
+
+		if (m_Animate)
+		{
+			float fps = 1.f / ts;
+
+			m_FPSCache.push_front(fps);
+			m_FPSSum += fps;
+
+			if (m_FPSCache.size() > MaxCacheSize)
+			{
+				m_FPSSum -= m_FPSCache.back();
+				m_FPSCache.pop_back();
+			}
+
+			m_FPS = m_FPSSum / m_FPSCache.size();
+
+			m_TimeSinceLastRender = ts;
+			m_Time += ts;
+
+			m_FrameCount++;
+		}
+
 
         Renderer2D::ResetStats();
+
         m_Framebuffer->Bind();
-        //RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
-        RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
-        RenderCommand::Clear();
+
+		RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
+		//RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.f });
+		RenderCommand::Clear();
 
 		m_Framebuffer->ClearAttachment(1, -1);
 
-		if (m_Animate)
-			s_Angle += ts;
+		// RayTracing
+		//float nearClip = m_EditorCamera.GetNearClip();
+		//float planeHeight = tanf(m_EditorCamera.GetFOV() * 0.5f * DEG2RAD) * 2;
+		//float planeWidth = planeHeight * m_EditorCamera.GetAspectRatio();
 
-		Renderer2D::BeginScene(m_EditorCamera);
+		//m_CameraData = {
+		//	glm::vec4(m_EditorCamera.GetPosition(), 0.f),
+		//	glm::vec4(planeWidth, planeHeight, 1.f, 0.f),
+		//	m_EditorCamera.GetCameraToWorldMatrix()
+		//};
+		//m_CameraBuffer->SetData(&m_CameraData);
+		//
+		//m_EnvironmentBuffer->SetData(&m_EnvironmentSettings);
 
-		CelestialBody cb = CelestialBody({}, {}, 0.1f);
-		cb.Draw();
+		//m_WorldData.PixelCount = glm::ivec2(width, height);
+		//m_WorldData.Frame = m_FrameCount;
+		//m_WorldData.NumSpheres = m_Spheres.size();
+		//m_WorldDataBuffer->SetData(&m_WorldData);
+
+		//m_SphereBuffer->SetData(m_Spheres.data());
+		//m_SphereBuffer->Bind(0);
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+			m_ShaderData.Mouse = glm::vec4(mouseX, mouseY, m_MouseLastClicked.x, m_MouseLastClicked.y);
+		m_ShaderData.Resolution = glm::vec4(width, height, 0.f, 0.f);
+		m_ShaderData.Time = m_Time;
+		m_ShaderData.Frame = m_FrameCount;
+
+		m_ShaderDataBuffer->SetData(&m_ShaderData);
+
+		m_Shader->Bind();
+
+		//Test->Bind(0);
+		m_VertexArray->Bind();
 		
-		Renderer2D::EndScene();
+		// TEMP: Draw function
+		m_Shader->TestFunction();
+
+		m_VertexArray->UnBind();
+		m_Shader->Unbind();
+		// End RayTracing
+
+		//std::vector<glm::vec4> data(width * height);
+		//m_DestinationTexture->GetData(data.data());
+		//m_OutputTexture->SetData(data.data(), width * height * 4);
+		//m_DestinationTexture->Unbind();
+		//m_Framebuffer->SetColorAttachmentTexture(m_OutputTexture->GetRendererID());
 
 		switch (m_SceneState)
 		{
@@ -215,24 +324,15 @@ namespace Bubble {
 			}
 		}
 
-		auto [mx, my] = ImGui::GetMousePos();
-		mx -= m_ViewportBounds[0].x;
-		my -= m_ViewportBounds[0].y;
-		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-		my = viewportSize.y - my;
-		int mouseX = (int)mx;
-		int mouseY = (int)my;
-
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
+			//int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			//m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
 		OnOverlayRender();
 		
         m_Framebuffer->Unbind();
-        m_FrameCount++;
     }
 
     void EditorLayer::OnImGuiRender()
@@ -319,7 +419,7 @@ namespace Bubble {
 
         ImGui::Begin("Stats");
 
-#if 0
+#if 1
 		std::string name = "None";
 		if (m_HoveredEntity)
 			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
@@ -341,11 +441,65 @@ namespace Bubble {
         ImGui::Text("Time Elasped: %.2fs", m_Time);
         ImGui::Text("FPS: %i", (int)m_FPS);
 
-        ImGui::Checkbox("Animate", &m_Animate);
-		ImGui::InputInt("Depth", &s_Depth);
+		ImGui::SeparatorText("Camera");
 
-		ImGui::DragFloat("Angle", &s_Angle, 0.01f, -PI, PI);
-		ImGui::DragFloat("Len", &s_LenScalar, 0.01f);
+		const auto& p = m_EditorCamera.GetPosition();
+        ImGui::Text("EditorCamera: (%f, %f, %f)", p.x, p.y, p.z);
+		const auto& r = glm::degrees(m_EditorCamera.GetRotation());
+        ImGui::Text("EditorCamera: (%f, %f, %f)", r.x, r.y, r.z);
+
+		float nearClip = m_EditorCamera.GetNearClip();
+		if (ImGui::DragFloat("Near Clip", &nearClip))
+		{
+			m_EditorCamera.SetNearClip(nearClip);
+		}
+		float farClip = m_EditorCamera.GetFarClip();
+		if (ImGui::DragFloat("Far Clip", &farClip))
+		{
+			m_EditorCamera.SetFarClip(farClip);
+		}
+
+		float fov = m_EditorCamera.GetFOV();
+		if (ImGui::DragFloat("FOV", &fov))
+		{
+			m_EditorCamera.SetFOV(fov);
+		}
+
+		ImGui::SeparatorText("Ray Tracing");
+
+		ImGui::DragInt("Bounces", &m_WorldData.MaxBounceCount);
+		ImGui::DragInt("Rays Per Pixel", &m_WorldData.NumRaysPerPixel);
+
+		ImGui::SeparatorText("Environment");
+
+		bool env = m_EnvironmentSettings.EnvironmentEnabled;
+		if (ImGui::Checkbox("Environment", &env))
+		{
+			if (env)
+				m_EnvironmentSettings.EnvironmentEnabled = 1;
+			else
+				m_EnvironmentSettings.EnvironmentEnabled = 0;
+		}
+
+		ImGui::ColorEdit4("Ground Colour", &m_EnvironmentSettings.GroundColour.x);
+		ImGui::ColorEdit4("Sky Colour Horizon", &m_EnvironmentSettings.SkyColourHorizon.x);
+		ImGui::ColorEdit4("Sky Colour Zenith", &m_EnvironmentSettings.SkyColourZenith.x);
+		ImGui::DragFloat("Sun Focus", &m_EnvironmentSettings.SunFocus);
+		ImGui::DragFloat("Sun Intensity", &m_EnvironmentSettings.SunIntensity);
+
+		ImGui::SeparatorText("Spheres");
+
+		for (auto& sphere : m_Spheres)
+		{
+			ImGui::PushID(&sphere);
+			ImGui::Separator();
+			ImGui::DragFloat3("Pos", &sphere.position.x, 0.01f);
+			ImGui::DragFloat("Radius", &sphere.radius, 0.01f);
+			DrawMaterialControls(sphere.material);
+			ImGui::PopID();
+		}
+
+        ImGui::Checkbox("Animate", &m_Animate);
 
         ImGui::End();
 
@@ -364,7 +518,9 @@ namespace Bubble {
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+		//m_ViewportSize = { 1280, 720 };
 
+        //ImGui::Image((void*)m_OutputTexture->GetRendererID(),
         ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(),
             { m_ViewportSize.x, m_ViewportSize.y },
             { 0, 1 }, { 1, 0 });
@@ -521,6 +677,16 @@ namespace Bubble {
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
+	}
+
+	void EditorLayer::DrawMaterialControls(RayTracingMaterial& mat)
+	{
+		ImGui::ColorEdit4("Colour", &mat.colour.x);
+		ImGui::ColorEdit4("Emission Colour", &mat.emissionColour.x);
+		ImGui::ColorEdit4("Specular Colour", &mat.specularColour.x);
+		ImGui::DragFloat("Emission Strength", &mat.emissionStrength);
+		ImGui::DragFloat("Smoothness", &mat.smoothness);
+		ImGui::DragFloat("Specular Probability", &mat.specularProbability);
 	}
 
     void EditorLayer::OnEvent(Event& e)
