@@ -63,6 +63,8 @@ namespace Bubble {
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
 
 		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
+
+		bool m_ShouldRecompile = false;
 	};
 
 }

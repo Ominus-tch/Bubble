@@ -7,8 +7,8 @@ namespace Bubble {
 	class FileSystem
 	{
 	public:
-		// TODO: move to FileSystem class
 		static Buffer ReadFileBinary(const std::filesystem::path& filepath);
+		static bool FileChanged(const std::filesystem::path& filepath);
 	};
 
 }

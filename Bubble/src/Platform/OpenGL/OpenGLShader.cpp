@@ -1,6 +1,7 @@
 #include "bgpch.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Bubble/Core/Timer.h"
+#include "Bubble/Core/FileSystem.h"
 
 #include <fstream>
 #include <glad/glad.h>
@@ -109,6 +110,8 @@ namespace Bubble {
 
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
+
+		m_ShouldRecompile = FileSystem::FileChanged(m_FilePath.c_str());
 
 		{
 			Timer timer;
@@ -224,6 +227,12 @@ namespace Bubble {
 			std::filesystem::path shaderFilePath = m_FilePath;
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
 
+			if (m_ShouldRecompile)
+			{
+				BG_CORE_INFO("Deleting Cache file for {0}", m_FilePath);
+				std::filesystem::remove(cachedPath);
+			}
+
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open())
 			{
@@ -280,6 +289,12 @@ namespace Bubble {
 		{
 			std::filesystem::path shaderFilePath = m_FilePath;
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
+
+			if (m_ShouldRecompile)
+			{
+				BG_CORE_INFO("Deleting Cache file for {0}", m_FilePath);
+				std::filesystem::remove(cachedPath);
+			}
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open())

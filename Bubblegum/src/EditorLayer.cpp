@@ -14,6 +14,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Bubble/Core/FileSystem.h"
+
 // Temp
 #include <GLFW/include/GLFW/glfw3.h>
 
@@ -285,7 +287,7 @@ namespace Bubble {
 
 
 		m_Shader->Bind();
-		m_Shader->SetTexture(1, "iTexture", Test);
+		//m_Shader->SetTexture(1, "iTexture", Test);
 
 		//Test->Bind(0);
 		m_VertexArray->Bind();

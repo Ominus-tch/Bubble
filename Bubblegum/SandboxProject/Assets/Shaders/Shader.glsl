@@ -34,16 +34,13 @@ layout(std140, binding = 0) uniform Data {
 	int iFrame;
 };
 
-layout(binding = 1) uniform sampler2D iTexture;
-
 void main() {
 	vec2 uv = fragUV * 1.0 - 0.5;
 	uv.x *= iResolution.x / iResolution.y;
 
-	vec3 col = texture(iTexture, fragUV).rgb;
-	// Output texture pixel color
-	//vec3 col = vec3(// Here, 0.0);
+	vec3 col = vec3(1.0, 1.0, 0.0);
     
-    fragColor = vec4(col,1);
+    fragColor = vec4(col,1.0);
+
 	o_EntityID = v_EntityID;
 }
