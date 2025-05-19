@@ -38,16 +38,39 @@ namespace Bubble {
 
 		ImGui::Columns(columnCount, 0, false);
 
+		bool anyItemHovered = false;
+
 		for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
 		{
 			const auto& path = directoryEntry.path();
 			std::string filenameString = path.filename().string();
 
-			ImGui::PushID(filenameString.c_str());
-			Ref<Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+			bool isDir = directoryEntry.is_directory();
 
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+			//ImGui::PushID(filenameString.c_str());
+			Ref<Texture2D> icon = isDir ? m_DirectoryIcon : m_FileIcon;
+
+			if (path.extension().string() == ".png")
+			{
+				std::string pathStr = path.string();
+				if (m_TextureIcons.find(pathStr) == m_TextureIcons.end())
+				{
+					icon = Texture2D::Create(pathStr);
+					m_TextureIcons[pathStr] = icon;
+				}
+				else
+				{
+					icon = m_TextureIcons[pathStr];
+				}
+			}
+
+
+			if (m_SelectedEntry == path)
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1, 1, 1, 0.2));
+			else
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
+			ImGui::ImageButton(filenameString.c_str(), (ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
 			if (ImGui::BeginDragDropSource())
 			{
@@ -59,7 +82,17 @@ namespace Bubble {
 			}
 
 			ImGui::PopStyleColor();
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+
+			bool hovered = ImGui::IsItemHovered();
+			anyItemHovered |= hovered;
+
+			if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			{
+				m_SelectedEntry = path;
+			}
+
+
+			if (hovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
 				if (directoryEntry.is_directory())
 					m_CurrentDirectory /= path.filename();
@@ -68,7 +101,12 @@ namespace Bubble {
 
 			ImGui::NextColumn();
 
-			ImGui::PopID();
+			//ImGui::PopID();
+		}
+
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !anyItemHovered)
+		{
+			m_SelectedEntry.clear();
 		}
 
 		ImGui::Columns(1);

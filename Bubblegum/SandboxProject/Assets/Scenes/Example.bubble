@@ -1,2 +1,85 @@
-Scene: ExampleScene
+Scene: Untitled
 Entities:
+  - Entity: 11411866900244477734
+    TagComponent:
+      Tag: Rocks2
+    TransformComponent:
+      Translation: [31.1, 3.33, -26]
+      Rotation: [0, 0, 0]
+      Scale: [7, 7, 7]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\rocks.fbx
+      DrawMesh: true
+      DrawWireframe: true
+  - Entity: 11120067233519767427
+    TagComponent:
+      Tag: CannonR
+    TransformComponent:
+      Translation: [12.526018, 1.5, -1.9426918]
+      Rotation: [0, 428.05847, 0]
+      Scale: [0.003, 0.003, 0.01]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\Cube.fbx
+      DrawMesh: true
+      DrawWireframe: true
+  - Entity: 15031047307019479370
+    TagComponent:
+      Tag: CannonL
+    TransformComponent:
+      Translation: [8.768284, 1.5, -0.5717662]
+      Rotation: [0, 424.91687, 0]
+      Scale: [0.003, 0.003, 0.01]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\Cube.fbx
+      DrawMesh: true
+      DrawWireframe: true
+  - Entity: 9734492124623386718
+    TagComponent:
+      Tag: Sea
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [1.5707964, 0, 0]
+      Scale: [50000, 50000, 1]
+    SpriteRendererComponent:
+      Color: [0.26046124, 0.82986087, 0.8648649, 1]
+      TilingFactor: 1
+  - Entity: 3031179028135819401
+    TagComponent:
+      Tag: PlayerShip
+    TransformComponent:
+      Translation: [10.647151, -1.5, -1.257229]
+      Rotation: [0, 430.74802, 0]
+      Scale: [0.01, 0.01, 0.01]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\kapal.fbx
+      DrawMesh: true
+      DrawWireframe: true
+  - Entity: 5656415933717759442
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [1.1575458, 2, -3.2807236]
+      Rotation: [0, 424.91687, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 12187117447217683959
+    TagComponent:
+      Tag: Rocks1
+    TransformComponent:
+      Translation: [-17.192749, 3.3307676, 21.936584]
+      Rotation: [0, 0, 0]
+      Scale: [7, 7.0149746, 7]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\rocks.fbx
+      DrawMesh: true
+      DrawWireframe: true

@@ -10,6 +10,7 @@
 #include "Bubble/Core/Timestep.h"
 
 #include "Bubble/ImGui/ImGuiLayer.h"
+#include "Bubble/Core/FileWatchLayer.h"
 
 int main(int argc, char** argv);
 
@@ -53,6 +54,7 @@ namespace Bubble {
 		void Close();
 
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		FileWatchLayer* GetFileWatchLayer() { return m_FileWatchLayer; }
 
 		inline static Application& Get() { return *s_Instance; }
 
@@ -67,7 +69,10 @@ namespace Bubble {
 	private:
 		ApplicationSpecification m_Specification;
 		Scope<Window> m_Window;
+
 		ImGuiLayer* m_ImGuiLayer;
+		FileWatchLayer* m_FileWatchLayer;;
+
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;

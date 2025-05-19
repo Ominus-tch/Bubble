@@ -48,9 +48,13 @@ namespace Bubble {
 		void SetNearClip(float clip) { m_NearClip = clip; UpdateProjection(); }
 		void SetFarClip(float clip) { m_FarClip = clip; UpdateProjection(); }
 		void SetFOV(float fov) { m_FOV = fov; UpdateProjection(); }
+
+		void SetPosition(glm::vec3 pos) { m_Position = pos; }
+		void SetPitch(float pitch) { m_Pitch = pitch; }
+		void SetYaw(float yaw) { m_Yaw = yaw; }
+		void UpdateView();
 	private:
 		void UpdateProjection();
-		void UpdateView();
 
 		bool OnMouseScroll(MouseScrolledEvent& e);
 

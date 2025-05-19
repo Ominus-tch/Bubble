@@ -85,7 +85,7 @@ namespace Bubble {
 
 			// Ignoring certain nodes will only stop them from being processed not tokenised (i.e. they will still be in the tree)
 			ofbx::LoadFlags flags =
-				//		ofbx::LoadFlags::IGNORE_MODELS |
+				//ofbx::LoadFlags::IGNORE_MODELS |
 				ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
 				ofbx::LoadFlags::IGNORE_CAMERAS |
 				ofbx::LoadFlags::IGNORE_LIGHTS |

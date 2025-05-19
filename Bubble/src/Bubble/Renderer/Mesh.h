@@ -8,6 +8,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "Bubble/Renderer/Material.h"
+
 namespace Bubble {
 
 	namespace Utils {
@@ -151,6 +153,8 @@ namespace Bubble {
 			GlobalTransform = glm::rotate(GlobalTransform, glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));  // Rotation around Z-axis
 
 			GlobalTransform = glm::scale(GlobalTransform, Scale);
+
+			
 		}
 
 		std::string GetPath() const { return Path; }

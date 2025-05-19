@@ -30,6 +30,9 @@ namespace Bubble {
 		glm::vec3 Position;
 		glm::vec4 Color;
 
+		glm::vec2 TexCoord;
+		float TexIndex;
+
 		// Editor-only
 		int EntityID;
 	};
@@ -97,28 +100,33 @@ namespace Bubble {
 
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
-		Ref<Shader> QuadShader;
-		Ref<Texture2D> WhiteTexture;
+		Ref<Shader> DefaultQuadShader;
+		Ref<Material> ActiveQuadMaterial;
 
 		Ref<VertexArray> CircleVertexArray;
 		Ref<VertexBuffer> CircleVertexBuffer;
-		Ref<Shader> CircleShader;
+		Ref<Shader> DefaultCircleShader;
+		Ref<Material> ActiveCircleMaterial;
 
 		Ref<VertexArray> SphereVertexArray;
 		Ref<VertexBuffer> SphereVertexBuffer;
-		Ref<Shader> SphereShader;
+		Ref<Shader> DefaultSphereShader;
+		Ref<Material> ActiveSphereMaterial;
 
 		Ref<VertexArray> TriVertexArray;
 		Ref<VertexBuffer> TriVertexBuffer;
-		Ref<Shader> TriShader;
+		Ref<Shader> DefaultTriShader;
+		Ref<Material> ActiveTriMaterial;
 
 		Ref<VertexArray> LineVertexArray;
 		Ref<VertexBuffer> LineVertexBuffer;
-		Ref<Shader> LineShader;
+		Ref<Shader> DefaultLineShader;
+		Ref<Material> ActiveLineMaterial;
 
 		Ref<VertexArray> TextVertexArray;
 		Ref<VertexBuffer> TextVertexBuffer;
-		Ref<Shader> TextShader;
+		Ref<Shader> DefaultTextShader;
+		Ref<Material> ActiveTextMaterial;
 
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
@@ -149,6 +157,7 @@ namespace Bubble {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = white texture
 
+		Ref<Texture2D> WhiteTexture;
 		Ref<Texture2D> FontAtlasTexture;
 
 		glm::vec4 QuadVertexPositions[4];
@@ -211,6 +220,8 @@ namespace Bubble {
 		s_Data.TriVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"    },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+			{ ShaderDataType::Float,  "a_TexIndex" },
 			{ ShaderDataType::Int,    "a_EntityID" }
 			});
 		s_Data.TriVertexArray->AddVertexBuffer(s_Data.TriVertexBuffer);
@@ -300,11 +311,11 @@ namespace Bubble {
 		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
-		s_Data.TriShader = Shader::Create("assets/shaders/Renderer2D_Triangle.glsl");
-		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
-		s_Data.SphereShader = Shader::Create("assets/shaders/Renderer2D_Sphere.glsl");
-		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
+		s_Data.DefaultQuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
+		s_Data.DefaultTriShader = Shader::Create("assets/shaders/Renderer2D_Triangle.glsl");
+		s_Data.DefaultCircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
+		s_Data.DefaultSphereShader = Shader::Create("assets/shaders/Renderer2D_Sphere.glsl");
+		s_Data.DefaultLineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
 		//s_Data.TextShader = Shader::Create("assets/shaders/Renderer2D_Text.glsl");
 
 		// Set first texture slot to 0
@@ -324,6 +335,10 @@ namespace Bubble {
 
 		delete[] s_Data.QuadVertexBufferBase;
 		delete[] s_Data.TriVertexBufferBase;
+		delete[] s_Data.CircleVertexBufferBase;
+		delete[] s_Data.SphereVertexBufferBase;
+		delete[] s_Data.LineVertexBufferBase;
+		delete[] s_Data.TextVertexBufferBase;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
@@ -386,6 +401,14 @@ namespace Bubble {
 		s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
 
 		s_Data.TextureSlotIndex = 1;
+
+
+		// Shaders
+		s_Data.ActiveQuadMaterial = nullptr;
+		s_Data.ActiveTriMaterial = nullptr;
+		s_Data.ActiveCircleMaterial = nullptr;
+		s_Data.ActiveSphereMaterial = nullptr;
+		s_Data.ActiveLineMaterial = nullptr;
 	}
 
 	void Renderer2D::Flush()
@@ -401,7 +424,11 @@ namespace Bubble {
 			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 				s_Data.TextureSlots[i]->Bind(i);
 
-			s_Data.QuadShader->Bind();
+			if (s_Data.ActiveQuadMaterial)
+				s_Data.ActiveQuadMaterial->Apply(1, s_Data.TextureSlotIndex);
+			else
+				s_Data.DefaultQuadShader->Bind();
+
 			RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
@@ -411,7 +438,14 @@ namespace Bubble {
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.TriVertexBufferPtr - (uint8_t*)s_Data.TriVertexBufferBase);
 			s_Data.TriVertexBuffer->SetData(s_Data.TriVertexBufferBase, dataSize);
 
-			s_Data.TriShader->Bind();
+			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+				s_Data.TextureSlots[i]->Bind(i);
+
+			if (s_Data.ActiveTriMaterial)
+				s_Data.ActiveTriMaterial->Apply(1, s_Data.TextureSlotIndex);
+			else
+				s_Data.DefaultTriShader->Bind();
+
 			RenderCommand::DrawIndexed(s_Data.TriVertexArray, s_Data.TriIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
@@ -421,7 +455,11 @@ namespace Bubble {
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.CircleVertexBufferPtr - (uint8_t*)s_Data.CircleVertexBufferBase);
 			s_Data.CircleVertexBuffer->SetData(s_Data.CircleVertexBufferBase, dataSize);
 
-			s_Data.CircleShader->Bind();
+			if (s_Data.ActiveCircleMaterial)
+				s_Data.ActiveCircleMaterial->Apply(1, s_Data.TextureSlotIndex);
+			else
+				s_Data.DefaultCircleShader->Bind();
+
 			RenderCommand::DrawIndexed(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
@@ -431,7 +469,11 @@ namespace Bubble {
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.SphereVertexBufferPtr - (uint8_t*)s_Data.SphereVertexBufferBase);
 			s_Data.SphereVertexBuffer->SetData(s_Data.SphereVertexBufferBase, dataSize);
 
-			s_Data.SphereShader->Bind();
+			if (s_Data.ActiveSphereMaterial)
+				s_Data.ActiveSphereMaterial->Apply(1, s_Data.TextureSlotIndex);
+			else
+				s_Data.DefaultSphereShader->Bind();
+
 			RenderCommand::DrawIndexed(s_Data.SphereVertexArray, s_Data.SphereIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
@@ -441,7 +483,11 @@ namespace Bubble {
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.LineVertexBufferPtr - (uint8_t*)s_Data.LineVertexBufferBase);
 			s_Data.LineVertexBuffer->SetData(s_Data.LineVertexBufferBase, dataSize);
 
-			s_Data.LineShader->Bind();
+			if (s_Data.ActiveLineMaterial)
+				s_Data.ActiveLineMaterial->Apply(1, s_Data.TextureSlotIndex);
+			else
+				s_Data.DefaultLineShader->Bind();
+
 			RenderCommand::SetLineWidth(s_Data.LineWidth);
 			RenderCommand::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
 			s_Data.Stats.DrawCalls++;
@@ -466,13 +512,13 @@ namespace Bubble {
 		// Half dimensions for easy calculations
 		glm::vec3 halfSize = size * 0.5f;
 
-		glm::vec4 redColor = color;
-		glm::vec4 greenColor = color;
-		glm::vec4 blueColor = color;
+		//glm::vec4 redColor = color;
+		//glm::vec4 greenColor = color;
+		//glm::vec4 blueColor = color;
 
-		//glm::vec4 redColor = glm::vec4(1.0f, 0.0f, 0.0f, color.a);   // Red for X-axis
-		//glm::vec4 greenColor = glm::vec4(0.0f, 1.0f, 0.0f, color.a); // Green for Y-axis
-		//glm::vec4 blueColor = glm::vec4(0.0f, 0.0f, 1.0f, color.a);  // Blue for Z-axis
+		glm::vec4 redColor = glm::vec4(1.0f, 0.0f, 0.0f, color.a);   // Red for X-axis
+		glm::vec4 greenColor = glm::vec4(0.0f, 1.0f, 0.0f, color.a); // Green for Y-axis
+		glm::vec4 blueColor = glm::vec4(0.0f, 0.0f, 1.0f, color.a);  // Blue for Z-axis
 
 		// Front face (z+)
 		DrawQuad(
@@ -521,6 +567,64 @@ namespace Bubble {
 			glm::vec3(90.0f, 0.0f, 0.0f),  // Rotated to face down
 			greenColor
 		);
+	}
+
+	void Renderer2D::DrawRotatedCube(const glm::vec3& position, const glm::vec3& size, const glm::vec3& rotation, const glm::vec4& color)
+	{
+		glm::vec3 halfSize = size * 0.5f;
+
+		glm::vec4 redColor = glm::vec4(1.0f, 0.0f, 0.0f, color.a);   // X-axis
+		glm::vec4 greenColor = glm::vec4(0.0f, 1.0f, 0.0f, color.a);   // Y-axis
+		glm::vec4 blueColor = glm::vec4(0.0f, 0.0f, 1.0f, color.a);   // Z-axis
+
+		// Front face (z+)
+		DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(0.0f, 0.0f, halfSize.z)),
+			glm::vec2(size.x, size.y),
+			rotation + glm::vec3(0.0f, 0.0f, 0.0f), // No face-specific rotation
+			blueColor
+		);
+
+		// Back face (z-)
+		DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(0.0f, 0.0f, -halfSize.z)),
+			glm::vec2(size.x, size.y),
+			rotation + glm::vec3(0.0f, 180.0f, 0.0f),
+			blueColor
+		);
+
+		// Left face (x-)
+		DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(-halfSize.x, 0.0f, 0.0f)),
+			glm::vec2(size.z, size.y),
+			rotation + glm::vec3(0.0f, 90.0f, 0.0f),
+			redColor
+		);
+
+		// Right face (x+)
+		DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(halfSize.x, 0.0f, 0.0f)),
+			glm::vec2(size.z, size.y),
+			rotation + glm::vec3(0.0f, -90.0f, 0.0f),
+			redColor
+		);
+
+		// Top face (y+)
+		glm::vec3 rot = { 0.f, 90.f, 0.f };
+		DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(0.0f, halfSize.y, 0.0f)),
+			glm::vec2(size.x, size.z),
+			rotation,
+			greenColor
+		);
+
+		// Bottom face (y-)
+		/*DrawQuad(
+			position + glm::rotate(glm::quat(glm::radians(rotation)), glm::vec3(0.0f, -halfSize.y, 0.0f)),
+			glm::vec2(size.x, size.z),
+			rotation + glm::vec3(0.0f, 0.0f, 0.0f),
+			greenColor
+		);*/
 	}
 
 	void Renderer2D::DrawCubeOutlines(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color)
@@ -847,17 +951,23 @@ namespace Bubble {
 
 		s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(a, 1.0f);
 		s_Data.TriVertexBufferPtr->Color = color;
-		//s_Data.TriVertexBufferPtr->EntityID = -1;
+		s_Data.TriVertexBufferPtr->TexCoord = glm::vec2(0.0f);
+		s_Data.TriVertexBufferPtr->TexIndex = -1;
+		s_Data.TriVertexBufferPtr->EntityID = entityID;
 		s_Data.TriVertexBufferPtr++;
 
 		s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(b, 1.0f);
 		s_Data.TriVertexBufferPtr->Color = color;
-		//s_Data.TriVertexBufferPtr->EntityID = -1;
+		s_Data.TriVertexBufferPtr->TexCoord = glm::vec2(0.0f);
+		s_Data.TriVertexBufferPtr->TexIndex = -1;
+		s_Data.TriVertexBufferPtr->EntityID = entityID;
 		s_Data.TriVertexBufferPtr++;
 
 		s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(c, 1.0f);
 		s_Data.TriVertexBufferPtr->Color = color;
-		//s_Data.TriVertexBufferPtr->EntityID = -1;
+		s_Data.TriVertexBufferPtr->TexCoord = glm::vec2(0.0f);
+		s_Data.TriVertexBufferPtr->TexIndex = -1;
+		s_Data.TriVertexBufferPtr->EntityID = entityID;
 		s_Data.TriVertexBufferPtr++;
 
 		s_Data.TriIndexCount += 3;
@@ -1130,29 +1240,81 @@ namespace Bubble {
 			DrawQuad(transform, src.Color, entityID);
 	}
 
-	void Renderer2D::DrawMesh(const glm::mat4& entityTransform, const MeshComponent& meshComponent, int entityID)
+	void Renderer2D::DrawMesh(const glm::mat4& entityTransform, const MeshComponent* meshComponent, int entityID)
 	{
 		constexpr size_t triangleVertexCount = 3;
 
-		if (meshComponent.DrawWireframe)
+		if (meshComponent->DrawWireframe)
 		{
 			DrawMeshWireframe(entityTransform, meshComponent, entityID);
 		}
 
-		if (!meshComponent.DrawMesh)
+		if (!meshComponent->DrawMesh)
 			return;
 
-		for (int i = 0; i < meshComponent.Meshes.size(); i++)
+		Ref<Material> lastMaterial = nullptr;
+
+		size_t materialCount = meshComponent->Materials.size();
+
+		for (int m = 0; m < meshComponent->Meshes.size(); m++)
 		{
-			Ref<Mesh> mesh = meshComponent.Meshes[i];
+			Ref<Mesh> mesh = meshComponent->Meshes[m];
 
 			const glm::mat4& transform = entityTransform * mesh->GetGlobalTransform();
 			const auto& Vertices = mesh->GetVertices();
 			const auto& Indices = mesh->GetIndices();
+			const auto& UVs = mesh->GetUVs();
+
+			Ref<Material> currentMaterial = nullptr;
+
+			if (materialCount > 0)
+			{
+				size_t matIndex = m % materialCount;
+				currentMaterial = meshComponent->Materials[matIndex];
+			}
+
+
+			glm::vec2 defaultUV(0.0f);
+
+			float textureIndex = 0.0f;
+			if (currentMaterial && currentMaterial->NumTextures() == 1) // for example
+			{
+				Ref<Texture2D> texture = currentMaterial->GetTexture(0);
+
+				for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+				{
+					if (*s_Data.TextureSlots[i] == *texture)
+					{
+						textureIndex = (float)i;
+						break;
+					}
+				}
+
+				if (textureIndex == 0.0f)
+				{
+					if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+						NextBatch();
+
+					textureIndex = (float)s_Data.TextureSlotIndex;
+					s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+					s_Data.TextureSlotIndex++;
+				}
+			}
+
 
 			// Check if we need to start a new batch (if we're exceeding the maximum indices or vertices)
 			if (s_Data.TriIndexCount + Indices.size() >= Renderer2DData::MaxTriIndices)
 				NextBatch();
+
+			s_Data.ActiveTriMaterial = currentMaterial ? currentMaterial : nullptr;
+
+			if (currentMaterial != lastMaterial)
+			{
+				if (s_Data.TriIndexCount > 0)
+					NextBatch();
+
+				lastMaterial = currentMaterial;
+			}
 
 			for (size_t i = 0; i < Indices.size(); i += triangleVertexCount)
 			{
@@ -1167,19 +1329,36 @@ namespace Bubble {
 				Vertex v1 = Vertices[index1];
 				Vertex v2 = Vertices[index2];
 
+				glm::vec2 uv0 = { 0.f, 0.f };
+				glm::vec2 uv1 = { 1.f, 0.f };
+				glm::vec2 uv2 = { 0.5f, 1.f };
+
+				if (UVs.size() > index0 && UVs.size() > index1 && UVs.size() > index2)
+				{
+					uv0 = UVs[index0];
+					uv1 = UVs[index1];
+					uv2 = UVs[index2];
+				}
+
 				// Apply the transform to each vertex position
 				s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(v0.Position, 1.0f);
 				s_Data.TriVertexBufferPtr->Color = v0.Color; // Default color, or you could pass a color as a parameter
+				s_Data.TriVertexBufferPtr->TexCoord = uv0;
+				s_Data.TriVertexBufferPtr->TexIndex = textureIndex;
 				s_Data.TriVertexBufferPtr->EntityID = entityID;
 				s_Data.TriVertexBufferPtr++;
 
 				s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(v1.Position, 1.0f);
 				s_Data.TriVertexBufferPtr->Color = v1.Color; // Default color
+				s_Data.TriVertexBufferPtr->TexCoord = uv1;
+				s_Data.TriVertexBufferPtr->TexIndex = textureIndex;
 				s_Data.TriVertexBufferPtr->EntityID = entityID;
 				s_Data.TriVertexBufferPtr++;
 
 				s_Data.TriVertexBufferPtr->Position = transform * glm::vec4(v2.Position, 1.0f);
 				s_Data.TriVertexBufferPtr->Color = v2.Color; // Default color
+				s_Data.TriVertexBufferPtr->TexCoord = uv2;
+				s_Data.TriVertexBufferPtr->TexIndex = textureIndex;
 				s_Data.TriVertexBufferPtr->EntityID = entityID;
 				s_Data.TriVertexBufferPtr++;
 
@@ -1188,20 +1367,17 @@ namespace Bubble {
 
 				// Update statistics (optional)
 				s_Data.Stats.TriCount++;
-
-				if (s_Data.TriIndexCount + 3 >= Renderer2DData::MaxTriIndices)
-					NextBatch();
 			}
 		}
 	}
 
-	void Renderer2D::DrawMeshWireframe(const glm::mat4& entityTransform, const MeshComponent& meshComponent, int entityID)
+	void Renderer2D::DrawMeshWireframe(const glm::mat4& entityTransform, const MeshComponent* meshComponent, int entityID)
 	{
 		constexpr size_t lineVertexCount = 2;
 
-		for (int i = 0; i < meshComponent.Meshes.size(); i++)
+		for (int i = 0; i < meshComponent->Meshes.size(); i++)
 		{
-			Ref<Mesh> mesh = meshComponent.Meshes[i];
+			Ref<Mesh> mesh = meshComponent->Meshes[i];
 
 			const glm::mat4& transform = entityTransform * mesh->GetGlobalTransform();
 			const auto& Vertices = mesh->GetVertices();

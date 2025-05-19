@@ -151,7 +151,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SandboxProject\Assets\Shaders\Shader.glsl" />
+    <None Include="assets\materials\defaultMat.bmat" />
+    <None Include="SandboxProject\Assets\Materials\example.bmat" />
+    <None Include="assets\materials\DefaultGray.bmat" />
+    <None Include="SandboxProject\Assets\Materials\Test2.bmat" />
+    <None Include="SandboxProject\Assets\Shaders\StandardPBR.glsl" />
+    <None Include="SandboxProject\Materials.bproj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

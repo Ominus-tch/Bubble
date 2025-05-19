@@ -43,6 +43,7 @@ namespace Bubble {
 		YAML::Node data;
 		try
 		{
+			BG_CORE_INFO(filepath.string());
 			data = YAML::LoadFile(filepath.string());
 		}
 		catch (YAML::ParserException e)

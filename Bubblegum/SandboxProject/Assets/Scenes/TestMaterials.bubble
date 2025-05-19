@@ -1,0 +1,16 @@
+Scene: Untitled
+Entities:
+  - Entity: 11043236514707594649
+    TagComponent:
+      Tag: Test
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.01, 0.01, 0.01]
+    MeshComponent:
+      ModelPath: SandboxProject\Assets\Models\kapal.fbx
+      DrawMesh: true
+      DrawWireframe: true
+      Materials:
+        - Path: SandboxProject/Assets/Materials/DefaultGray.bmat
+          Name: DefaultGray

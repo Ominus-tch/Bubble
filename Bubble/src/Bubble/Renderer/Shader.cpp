@@ -7,40 +7,55 @@
 
 namespace Bubble {
 
+	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::m_Shaders;
+
 	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
+		if (ShaderLibrary::Has(name))
+			return ShaderLibrary::Get(name);
+
+		Ref<Shader> shader = nullptr;
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:	BG_CORE_ASSERT(false, "RendererAPI::None is not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc, "");
+		case RendererAPI::API::OpenGL:	shader = CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc, ""); break;
+		default: BG_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 		}
 
-		BG_CORE_ASSERT(false, "Unknown RendererAPI");
-		return nullptr;
+		ShaderLibrary::Add(name, shader);
+		return shader;
 	}
 
 	Ref<Shader> Shader::Create(const std::string& filepath)
 	{
+		if (ShaderLibrary::Has(filepath))
+			return ShaderLibrary::Get(filepath);
+
+		Ref<Shader> shader = nullptr;
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:	BG_CORE_ASSERT(false, "RendererAPI::None is not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(filepath);
+		case RendererAPI::API::OpenGL:	shader = CreateRef<OpenGLShader>(filepath); break;
+		default: BG_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 		}
 
-		BG_CORE_ASSERT(false, "Unknown RendererAPI");
-		return nullptr;
+		ShaderLibrary::Add(filepath, shader);
+		return shader;
 	}
 
-	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
+	void ShaderLibrary::Add(const std::string& filepath, const Ref<Shader>& shader)
 	{
-		BG_CORE_ASSERT(!Exists(name), "Shader already exists!");
-		m_Shaders[name] = shader;
+		if (!Has(filepath))
+		m_Shaders[filepath] = shader;
 	}
 
 	void ShaderLibrary::Add(const Ref<Shader>& shader)
 	{
-		auto& name = shader->GetName();
-		Add(name, shader);
+		auto& filepath = shader->GetPath();
+		if (!filepath.empty())
+			Add(filepath, shader);
 	}
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
@@ -50,21 +65,21 @@ namespace Bubble {
 		return shader;
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
+	bool ShaderLibrary::Has(const std::string& filepath)
 	{
-		auto shader = Shader::Create(filepath);
-		Add(name, shader);
-		return shader;
+		return m_Shaders.find(filepath) != m_Shaders.end();
 	}
 
-	Ref<Shader> ShaderLibrary::Get(const std::string& name)
+	Ref<Shader> ShaderLibrary::Get(const std::string& filepath)
 	{
-		BG_CORE_ASSERT(Exists(name), "Shader not found!");
-		return m_Shaders[name];
+		if (Has(filepath))
+			return m_Shaders[filepath];
+		return nullptr;
 	}
 
-	bool ShaderLibrary::Exists(const std::string& name) const
+	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::GetShaders()
 	{
-		return m_Shaders.find(name) != m_Shaders.end();
+		return m_Shaders;
 	}
+
 }

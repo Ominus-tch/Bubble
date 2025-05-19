@@ -63,7 +63,7 @@ namespace Bubble {
 		else
 		{
 			// TEMP
-			OpenProject("D:/Dev/Bubble/BubbleGum/SandboxProject/Sandbox.bproj");
+			OpenProject("SandboxProject/Materials.bproj");
 			// TODO: prompt the user to select a directory
 			// NewProject();
 
@@ -159,24 +159,24 @@ namespace Bubble {
 		// End RayTracing
 
 		// General Shader Tests
-		m_Shader = Shader::Create("SandboxProject/Assets/Shaders/Shader.glsl");
+		//m_Shader = Shader::Create("SandboxProject/Assets/Shaders/Shader.glsl");
 
-		m_ShaderDataBuffer = UniformBuffer::Create(sizeof(ShaderData), 0);
+		//m_ShaderDataBuffer = UniformBuffer::Create(sizeof(ShaderData), 0);
 
-		m_VertexArray = VertexArray::Create();
+		//m_VertexArray = VertexArray::Create();
 
-		m_VertexBuffer = VertexBuffer::Create(sizeof(QuadVert) * 6);
-		m_VertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float2, "a_UV" },
-			{ ShaderDataType::Int,    "a_EntityID" }
-		});
-		m_VertexBuffer->SetData(s_QuadVertices, sizeof(QuadVert) * 6);
-		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		//m_VertexBuffer = VertexBuffer::Create(sizeof(QuadVert) * 6);
+		//m_VertexBuffer->SetLayout({
+		//	{ ShaderDataType::Float3, "a_Position" },
+		//	{ ShaderDataType::Float2, "a_UV" },
+		//	{ ShaderDataType::Int,    "a_EntityID" }
+		//});
+		//m_VertexBuffer->SetData(s_QuadVertices, sizeof(QuadVert) * 6);
+		//m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-		Test = Texture2D::Create("SandboxProject/Assets/Textures/street.png");
+		//Test = Texture2D::Create("SandboxProject/Assets/Textures/street.png");
 
-		auto test = m_ActiveScene->CreateEntity("Test");
+		//auto test = m_ActiveScene->CreateEntity("Test");
 	}
 
     void EditorLayer::OnDetach()
@@ -255,6 +255,56 @@ namespace Bubble {
 
 		m_Framebuffer->ClearAttachment(1, -1);
 
+
+		/*Renderer2D::BeginScene(m_EditorCamera);
+
+		glm::vec3 position = { 0.f, 0.f, 0.f };
+		float rotation = PI/2;
+		glm::vec3 axis = { 1.f, 0.f, 0.f };
+		glm::vec3 scale = { 50.f, 50.f, 1.f };
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), rotation, axis)
+			* glm::scale(glm::mat4(1.0f), scale);*/
+
+		//Renderer2D::DrawQuad(transform, glm::vec4(1.f ,1.f, 1.f, 1.f));
+
+
+
+		//Renderer2D::DrawRotatedCube(m_PlayerShipPos, { 6.f, 2.f, 2.f }, m_PlayerShipRotation);
+
+		//Renderer2D::EndScene();
+
+		////////////////////////////
+		//Entity ship = m_ActiveScene->FindEntityByName("PlayerShip");
+		//auto& shipTransform = ship.GetComponent<TransformComponent>();
+
+		//// Move the ship
+		//glm::vec3 forward = shipTransform.GetForward();
+		//float speed = 2.0f;
+		//shipTransform.Translation += forward * speed * (float)ts;
+		//shipTransform.Rotation += glm::radians(m_ShipTurning) * (float)ts;
+
+		//// Define cannon offsets in local ship space
+		//glm::vec3 offsetL = { 2.f, 3.f, 0.f };
+		//glm::vec3 offsetR = { -2.f, 3.f, 0.f };
+
+		//// Rotate the offsets to world space based on the ship's rotation
+		//glm::mat4 shipRotationMatrix = glm::toMat4(glm::quat(shipTransform.Rotation));
+		//glm::vec3 rotatedOffsetL = glm::vec3(shipRotationMatrix * glm::vec4(offsetL, 0.0));
+		//glm::vec3 rotatedOffsetR = glm::vec3(shipRotationMatrix * glm::vec4(offsetR, 0.0));
+
+		//// Position cannons relative to the rotated ship
+		//Entity cannonL = m_ActiveScene->FindEntityByName("CannonL");
+		//auto& cannonTransformL = cannonL.GetComponent<TransformComponent>();
+		//cannonTransformL.Translation = shipTransform.Translation + rotatedOffsetL;
+
+		//Entity cannonR = m_ActiveScene->FindEntityByName("CannonR");
+		//auto& cannonTransformR = cannonR.GetComponent<TransformComponent>();
+		//cannonTransformR.Translation = shipTransform.Translation + rotatedOffsetR;
+		////////////////////////////
+
+
 		// RayTracing
 		//float nearClip = m_EditorCamera.GetNearClip();
 		//float planeHeight = tanf(m_EditorCamera.GetFOV() * 0.5f * DEG2RAD) * 2;
@@ -277,26 +327,26 @@ namespace Bubble {
 		//m_SphereBuffer->SetData(m_Spheres.data());
 		//m_SphereBuffer->Bind(0);
 
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-			m_ShaderData.Mouse = glm::vec4(mouseX, mouseY, m_MouseLastClicked.x, m_MouseLastClicked.y);
-		m_ShaderData.Resolution = glm::vec4(width, height, 0.f, 0.f);
-		m_ShaderData.Time = m_Time;
-		m_ShaderData.Frame = m_FrameCount;
+		//if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+		//	m_ShaderData.Mouse = glm::vec4(mouseX, mouseY, m_MouseLastClicked.x, m_MouseLastClicked.y);
+		//m_ShaderData.Resolution = glm::vec4(width, height, 0.f, 0.f);
+		//m_ShaderData.Time = m_Time;
+		//m_ShaderData.Frame = m_FrameCount;
 
-		m_ShaderDataBuffer->SetData(&m_ShaderData);
+		//m_ShaderDataBuffer->SetData(&m_ShaderData);
 
 
-		m_Shader->Bind();
-		//m_Shader->SetTexture(1, "iTexture", Test);
+		//m_Shader->Bind();
+		////m_Shader->SetTexture(1, "iTexture", Test);
 
-		//Test->Bind(0);
-		m_VertexArray->Bind();
-		
-		// TEMP: Draw function
-		m_Shader->TestFunction();
+		////Test->Bind(0);
+		//m_VertexArray->Bind();
+		//
+		//// TEMP: Draw function
+		//m_Shader->TestFunction();
 
-		m_VertexArray->UnBind();
-		m_Shader->Unbind();
+		//m_VertexArray->UnBind();
+		//m_Shader->Unbind();
 
 		// End RayTracing
 
@@ -327,6 +377,73 @@ namespace Bubble {
 			}
 			case SceneState::Play:
 			{
+				//Entity camera = m_ActiveScene->FindEntityByName("Camera");
+				//auto& cameraTransform = camera.GetComponent<TransformComponent>();
+
+				//// Control Camera
+				//auto& canTransform = cannonTransformL;
+				//glm::vec2* rotation = &m_LCannonRot;
+
+				//glm::vec3 canRotation = shipTransform.Rotation + glm::radians(glm::vec3(0.f, -90.f, 0.f));
+				//glm::vec3 forward = canTransform.GetForward();
+				//if (m_ControllingCannon == 2)
+				//{
+				//	canRotation = shipTransform.Rotation + glm::radians(glm::vec3(0.f, 90.f, 0.f));
+				//	canTransform = cannonTransformR;
+				//	forward = canTransform.GetForward();
+				//	rotation = &m_RCannonRot;
+				//}
+
+				//cannonTransformL.Rotation = shipTransform.Rotation + glm::radians(glm::vec3(0.f, -90.f, 0.f));
+				//cannonTransformR.Rotation = shipTransform.Rotation + glm::radians(glm::vec3(0.f, 90.f, 0.f));
+
+				//if (m_ControllingCannon != 0)
+				//{
+				//	if (Input::IsKeyPressed(Key::W))
+				//	{
+				//		rotation->x += m_CannonSpeed * ts;
+				//	}
+				//	if (Input::IsKeyPressed(Key::S))
+				//	{
+				//		rotation->x -= m_CannonSpeed * ts;
+				//	}
+				//	if (Input::IsKeyPressed(Key::A))
+				//	{
+				//		rotation->y += m_CannonSpeed * ts;
+				//	}
+				//	if (Input::IsKeyPressed(Key::D))
+				//	{
+				//		rotation->y -= m_CannonSpeed * ts;
+				//	}
+
+				//	BG_INFO("1. {0}, {1}", rotation->x, rotation->y);
+
+				//	if (rotation->x > 40.f)
+				//	{
+				//		rotation->x = 40.f;
+				//	}
+				//	else if (rotation->x < -15.f)
+				//	{
+				//		rotation->x = -15.f;
+				//	}
+
+				//	if (rotation->y > 50.f)
+				//	{
+				//		rotation->y = 50.f;
+				//	}
+				//	else if (rotation->y < -50.f)
+				//	{
+				//		rotation->y = -50.f;
+				//	}
+
+				//	BG_INFO("2. {0}, {1}", rotation->x, rotation->y);
+
+				//	cameraTransform.Translation = (canTransform.Translation + glm::vec3(0.f, 0.5f, 0.f)) - forward * -2.f;
+
+				//	canTransform.Rotation = canRotation + glm::radians(glm::vec3(*rotation, 0.f));
+				//	cameraTransform.Rotation = canRotation + glm::radians(glm::vec3(*rotation, 0.f));
+				//}
+
 				m_ActiveScene->OnUpdateRuntime(ts);
 				break;
 			}
@@ -418,9 +535,15 @@ namespace Bubble {
 
         // Panels
 
-        m_SceneHierarchyPanel.OnImGuiRender();
 		if (m_ContentBrowserPanel)
+		{
 			m_ContentBrowserPanel->OnImGuiRender();
+			m_SceneHierarchyPanel.SetSelectedDirectoryEntry(m_ContentBrowserPanel->GetSelectedEntry());
+			m_SceneHierarchyPanel.SetAssetIcons(m_ContentBrowserPanel->GetAssetIcons());
+		}
+
+        m_SceneHierarchyPanel.OnImGuiRender();
+
 
 
         // Windows
@@ -429,8 +552,8 @@ namespace Bubble {
 
 #if 1
 		std::string name = "None";
-		if (m_HoveredEntity)
-			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+		/*if (m_HoveredEntity)
+			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;*/
 		ImGui::Text("Hovered Entity: %s", name.c_str());
 #endif
 
@@ -472,6 +595,24 @@ namespace Bubble {
 		{
 			m_EditorCamera.SetFOV(fov);
 		}
+
+
+		ImGui::SeparatorText("App");
+
+		if (m_ControllingCannon != 1)
+			if (ImGui::Button("Control Left Cannon"))
+				m_ControllingCannon = 1;
+
+		if (m_ControllingCannon != 2)
+			if (ImGui::Button("Control Right Cannon"))
+				m_ControllingCannon = 2;
+
+		if (m_ControllingCannon != 0)
+			if (ImGui::Button("Stop Controlling"))
+				m_ControllingCannon = 0;
+
+		ImGui::DragFloat3("Steering", glm::value_ptr(m_ShipTurning));
+		ImGui::DragFloat3("Debug vals", glm::value_ptr(m_DebugVals), 0.01f);
 
 		ImGui::SeparatorText("Ray Tracing");
 
@@ -529,7 +670,7 @@ namespace Bubble {
 		//m_ViewportSize = { 1280, 720 };
 
         //ImGui::Image((void*)m_OutputTexture->GetRendererID(),
-        ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(),
+        ImGui::Image((ImTextureID)m_Framebuffer->GetColorAttachmentRendererID(),
             { m_ViewportSize.x, m_ViewportSize.y },
             { 0, 1 }, { 1, 0 });
 
@@ -736,7 +877,7 @@ namespace Bubble {
 			Renderer2D::BeginScene(m_EditorCamera);
 		}
 
-		// Draw selected entity outline 
+		// Draw selected entity outline
 		if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
 		{
 			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
@@ -767,87 +908,93 @@ namespace Bubble {
 
         switch (e.GetKeyCode())
         {
-        case Key::N:
-        {
-            if (control)
-                NewScene();
+			case Key::N:
+			{
+				if (control)
+					NewScene();
 
-            break;
-        }
-        case Key::O:
-        {
-            if (control)
-                OpenProject();
+				break;
+			}
+			case Key::O:
+			{
+				if (control)
+					OpenProject();
 
-            break;
-        }
-        case Key::S:
-        {
-            if (control)
-            {
-                if (shift)
-                    SaveSceneAs();
-                else
-                    SaveScene();
-            }
+				break;
+			}
+			case Key::S:
+			{
+				if (control)
+				{
+					if (shift)
+						SaveSceneAs();
+					else
+						SaveScene();
+				}
+				
+				break;
+			}
 
-            break;
-        }
+			// Scene Commands
+			case Key::D:
+			{
+				if (control)
+				   OnDuplicateEntity();
+				
+				break;
+			}
 
-        // Scene Commands
-        case Key::D:
-        {
-            if (control)
-               OnDuplicateEntity();
-
-            break;
-        }
-
-        // Gizmos
-        case Key::Q:
-        {
-            if (shift && !ImGuizmo::IsUsing())
-                m_GizmoType = -1;
-            break;
-        }
-        case Key::W:
-        {
-            if (shift && !ImGuizmo::IsUsing())
-                m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-            break;
-        }
-        case Key::E:
-        {
-            if (shift && !ImGuizmo::IsUsing())
-                m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-            break;
-        }
-        case Key::R:
-        {
-            if (control)
-            {
-                ScriptEngine::ReloadAssembly();
-            }
-            else
-            {
-                if (shift && !ImGuizmo::IsUsing())
-                    m_GizmoType = ImGuizmo::OPERATION::SCALE;
-            }
-            break;
-        }
-        case Key::Delete:
-        {
-            if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
-            {
-                Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-                if (selectedEntity)
-                {
-                    m_SceneHierarchyPanel.SetSelectedEntity({});
-                    m_ActiveScene->DestroyEntity(selectedEntity);
-                }
-            }
-            break;
-        }
+			// Gizmos
+			case Key::Q:
+			{
+				if (shift && !ImGuizmo::IsUsing())
+					m_GizmoType = -1;
+				break;
+			}
+			case Key::W:
+			{
+				if (shift && !ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				
+				break;
+			}
+			case Key::A:
+			{
+				
+				break;
+			}
+			case Key::E:
+			{
+				if (shift && !ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+			case Key::R:
+			{
+				if (control)
+				{
+					ScriptEngine::ReloadAssembly();
+				}
+				else
+				{
+					if (shift && !ImGuizmo::IsUsing())
+						m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				}
+				break;
+			}
+			case Key::Delete:
+			{
+				if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+				{
+					Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+					if (selectedEntity)
+					{
+						m_SceneHierarchyPanel.SetSelectedEntity({});
+						m_ActiveScene->DestroyEntity(selectedEntity);
+					}
+				}
+				break;
+			}
         }
 
         return false;

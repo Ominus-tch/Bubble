@@ -2,6 +2,7 @@
 #include "Bubble/Core/Application.h"
 
 #include "Bubble/Core/Log.h"
+#include "Bubble/Core/FileSystem.h"
 
 #include "Bubble/Renderer/Renderer.h"
 #include "Bubble/Scripting/ScriptEngine.h"
@@ -32,7 +33,10 @@ namespace Bubble {
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
+		m_FileWatchLayer = new FileWatchLayer();
+
 		PushOverlay(m_ImGuiLayer);
+		PushLayer(m_FileWatchLayer);
 	}
 
 	Application::~Application()

@@ -308,6 +308,20 @@ namespace Bubble {
 			out << YAML::Key << "DrawMesh" << YAML::Value << meshComponent.DrawMesh;
 			out << YAML::Key << "DrawWireframe" << YAML::Value << meshComponent.DrawWireframe;
 
+			out << YAML::Key << "Materials";
+			out << YAML::BeginSeq; // Begin Materials array
+
+			for (int i = 0; i < meshComponent.Materials.size(); i++)
+			{
+				const auto& material = meshComponent.Materials[i];
+				out << YAML::BeginMap; // Individual Material
+				out << YAML::Key << "Path" << YAML::Value << material->GetPath();
+				out << YAML::Key << "Name" << YAML::Value << material->GetName();
+				out << YAML::EndMap; // Individual Material
+			}
+
+			out << YAML::EndSeq; // End Materials array
+
 			out << YAML::EndMap; // MeshComponent
 		}
 
@@ -388,6 +402,8 @@ namespace Bubble {
 
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
+		BG_CORE_INFO("Serializing Scene...");
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
@@ -559,13 +575,38 @@ namespace Bubble {
 					if (meshComponent["ModelPath"])
 						path = meshComponent["ModelPath"].as<std::string>();
 
-					auto& src = deserializedEntity.AddComponent<MeshComponent>(path);
-					//src.Color = meshComponent["Color"].as<glm::vec4>();
 
-					if (meshComponent["DrawMesh"])
-						src.DrawMesh = meshComponent["DrawMesh"].as<bool>();
-					if (meshComponent["DrawWireframe"])
-						src.DrawWireframe = meshComponent["DrawWireframe"].as<bool>();
+					auto& src = deserializedEntity.AddComponent<MeshComponent>();
+					if (!path.empty())
+					{
+						src.Load(path);
+						//src.Color = meshComponent["Color"].as<glm::vec4>();
+
+						if (meshComponent["DrawMesh"])
+							src.DrawMesh = meshComponent["DrawMesh"].as<bool>();
+						if (meshComponent["DrawWireframe"])
+							src.DrawWireframe = meshComponent["DrawWireframe"].as<bool>();
+
+						auto materialsNode = meshComponent["Materials"];
+						if (materialsNode)
+						{
+							src.Materials.clear();
+
+							for (const auto& materialNode : materialsNode)
+							{
+								std::string path = materialNode["Path"].as<std::string>();
+								std::string name = materialNode["Name"].as<std::string>();
+
+								Ref<Material> mat = src.AddMaterial(path);
+								mat->SetName(name);
+							}
+						}
+					}
+					else
+					{
+						m_Scene->DestroyEntity(deserializedEntity);
+						continue;
+					}
 				}
 
 				//auto circleRendererComponent = entity["CircleRendererComponent"];

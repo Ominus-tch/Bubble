@@ -5,6 +5,8 @@
 #include "Bubble/Core/UUID.h"
 #include "Bubble/Renderer/Texture.h"
 #include "Bubble/Renderer/Mesh.h"
+#include "Bubble/Renderer/Material.h"
+#include "Bubble/Utils/MaterialSerializer.h"
 //#include "Bubble/Renderer/Font.h"
 
 #include <glm/glm.hpp>
@@ -99,20 +101,22 @@ namespace Bubble {
 
 	struct MeshComponent
 	{
-		std::vector<Ref<Mesh>> Meshes;
+		std::vector<Ref<Mesh>> Meshes; // Really submeshes
+		std::vector<Ref<Material>> Materials;
 		std::string Path = "";
 		bool DrawMesh = true;
-		bool DrawWireframe = false;
+		bool DrawWireframe = true;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
-		MeshComponent(const std::string& path) { Meshes = Mesh::Create(path); Path = path; }
+		MeshComponent(const std::string& path) { Meshes = Mesh::Create(path); Path = path; OnMeshesLoaded(); }
 		MeshComponent(const std::vector<Vertex>& verts,
 			const std::vector<glm::vec3>& norms,
 			const std::vector<glm::vec2>& texCoords,
 			const std::vector<uint32_t>& inds)
 		{
 			Meshes = Mesh::Create(verts, norms, texCoords, inds);
+			OnMeshesLoaded();
 		}
 
 		void Load(const std::string& path)
@@ -126,11 +130,27 @@ namespace Bubble {
 			Clear();
 			Path = path;
 			Meshes = Mesh::Create(path);
+			OnMeshesLoaded();
+		}
+
+		void OnMeshesLoaded()
+		{
+			if (Materials.size() == 0)
+			{
+				Ref<Material> mat = Material::Create("assets/materials/DefaultGray.bmat");
+				BG_CORE_INFO(mat->GetShader()->GetName());
+				Materials.push_back(mat);
+			}
 		}
 
 		void Load()
 		{
-			Load(Path);
+			if (!Path.empty())
+				Load(Path);
+			else
+			{
+				BG_CORE_ERROR("Error at MeshComponent::Load(): Please provide a path");
+			}
 		}
 
 		void Clear()
@@ -141,19 +161,123 @@ namespace Bubble {
 				mesh->Clear();
 			}
 
+			for (auto& mat : Materials)
+			{
+				mat->Clear();
+			}
+
 			Meshes.clear();
+			Materials.clear();
 		}
 
 		void AddMesh(Ref<Mesh> mesh)
 		{
 			Meshes.push_back(mesh);
+			OnMeshesLoaded();
 		}
 
 		void AddMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
 		{
-			Meshes.push_back(CreateRef<Mesh>(vertices, indices));
+			AddMesh(CreateRef<Mesh>(vertices, indices));
 		}
 
+		Ref<Material> AddMaterial(const std::string& filepath)
+		{
+			BG_INFO("Adding Material {0} to {1}", filepath, Path);
+			if (filepath.substr(filepath.find_last_of('.') + 1) == "bmat")
+			{
+				Ref<Material> mat = MaterialSerializer::DeserializeMaterial(filepath);
+				AddMaterial(mat);
+				return mat;
+			}
+			else if (filepath.substr(filepath.find_last_of('.') + 1) == "png")
+			{
+				Ref<Texture2D> texture = Texture2D::Create(filepath);
+				return AddMaterial(filepath, texture);
+			}
+			else
+			{
+				BG_WARN("Not valid material or texture file");
+			}
+
+			return nullptr;
+		}
+
+		bool SwitchMaterial(const std::string& oldMaterialPath, const std::string& filepath)
+		{
+
+			Ref<Material> mat = nullptr;
+
+			size_t extPos = filepath.find_last_of('.');
+			if (extPos == std::string::npos)
+			{
+				BG_WARN("File has no extension: {0}", filepath);
+				return false;
+			}
+
+			std::string ext = filepath.substr(extPos + 1);
+			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+			if (ext == "bmat")
+			{
+				mat = MaterialSerializer::DeserializeMaterial(filepath);
+			}
+			else if (ext == "png")
+			{
+				Ref<Texture2D> texture = Texture2D::Create(filepath);
+				mat = Material::Create();
+				mat->SetName(std::filesystem::path(filepath).filename().string());
+				mat->SetTexture(filepath, texture);
+			}
+			else
+			{
+				BG_WARN("Not valid material or texture file");
+			}
+
+			if (mat)
+			{
+				int index = -1;
+				int i = 0;
+				for (const auto& _mat : Materials)
+				{
+					BG_INFO(i);
+					BG_INFO(oldMaterialPath);
+					BG_INFO(_mat->GetPath());
+					BG_INFO(_mat->GetName());
+					if (_mat->GetPath() == oldMaterialPath || _mat->GetName() == oldMaterialPath)
+					{
+						index = i;
+						break;
+					}
+
+					i++;
+				}
+
+				if (index != -1)
+				{
+					BG_INFO(index);
+					Materials[index]->Clear();
+					Materials[index] = mat;
+					
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		void AddMaterial(Ref<Material> material)
+		{
+			Materials.push_back(material);
+		}
+
+		Ref<Material> AddMaterial(const std::string& name, Ref<Texture2D> texture)
+		{
+			auto material = Material::Create();
+			material->SetTexture(name, texture);
+			AddMaterial(material);
+			return material;
+		}
 	};
 
 	struct CameraComponent
@@ -208,6 +332,6 @@ namespace Bubble {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		NativeScriptComponent, MeshComponent, CameraComponent,
-		ScriptComponent>;
+		NativeScriptComponent, MeshComponent,
+		CameraComponent, ScriptComponent>;
 }

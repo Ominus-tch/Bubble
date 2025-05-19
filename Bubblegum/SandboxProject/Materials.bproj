@@ -1,0 +1,5 @@
+Project:
+  Name: TestMaterials
+  StartScene: Scenes/TestMaterials.bubble
+  AssetDirectory: Assets
+  ScriptModulePath: Scripts/Binaries/Sandbox.dll

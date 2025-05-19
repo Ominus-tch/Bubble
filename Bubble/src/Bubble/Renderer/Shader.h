@@ -34,7 +34,10 @@ namespace Bubble {
 		virtual void SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture) = 0;
 		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) = 0;
 
+		virtual bool Recompile() = 0;
+
 		virtual const std::string& GetName() const = 0;
+		virtual const std::string& GetPath() const = 0;
 
 		virtual void TestFunction() = 0;
 
@@ -46,15 +49,14 @@ namespace Bubble {
 	class ShaderLibrary
 	{
 	public:
-		void Add(const std::string& name, const Ref<Shader>& shader);
-		void Add(const Ref<Shader>& shader);
-		Ref<Shader> Load(const std::string& filepath);
-		Ref<Shader> Load(const std::string& name, const std::string& filepath);
+		static void Add(const std::string& name, const Ref<Shader>& shader);
+		static void Add(const Ref<Shader>& shader);
+		static Ref<Shader> Load(const std::string& filepath);
 
-		Ref<Shader> Get(const std::string& name);
-
-		bool Exists(const std::string& name) const;
+		static bool Has(const std::string& name);
+		static Ref<Shader> Get(const std::string& name);
+		static std::unordered_map <std::string, Ref<Shader>> GetShaders();
 	private:
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+		static std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 	};
 }

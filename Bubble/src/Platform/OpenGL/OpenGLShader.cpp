@@ -111,7 +111,8 @@ namespace Bubble {
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
 
-		m_ShouldRecompile = FileSystem::FileChanged(m_FilePath.c_str());
+		m_ShouldRecompile = FileSystem::FileChanged(filepath);
+		//m_ShouldRecompile = true;
 
 		{
 			Timer timer;
@@ -142,6 +143,37 @@ namespace Bubble {
 		CompileOrGetVulkanBinaries(sources);
 		CompileOrGetOpenGLBinaries();
 		CreateProgram();
+	}
+
+	bool OpenGLShader::Recompile()
+	{
+		BG_PROFILE_FUNCTION();
+
+		BG_CORE_INFO("Recompiling shader: {0}", m_FilePath);
+
+		Utils::CreateCacheDirectoryIfNeeded();
+
+		std::string source = ReadFile(m_FilePath);
+		auto shaderSources = PreProcess(source);
+
+		m_ShouldRecompile = true; // Force recompile and cache clearing
+
+		// Clear previous SPIR-V and source data
+		m_VulkanSPIRV.clear();
+		m_OpenGLSPIRV.clear();
+		m_OpenGLSourceCode.clear();
+
+		// Compile new binaries and recreate the program
+		if (!CompileOrGetVulkanBinaries(shaderSources))
+			return false;
+
+		if (!CompileOrGetOpenGLBinaries())
+			return false;
+
+		if (!CreateProgram())
+			return false;
+
+		return true;
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -207,8 +239,9 @@ namespace Bubble {
 		return shaderSources;
 	}
 
-	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
+	bool OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		bool success = true;
 		GLuint program = glCreateProgram();
 
 		shaderc::Compiler compiler;
@@ -229,7 +262,6 @@ namespace Bubble {
 
 			if (m_ShouldRecompile)
 			{
-				BG_CORE_INFO("Deleting Cache file for {0}", m_FilePath);
 				std::filesystem::remove(cachedPath);
 			}
 
@@ -251,6 +283,7 @@ namespace Bubble {
 				{
 					BG_CORE_ERROR(module.GetErrorMessage());
 					BG_CORE_ASSERT(false);
+					success = false;
 				}
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
@@ -266,12 +299,15 @@ namespace Bubble {
 			}
 		}
 
-		for (auto&& [stage, data] : shaderData)
-			Reflect(stage, data);
+		if (success)
+			for (auto&& [stage, data] : shaderData)
+				success |= Reflect(stage, data);
+		return success;
 	}
 
-	void OpenGLShader::CompileOrGetOpenGLBinaries()
+	bool OpenGLShader::CompileOrGetOpenGLBinaries()
 	{
+		bool success = true;
 		auto& shaderData = m_OpenGLSPIRV;
 
 		shaderc::Compiler compiler;
@@ -292,7 +328,6 @@ namespace Bubble {
 
 			if (m_ShouldRecompile)
 			{
-				BG_CORE_INFO("Deleting Cache file for {0}", m_FilePath);
 				std::filesystem::remove(cachedPath);
 			}
 
@@ -318,6 +353,7 @@ namespace Bubble {
 				{
 					BG_CORE_ERROR(module.GetErrorMessage());
 					BG_CORE_ASSERT(false);
+					success = false;
 				}
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
@@ -332,10 +368,13 @@ namespace Bubble {
 				}
 			}
 		}
+
+		return success;
 	}
 
-	void OpenGLShader::CreateProgram()
+	bool OpenGLShader::CreateProgram()
 	{
+		bool success = true;
 		GLuint program = glCreateProgram();
 
 		std::vector<GLuint> shaderIDs;
@@ -364,6 +403,8 @@ namespace Bubble {
 
 			for (auto id : shaderIDs)
 				glDeleteShader(id);
+
+			success = false;
 		}
 
 		for (auto id : shaderIDs)
@@ -373,58 +414,69 @@ namespace Bubble {
 		}
 
 		m_RendererID = program;
+
+		return success;
 	}
 
-	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData)
+	bool OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) const
 	{
-		spirv_cross::Compiler compiler(shaderData);
-		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+		bool success = true;
+		try {
+			spirv_cross::Compiler compiler(shaderData);
+			spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		BG_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), m_FilePath);
-		BG_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
-		BG_CORE_TRACE("    {0} resources", resources.sampled_images.size());
+			BG_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), m_FilePath);
+			BG_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
+			BG_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
-		BG_CORE_TRACE("Uniform buffers:");
-		for (const auto& resource : resources.uniform_buffers)
-		{
-			const auto& bufferType = compiler.get_type(resource.base_type_id);
-			uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
-			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			int memberCount = bufferType.member_types.size();
+			BG_CORE_TRACE("Uniform buffers:");
+			for (const auto& resource : resources.uniform_buffers)
+			{
+				const auto& bufferType = compiler.get_type(resource.base_type_id);
+				uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+				int memberCount = bufferType.member_types.size();
 
-			BG_CORE_TRACE("  {0}", resource.name);
-			BG_CORE_TRACE("    Size = {0}", bufferSize);
-			BG_CORE_TRACE("    Binding = {0}", binding);
-			BG_CORE_TRACE("    Members = {0}", memberCount);
-		}
-
-		BG_CORE_TRACE("Storage Images:");
-		for (const auto& resource : resources.storage_images)
-		{
-			std::string resourceName = compiler.get_name(resource.id);
-			if (resourceName.empty()) {
-				BG_CORE_WARN("Warning: Storage image has an empty or missing name.");
-				resourceName = "[Unnamed]";
+				BG_CORE_TRACE("  {0}", resource.name);
+				BG_CORE_TRACE("    Size = {0}", bufferSize);
+				BG_CORE_TRACE("    Binding = {0}", binding);
+				BG_CORE_TRACE("    Members = {0}", memberCount);
 			}
 
-			BG_CORE_TRACE("Storage Image: {0}", resourceName);
-		}
+			BG_CORE_TRACE("Storage Images:");
+			for (const auto& resource : resources.storage_images)
+			{
+				std::string resourceName = compiler.get_name(resource.id);
+				if (resourceName.empty()) {
+					BG_CORE_WARN("Warning: Storage image has an empty or missing name.");
+					resourceName = "[Unnamed]";
+				}
 
-		for (const auto& resource : resources.storage_buffers)
-		{
-			std::string resourceName = compiler.get_name(resource.id);
-
-			// Debug the storage buffer properties
-			BG_CORE_TRACE("Storage Buffer ID: {0}", resource.id);
-			BG_CORE_TRACE("Storage Buffer Base Type ID: {0}", resource.base_type_id);
-
-			if (resourceName.empty()) {
-				BG_CORE_WARN("Warning: Storage buffer has an empty or missing name.");
-				resourceName = "[Unnamed]";
+				BG_CORE_TRACE("Storage Image: {0}", resourceName);
 			}
 
-			BG_CORE_TRACE("Storage Buffer: {0}", resourceName);
+			for (const auto& resource : resources.storage_buffers)
+			{
+				std::string resourceName = compiler.get_name(resource.id);
+
+				// Debug the storage buffer properties
+				BG_CORE_TRACE("Storage Buffer ID: {0}", resource.id);
+				BG_CORE_TRACE("Storage Buffer Base Type ID: {0}", resource.base_type_id);
+
+				if (resourceName.empty()) {
+					BG_CORE_WARN("Warning: Storage buffer has an empty or missing name.");
+					resourceName = "[Unnamed]";
+				}
+
+				BG_CORE_TRACE("Storage Buffer: {0}", resourceName);
+			}
 		}
+		catch (...) {
+			BG_CORE_ERROR("Error compiling shader data!");
+			success = false;
+		}
+
+		return success;
 	}
 
 	void OpenGLShader::Bind() const

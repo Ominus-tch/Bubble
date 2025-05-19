@@ -234,7 +234,7 @@ namespace Bubble {
 				{
 					const auto& [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
-					Renderer2D::DrawMesh(transform.GetTransform(), mesh, (int)entity);
+					Renderer2D::DrawMesh(transform.GetTransform(), &mesh, (int)entity);
 				}
 			}
 
@@ -538,8 +538,7 @@ namespace Bubble {
 			for (const auto& entity : view)
 			{
 				const auto& [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-
-				Renderer2D::DrawMesh(transform.GetTransform(), mesh, (int)entity);
+				Renderer2D::DrawMesh(transform.GetTransform(), &mesh, (int)entity);
 			}
 		}
 

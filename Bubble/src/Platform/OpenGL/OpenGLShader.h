@@ -19,6 +19,7 @@ namespace Bubble {
 		virtual void Unbind() const override;
 
 		virtual const std::string& GetName() const override { return m_Name; }
+		virtual const std::string& GetPath() const override { return m_FilePath; }
 
 		virtual void SetBool(const std::string& name, bool value) override;
 		virtual void SetInt(const std::string& name, int value) override;
@@ -33,6 +34,8 @@ namespace Bubble {
 		virtual void SetBuffer(uint32_t slot, const std::string& name, const Ref<ComputeBuffer>& buffer) override;
 		virtual void SetTexture(uint32_t slot, const std::string& name, const Ref<Texture2D>& texture) override;
 		virtual void SetUniformBuffer(const std::string& name, const Ref<UniformBuffer>& buffer) override;
+
+		virtual bool Recompile() override;
 
 		virtual void TestFunction() override;
 	private:
@@ -50,10 +53,10 @@ namespace Bubble {
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<UINT, std::string> PreProcess(const std::string& source);
 
-		void CompileOrGetVulkanBinaries(const std::unordered_map<UINT, std::string>& shaderSources);
-		void CompileOrGetOpenGLBinaries();
-		void CreateProgram();
-		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
+		bool CompileOrGetVulkanBinaries(const std::unordered_map<UINT, std::string>& shaderSources);
+		bool CompileOrGetOpenGLBinaries();
+		bool CreateProgram();
+		bool Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) const;
 	private:
 		uint32_t m_RendererID;
 		std::string m_FilePath;

@@ -1,0 +1,8 @@
+Material:
+  Name: "DefaultGray"
+  Path: "SandboxProject/Assets/Materials/DefaultGray.bmat"
+  Shader:
+    Path: "assets/shaders/FlatColor.glsl"
+  Uniforms:
+    vec4:
+      u_Color: [0.5, 0.5, 0.5, 1.0]

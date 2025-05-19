@@ -57,4 +57,38 @@ namespace Bubble {
 		static Ref<Texture2D> Create(const std::string& path);
 	};
 
+	class TextureLibrary
+	{
+	public:
+		static void Add(const std::string& pathOrName, Ref<Texture> texture)
+		{
+			m_Textures[pathOrName] = texture;
+		}
+
+		static bool Has(const std::string& pathOrName)
+		{
+			return m_Textures.find(pathOrName) != m_Textures.end();
+		}
+
+		static Ref<Texture> Get(const std::string& pathOrName)
+		{
+			if (Has(pathOrName))
+				return m_Textures[pathOrName];
+			return nullptr;
+		}
+
+		static std::unordered_map<std::string, Ref<Texture>> GetTextures()
+		{
+			return m_Textures;
+		}
+
+		static Ref<Texture2D> Get2D(const std::string& pathOrName)
+		{
+			return std::dynamic_pointer_cast<Texture2D>(Get(pathOrName));
+		}
+
+	private:
+		static std::unordered_map<std::string, Ref<Texture>> m_Textures;
+	};
+
 }

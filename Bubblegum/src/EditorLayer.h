@@ -79,6 +79,16 @@ namespace Bubble {
 		glm::vec2 m_ViewportBounds[2];
 
 		// App
+		Entity m_Ship;
+		glm::vec3 m_ShipTurning = { 0.f, 20.f, 0.f };
+		glm::vec3 m_DebugVals = {0.f, 0.f, 0.f};
+
+		int m_ControllingCannon = 0;
+
+		glm::vec2 m_LCannonRot = { 0.f, 0.f };
+		glm::vec2 m_RCannonRot = { 0.f, 0.f };
+		float m_CannonSpeed = 30.f;
+
 
 		ShaderLibrary m_ShaderLib;
 

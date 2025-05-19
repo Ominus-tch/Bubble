@@ -29,6 +29,9 @@ namespace Bubble {
 	{
 		m_Context = context;
 		m_SelectionContext = {};
+
+		m_DirectoryIcon = Texture2D::Create("Resources/Icons/ContentBrowser/DirectoryIcon.png");
+		m_FileIcon = Texture2D::Create("Resources/Icons/ContentBrowser/FileIcon.png");
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -62,6 +65,11 @@ namespace Bubble {
 		{
 			DrawComponents(m_SelectionContext);
 		}
+		else if (!m_SelectedDirectoryEntry.empty())
+		{
+			DrawDirectoryEntry(m_SelectedDirectoryEntry);
+		}
+
 
 		ImGui::End();
 	}
@@ -73,7 +81,6 @@ namespace Bubble {
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		static std::map<uint32_t, bool> selectionPending;
 
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		uint32_t entityID = (uint32_t)entity;
@@ -89,7 +96,7 @@ namespace Bubble {
 		if (itemClicked && !isDragging)
 		{
 			// Set the flag indicating that we intend to select this item
-			selectionPending[entityID] = true;
+			m_SelectionPending[entityID] = true;
 		}
 
 		// Start drag-and-drop operation
@@ -98,7 +105,7 @@ namespace Bubble {
 			ImGui::SetDragDropPayload("ENTITY", &entityID, sizeof(uint32_t));
 
 			// Reset the selection flag because we're dragging, not selecting
-			selectionPending[entityID] = false;
+			m_SelectionPending[entityID] = false;
 
 			// Optional: ImGui::Image((ImTextureID)icon->GetRendererID(), { thumbnailSize * 0.2f, thumbnailSize * 0.2f }, { 0, 1 }, { 1, 0 });
 
@@ -106,10 +113,10 @@ namespace Bubble {
 		}
 
 		// If the mouse button was released and we were not dragging, select the item
-		if (selectionPending[entityID] && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		if (m_SelectionPending[entityID] && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 		{
 			m_SelectionContext = entity;
-			selectionPending[entityID] = false; // Reset the selection flag
+			m_SelectionPending[entityID] = false; // Reset the selection flag
 		}
 
 		bool entityDeleted = false;
@@ -645,15 +652,58 @@ namespace Bubble {
 					ImGui::EndDragDropTarget();
 				}
 
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+
+				for (int i = 0; i < component.Materials.size(); i++)
+				{
+					const auto& material = component.Materials[i];
+					if (ImGui::TreeNodeEx((void*)material.get(), flags, "Material #%d", i + 1))
+					{
+						std::string name = material->GetPath();
+						if (name.empty())
+							name = material->GetName();
+
+
+						Ref<Shader> matShader = material->GetShader();
+						std::string shaderPath = "No shader";
+						if (matShader)
+							shaderPath = material->GetShader()->GetPath();
+
+
+						if (ImGui::Button("Material", ImVec2(100.0f, 0.0f)))
+						{
+							std::string filepath = FileDialogs::OpenFile("Texture File (*.png;*.bmat)\0*.png;*.bmat\0");
+							if (!filepath.empty())
+							{
+								component.SwitchMaterial(name, filepath);
+							}
+						}
+						if (ImGui::BeginDragDropTarget())
+						{
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+							{
+								const wchar_t* path = (const wchar_t*)payload->Data;
+								std::filesystem::path materialPath(path);
+								component.SwitchMaterial(name, materialPath.string());
+								//BG_WARN("Could not load texture {0}", texturePath.filename().string());
+							}
+							ImGui::EndDragDropTarget();
+						}
+
+						ImGui::Text("Name: %s", name.c_str());
+						ImGui::Text("Shader path: %s", shaderPath.c_str());
+
+						ImGui::TreePop();
+					}
+				}
+
 				ImGui::Checkbox("Draw Mesh", &component.DrawMesh);
 				ImGui::Checkbox("Draw Wireframe", &component.DrawWireframe);
-
-				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
 
 				for (int i = 0; i < component.Meshes.size(); i++)
 				{
 					const auto& mesh = component.Meshes[i];
-					if (ImGui::TreeNodeEx((void*)mesh.get(), flags, "Mesh Part #%d", i))
+					if (ImGui::TreeNodeEx((void*)mesh.get(), flags, "Mesh Part #%d", i+1))
 					{
 						glm::vec3 translation = mesh->GetTranslation();
 						glm::vec3 rotation = glm::degrees(mesh->GetRotation());
@@ -672,6 +722,73 @@ namespace Bubble {
 					}
 				}
 			});
+
+		//DrawComponent<MaterialComponent>("Material", entity, [](MaterialComponent& component)
+		//	{
+		//		if (ImGui::Button("Material", ImVec2(100.0f, 0.0f)))
+		//		{
+		//			std::string filepath = FileDialogs::OpenFile("Texture File (*.png;*.bmat)\0*.png;*.bmat\0");
+		//			if (!filepath.empty())
+		//			{
+		//				component.AddMaterial(filepath);
+		//			}
+		//		}
+		//		if (ImGui::BeginDragDropTarget())
+		//		{
+		//			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+		//			{
+		//				const wchar_t* path = (const wchar_t*)payload->Data;
+		//				std::filesystem::path modelPath(path);
+		//				component.AddMaterial(modelPath.string());
+		//				//BG_WARN("Could not load texture {0}", texturePath.filename().string());
+		//			}
+		//			ImGui::EndDragDropTarget();
+		//		}
+
+		//		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		//		for (int i = 0; i < component.Materials.size(); i++)
+		//		{
+		//			const auto& material = component.Materials[i];
+		//			if (ImGui::TreeNodeEx((void*)material.get(), flags, "Material #%d", i+1))
+		//			{
+		//				const std::string& name = material->GetName();
+
+		//				Ref<Shader> matShader = material->GetShader();
+		//				std::string shaderPath = "No shader";
+		//				if (matShader)
+		//					shaderPath = material->GetShader()->GetPath();
+
+		//				ImGui::Text("Name: %s", name.c_str());
+		//				ImGui::Text("Shader path: %s", shaderPath.c_str());
+
+		//				ImGui::TreePop();
+		//			}
+		//		}
+		//	});
+	}
+
+	void SceneHierarchyPanel::DrawDirectoryEntry(const std::string& directoryPath)
+	{
+		std::string iconPathName = directoryPath;
+		std::filesystem::path path = directoryPath;
+
+		if (!TextureLibrary::Has(iconPathName))
+			iconPathName = std::filesystem::is_directory(path) ? 
+				"Resources/Icons/ContentBrowser/DirectoryIcon.png" : 
+				"Resources/Icons/ContentBrowser/FileIcon.png";
+
+		Ref<Texture2D> icon = TextureLibrary::Get2D(iconPathName);
+		if (icon)
+			ImGui::Image((ImTextureID)icon->GetRendererID(), { 128.0f * 0.2f, 128.0f * 0.2f }, { 0, 1 }, { 1, 0 });
+
+
+		const std::string& extension = path.extension().string();
+
+		ImGui::SameLine();
+		ImGui::Text("%s", path.filename().string().c_str());
+
+		ImGui::Separator();
 	}
 
 	template<typename T>

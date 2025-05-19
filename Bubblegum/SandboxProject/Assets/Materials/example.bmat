@@ -1,0 +1,16 @@
+Material:
+	Path: ...
+	Shader:
+		Path: ...
+	Textures:
+		- Texture: {texture_path_here}
+			// Other texture info, width, height, unit
+		- Texture: {texture_path_here}
+			// Other texture info, width, height, unit
+	// All uniforms
+	// Fix
+	UniformBuffers:
+		- Uniforms0: // {name}{binding}
+				vec4:
+					u_Color: [0.5, 0.5, 0.5, 1.0]
+

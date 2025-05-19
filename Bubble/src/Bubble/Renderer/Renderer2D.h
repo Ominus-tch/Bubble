@@ -3,6 +3,7 @@
 #include "Bubble/Renderer/OrthographicCamera.h"
 
 #include "Bubble/Renderer/Texture.h"
+#include "Bubble/Renderer/Material.h"
 #include "Bubble/Renderer/SubTexture2D.h"
 
 #include "Bubble/Renderer/Camera.h"
@@ -27,6 +28,7 @@ namespace Bubble {
 		static void Flush();
 
 		static void DrawCube(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color = glm::vec4(1.f));
+		static void DrawRotatedCube(const glm::vec3& position, const glm::vec3& size, const glm::vec3& rotation, const glm::vec4& color = glm::vec4(1.f));
 		static void DrawCubeOutlines(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color = glm::vec4(0.f, 0.f, 0.f, 1.f));
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec3& rotation, const glm::vec4& color = glm::vec4(1.f));
 
@@ -77,8 +79,9 @@ namespace Bubble {
 		static void DrawFrustum(const TransformComponent& tc, const SceneCamera& camera, int entityID = -1);
 
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& src, int entityID);
-		static void DrawMesh(const glm::mat4& transform, const MeshComponent& mesh, int entityID);
-		static void DrawMeshWireframe(const glm::mat4& transform, const MeshComponent& mesh, int entityID);
+
+		static void DrawMesh(const glm::mat4& transform, const MeshComponent* mesh, int entityID);
+		static void DrawMeshWireframe(const glm::mat4& transform, const MeshComponent* mesh, int entityID);
 
 		struct TextParams
 		{
